@@ -196,3 +196,4 @@ See github project at https://github.com/users/AliciaAMT/projects/3
 ## Dev Log
 Mon, June 16 2025
 - tweaking home page colors and layout
+- login/create account
