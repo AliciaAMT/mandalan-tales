@@ -20,5 +20,12 @@ export const routes: Routes = [
     path: 'legal',
     loadComponent: () =>
       import('./legal/legal.component').then(m => m.LegalComponent),
-  }
+  },
+  {
+    path: 'login',
+    loadComponent: () =>
+      import('./login/login.component').then(m => m.LoginComponent),
+  },
+  
+
 ];
