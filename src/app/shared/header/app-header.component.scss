@@ -1,0 +1,30 @@
+ion-toolbar {
+  --background: var(--step-50);
+  --color: var(--ion-color-primary);
+  color: var(--ion-color-primary); // fallback for inner elements
+}
+
+ion-title {
+  color: var(--ion-color-primary);
+}
+
+ion-button,
+ion-menu-button {
+  color: var(--ion-color-primary);
+}
+ion-title {
+  display: flex;
+  align-items: center;
+  gap: 3rem; // spacing between icon and text
+}
+
+.header-icon {
+  height: 2.5rem;  // match approximate font height
+  width: auto;
+  display: inline-block;
+  vertical-align: middle;
+  margin: 0.5rem;
+  margin-right: 2rem;
+  border-radius: 10px;
+  box-shadow: 0 0 12px rgba(255, 215, 0, 0.3);
+}

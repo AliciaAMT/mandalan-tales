@@ -193,4 +193,6 @@ See github project at https://github.com/users/AliciaAMT/projects/3
 `npm install @capacitor/core @capacitor/cli`
 `npx @capacitor/assets generate`
 
-
+## Dev Log
+Mon, June 16 2025
+- tweaking home page colors and layout
