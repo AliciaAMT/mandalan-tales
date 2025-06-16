@@ -1,6 +1,6 @@
 import { Component} from '@angular/core';
 import { AppHeaderComponent } from "../shared/header/app-header.component";
-import { IonContent} from "@ionic/angular/standalone";
+import { IonContent } from "@ionic/angular/standalone";
 import { AppFooterComponent } from "../shared/footer/app-footer.component";
 
 @Component({

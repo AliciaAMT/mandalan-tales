@@ -10,10 +10,8 @@ import { AppFooterComponent } from "../shared/footer/app-footer.component";
   standalone: true,
   imports: [AppHeaderComponent, AppFooterComponent, IonContent],
 })
-export class ContactComponent  implements OnInit {
+export class ContactComponent {
 
-  constructor() { }
-
-  ngOnInit() {}
+  currentYear: number = new Date().getFullYear();
 
 }
