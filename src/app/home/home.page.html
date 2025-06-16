@@ -1,20 +1,59 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>
-      Blank
-    </ion-title>
+<ion-header>
+  <ion-toolbar color="step-50">
+    <ion-title>Mandalan Tales</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Blank</ion-title>
-    </ion-toolbar>
-  </ion-header>
-
-  <div id="container">
-    <strong>Ready to create an app?</strong>
-    <p>Start with Ionic <a target="_blank" rel="noopener noreferrer" href="https://ionicframework.com/docs/components">UI Components</a></p>
+<ion-content class="home-content fullscreen ion-padding">
+  <div class="hero">
+    <div class="logo-wrapper">
+      <img src="assets/icon.png" alt="Mandalan Tales Logo" class="hero-logo" />
+    </div>
+    <h1>Awaken in a world not your own</h1>
+    <p class="tagline">Survive. Discover. Create.</p>
+    <ion-button expand="block" color="secondary" routerLink="/profile/characters/create">
+      Start Your Journey
+    </ion-button>
   </div>
+
+  <ion-card class="feature-card">
+    <ion-card-header>
+      <ion-card-title>Accessible Gameplay</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      Designed with inclusive controls and screen reader support for all players.
+    </ion-card-content>
+  </ion-card>
+
+  <ion-card class="feature-card">
+    <ion-card-header>
+      <ion-card-title>Story-Rich World</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      Explore a world crafted with deep lore, reactive quests, and engaging NPCs.
+    </ion-card-content>
+  </ion-card>
+
+  <ion-card class="feature-card">
+    <ion-card-header>
+      <ion-card-title>Create New Realms</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      Win the game to unlock the power of world-building and shape your own adventures.
+    </ion-card-content>
+  </ion-card>
+  <section class="screenshots">
+    <h2>In-Game Preview</h2>
+    <div class="screenshot-gallery">
+      <img src="assets/screenshot.png" alt="Gameplay screenshot 1" />
+      <img src="assets/screenshot2.png" alt="Gameplay screenshot 2" />
+    </div>
+  </section>
 </ion-content>
+
+<ion-footer>
+  <ion-toolbar>
+    <ion-title size="small">&copy; {{ currentYear }} Accessible Web Media</ion-title>
+
+  </ion-toolbar>
+</ion-footer>

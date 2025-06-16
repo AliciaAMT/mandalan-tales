@@ -190,5 +190,7 @@ See github project at https://github.com/users/AliciaAMT/projects/3
 `npx cap add android`
 `npx cap add ios`
 `npm install`
+`npm install @capacitor/core @capacitor/cli`
+`npx @capacitor/assets generate`
 
 
