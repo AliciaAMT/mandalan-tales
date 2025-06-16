@@ -1,0 +1,9 @@
+      - Audio
+        - Graphics
+           - Sprites
+           - Tiles
+             - Backgrounds
+             - Textures
+             - Objects
+           - Scenes
+        - Fonts

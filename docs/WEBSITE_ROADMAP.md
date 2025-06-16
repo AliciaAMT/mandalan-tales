@@ -1,0 +1,15 @@
+- [ ] Website Prototyping
+    - [ ] Splash Page
+    - [ ] Landing Page
+    - [ ] Onboarding
+    - [ ] Login/Registration
+    - [ ] Admin Panel
+    - [ ] Account Management
+    - [ ] Profile
+    - [ ] Settings
+    - [ ] Character Creation
+    - [ ] Character Management
+    - [ ] Character Selection
+    - [ ] Setting the Scene
+    - [ ] Home (Game)
+    
