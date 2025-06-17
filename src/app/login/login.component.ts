@@ -7,15 +7,13 @@ import { Component } from '@angular/core';
 import { AuthService } from '../services/auth.service'; // update path if needed
 import { Router } from '@angular/router';
 import { NgIf } from "@angular/common";
-import { CommonModule } from '@angular/common';
 
-import { IonicModule } from '@ionic/angular';
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
   standalone: true,
-  imports: [IonCard, IonCardTitle, IonCardHeader,  IonButton, IonInput, IonLabel, IonItem, IonList, IonContent, AppHeaderComponent, AppFooterComponent, FormsModule, IonText, NgIf, IonicModule, CommonModule],
+  imports: [IonCard, IonCardTitle, IonCardHeader,  IonButton, IonInput, IonLabel, IonItem, IonList, IonContent, AppHeaderComponent, AppFooterComponent, FormsModule, IonText, NgIf],
 })
 export class LoginComponent {
   email = '';
