@@ -105,101 +105,99 @@ app-footer {
     top: 0;
   }
 }
-// ion-item {
-//   --background: transparent;  // let input background show through
-//   --ion-item-background: transparent; // Ionic override
-//   background: transparent;
-//   --highlight-color-focused: #e6c265;
-//   --min-height: 64px;
-//   border: 1px solid #333;
-//   border-radius: 6px;
-//   margin-bottom: 1rem;
-//   padding: 0 8px;
-//   box-shadow: 0 0 4px rgba(255, 215, 0, 0.1);
-//   transition: box-shadow 0.3s ease;
-// }
-
-// ion-item.ion-focused {
-//   box-shadow: 0 0 8px rgba(255, 215, 0, 0.3);
-//   border-color: #e6c265;
-// }
-
-// ion-input {
-//   --background: #000 !important;  // ✅ force black field bg
-//   --color: #fff;
-//   background: #000 !important;    // backup if --background is ignored
-//   --color: #fff;
-//   font-size: 1rem;
-//   padding: 0.5rem 0;
-// }
-
-// ion-label {
-//   color: #f5d97e;
-//   font-size: 0.95rem;
-//   font-weight: 500;
-// }
-// ion-item.ion-focused {
-//   box-shadow: inset 0 -2px 0 #e6c265;
-// }
 ion-content {
   --background: #000;
   color: #fff;
 }
 
-/* Login card frame */
+/* Login card */
 .login-card {
+  background: linear-gradient(to bottom, #111, #000);
   border: 1px solid #c8a34d;
   border-radius: 10px;
   padding: 1.5rem;
-  background: linear-gradient(to bottom, #111, #000);
-  box-shadow: 0 0 16px rgba(255, 215, 0, 0.35);
+  box-shadow: 0 0 12px rgba(255, 215, 0, 0.3);
   margin-top: 2rem;
 }
 
-// /* Input wrapper */
-// ion-item {
-//   --background: #000;
-//   --border-color: transparent;
-//   border: none;
-//   border-radius: 6px;
-//   padding: 0;
-//   margin-bottom: 1.25rem;
-//   box-shadow: 0 0 4px rgba(255, 215, 0, 0.15);
-//   transition: box-shadow 0.3s ease;
-// }
+/* List wrapper */
+ion-list {
+  padding: 0;
+  margin: 0;
+  background: transparent;
+}
 
-// ion-item.ion-focused {
-//   box-shadow: 0 0 6px rgba(255, 215, 0, 0.35);
-// }
+/* Field container */
+ion-item {
+  --background: transparent !important;
+  --ion-item-background: transparent !important;
+  background: transparent !important;
+  border: 1px solid #e6c265;
+  border-radius: 6px;
+  margin-bottom: 1rem;
+  padding: 0.75rem 1rem;
+  --inner-border-width: 0;
+  box-shadow: none !important;
+}
 
-/* Label styling */
+ion-item.ion-focused {
+  border-color: #f5d97e;
+  box-shadow: 0 0 6px rgba(255, 215, 0, 0.4);
+}
+
+/* Field label */
 ion-label {
   color: #f5d97e;
   font-size: 0.95rem;
-  font-weight: 600;
+  font-weight: 500;
   padding-bottom: 0.2rem;
 }
 
-// /* Input styling */
-// ion-input {
-//   --color: #fff;
-//   --placeholder-color: #aaa;
-//   --background: transparent;
-//   font-size: 1rem;
-//   padding: 0.5rem 0;
-//   border: none;
-// }
+/* Style input inside ion-input properly */
+ion-input {
+  --background: transparent;
+  --color: #fff;
+  font-size: 1rem;
+}
 
-/* Button styling */
+/* 💥 Fix the native HTML input field */
+::ng-deep ion-input input {
+  background-color: #000 !important;
+  color: #fff !important;
+  border: none !important;
+  box-shadow: none !important;
+  caret-color: #f5d97e;
+}
+
+/* Autofill fix (Chrome, Edge) */
+input:-webkit-autofill {
+  background-color: #000 !important;
+  box-shadow: 0 0 0px 1000px #000 inset !important;
+  -webkit-text-fill-color: #fff !important;
+  caret-color: #f5d97e !important;
+}
+
+/* Autofill fix (Firefox) */
+input:-moz-autofill {
+  box-shadow: 0 0 0px 1000px #000 inset !important;
+  color: #fff !important;
+}
+
+/* Remove underline from ion-item */
+::ng-deep ion-item::after {
+  display: none !important;
+}
+
+/* Login button */
 ion-button {
   --background: #c8a34d;
   --color: #000;
-  font-weight: bold;
   --border-radius: 6px;
-  margin-top: 0.5rem;
+  font-weight: bold;
+  margin-top: 1rem;
 }
 
-/* Bottom links */
+/* Links below form */
 .login-links {
   margin-top: 2rem;
   text-align: center;
@@ -212,140 +210,28 @@ ion-button {
     margin-top: 0.5rem;
   }
 }
-
-/* Optional: spacing for mobile */
-@media screen and (max-width: 480px) {
-  .login-card {
-    padding: 1rem;
-  }
-}
-:host ::ng-deep ion-input {
-  --background: #000 !important;
-  background: #000 !important;
-}
-input:-webkit-autofill {
-  box-shadow: 0 0 0px 1000px #000 inset !important;
-  -webkit-text-fill-color: #fff !important;
-}
-
-
-
-
-ion-item {
-  --background: #000 !important;
-  --highlight-color-focused: #e6c265;
-  --inner-border-width: 0;
-  --padding-start: 0;
-  --min-height: 64px;
-  border: none;
-  margin-bottom: 1.25rem;
-  border-radius: 6px;
-  box-shadow: 0 0 8px rgba(255, 215, 0, 0.2);
-  transition: box-shadow 0.3s ease;
-}
-
-ion-item.ion-focused {
-  box-shadow: 0 0 12px rgba(255, 215, 0, 0.35);
-}
-
-ion-input {
-  --padding-start: 0.5rem;
-  --color: #fff;
-  --placeholder-color: #aaa;
-  --background: #000 !important;
-  background: #000 !important; /* fallback */
-  font-size: 1rem;
-}
-
-/* This targets the real input inside the shadow DOM */
-
-/* Force black background on actual native input */
-::ng-deep ion-input input {
+::ng-deep ion-input::part(native-input) {
   background-color: #000 !important;
   color: #fff !important;
+  box-shadow: none !important;
+  border: none !important;
   caret-color: #f5d97e;
-  border: none !important;
 }
-
-/* Optional: adjust autofill highlight */
-input:-webkit-autofill {
-  box-shadow: 0 0 0px 1000px #000 inset !important;
-  -webkit-text-fill-color: #fff !important;
-}
-ion-item {
-  --background: #000 !important;
-  --inner-border-width: 0;
-  --border-color: transparent;
-  --min-height: 64px;
-  background: #000 !important;
-  border: none !important;
-  border-radius: 6px !important;
-  margin-bottom: 1rem;
-  box-shadow: none !important; /* clear default styling */
-  padding: 0.75rem 1rem;
-  transition: border 0.2s, box-shadow 0.2s;
-}
-
-ion-item.ion-focused {
-  border: 1px solid #e6c265 !important;
-  box-shadow: 0 0 6px rgba(255, 215, 0, 0.3) !important;
-}
-ion-list {
-  padding: 0;
-  margin: 0;
-}
-input:-webkit-autofill {
+/* Fix autofill background leak in email fields (Chrome) */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  background-color: #000 !important;
+  -webkit-box-shadow: 0 0 0 1000px #000 inset !important;
   box-shadow: 0 0 0 1000px #000 inset !important;
   -webkit-text-fill-color: #fff !important;
+  color: #fff !important;
+  caret-color: #f5d97e !important;
+  border: none !important;
 }
-ion-item {
-  --background: #000 !important;
-  --inner-border-width: 0;
-  --border-color: transparent;
-  --min-height: 64px;
-  background: #000 !important;
-  border: 1px solid #e6c265 !important; /* 🟨 Gold border around fields */
-  border-radius: 6px;
-  margin-bottom: 1.25rem;
-  box-shadow: none !important;
-  padding: 0.75rem 1rem;
-  transition: border 0.2s, box-shadow 0.2s;
-}
-
-ion-item.ion-focused {
-  border: 1px solid #f5d97e !important;
-  box-shadow: 0 0 6px rgba(255, 215, 0, 0.35) !important;
-}
-
-/* Fixes internal native input shadow */
-::ng-deep ion-input input {
+input:-moz-autofill {
+  box-shadow: 0 0 0px 1000px #000 inset !important;
   background-color: #000 !important;
   color: #fff !important;
-  caret-color: #f5d97e;
-  border: none !important;
-  box-shadow: none !important;
-}
-ion-item {
-  --background: transparent !important;
-  --ion-item-background: transparent !important;
-  background: transparent !important;
-  border: 1px solid #e6c265 !important;
-  border-radius: 6px;
-  margin-bottom: 1.25rem;
-  padding: 0.75rem 1rem;
-  box-shadow: none !important;
-}
-ion-list {
-  padding: 0 !important;
-  margin: 0 !important;
-  background: transparent !important;
-}
-::ng-deep ion-input input {
-  background-color: transparent !important;
-  color: #fff !important;
-  border: none !important;
-  box-shadow: none !important;
-}
-::ng-deep ion-item::after {
-  display: none !important;
 }

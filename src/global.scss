@@ -40,3 +40,19 @@ ion-content {
   background: #000000; // fallback for inner divs
   color: var(--ion-color-primary); // if you want gold text
 }
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  box-shadow: 0 0 0px 1000px #000 inset !important;
+  -webkit-text-fill-color: #fff !important;
+  background-color: #000 !important;
+  caret-color: #f5d97e !important;
+  border: none !important;
+}
+
+input:-moz-autofill {
+  box-shadow: 0 0 0px 1000px #000 inset !important;
+  color: #fff !important;
+  background-color: #000 !important;
+}
