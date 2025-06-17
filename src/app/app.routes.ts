@@ -3,6 +3,7 @@ import { Routes } from '@angular/router';
 export const routes: Routes = [
   {
     path: '',
+    pathMatch: 'full',
     loadComponent: () => import('./home/home.page').then(m => m.HomePage)
 
   },
@@ -26,6 +27,10 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./login/login.component').then(m => m.LoginComponent),
   },
-  
+  {
+    path: 'create-account',
+    loadComponent: () =>
+      import('./create-account/create-account.component').then(m => m.CreateAccountComponent)
+  }
 
 ];

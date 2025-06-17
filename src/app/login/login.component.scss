@@ -66,17 +66,22 @@
 // }
 
 /* Bottom links */
-.login-links {
-  margin-top: 2rem;
-  text-align: center;
-  font-size: 0.95rem;
+.login-links a {
+  color: #e6c265;
+  text-decoration: underline;
+  cursor: pointer;
+  display: inline-block;
+  margin-top: 0.5rem;
+  font-weight: 500;
+  transition: color 0.2s ease;
+  pointer-events: auto !important;
+  z-index: 10 !important;
+  position: relative;
+}
 
-  a {
-    color: #e6c265;
-    text-decoration: underline;
-    display: inline-block;
-    margin-top: 0.5rem;
-  }
+.login-links a:hover {
+  color: #fff;
+  text-decoration: underline;
 }
 .flex-page {
   display: flex;
@@ -234,4 +239,7 @@ input:-moz-autofill {
   box-shadow: 0 0 0px 1000px #000 inset !important;
   background-color: #000 !important;
   color: #fff !important;
+}
+.flex-page, ion-content {
+  pointer-events: auto; // should NOT be 'none'
 }

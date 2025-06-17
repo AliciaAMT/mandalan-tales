@@ -1,22 +1,39 @@
-import { Component, OnInit } from '@angular/core';
+
 import { AppHeaderComponent } from "../shared/header/app-header.component";
 import { IonContent, IonList, IonTitle, IonHeader, IonToolbar, IonItem, IonLabel, IonInput, IonButton, IonText, IonCardHeader, IonCardTitle, IonCard } from "@ionic/angular/standalone";
 import { AppFooterComponent } from "../shared/footer/app-footer.component";
 import { FormsModule } from '@angular/forms';
+import { Component } from '@angular/core';
+import { AuthService } from '../services/auth.service'; // update path if needed
+import { Router } from '@angular/router';
+import { NgIf } from "@angular/common";
+import { CommonModule } from '@angular/common';
 
+import { IonicModule } from '@ionic/angular';
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
   standalone: true,
-  imports: [IonCard, IonCardTitle, IonCardHeader,  IonButton, IonInput, IonLabel, IonItem, IonList, IonContent, AppHeaderComponent, AppFooterComponent, FormsModule],
+  imports: [IonCard, IonCardTitle, IonCardHeader,  IonButton, IonInput, IonLabel, IonItem, IonList, IonContent, AppHeaderComponent, AppFooterComponent, FormsModule, IonText, NgIf, IonicModule, CommonModule],
 })
 export class LoginComponent {
   email = '';
   password = '';
+  error: string | null = null;
+
+  constructor(private authService: AuthService, private router: Router) {}
 
   login() {
-    console.log('Logging in:', this.email, this.password);
+    this.error = null;
+    this.authService.login(this.email, this.password)
+      .then(() => {
+        this.router.navigate(['/dashboard']); // or your post-login route
+      })
+      .catch(err => {
+        this.error = 'Invalid credentials. Please try again.';
+        console.error(err);
+      });
   }
   currentYear: number = new Date().getFullYear();
 }
