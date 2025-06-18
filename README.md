@@ -196,3 +196,8 @@ See github project at https://github.com/users/AliciaAMT/projects/3
 ## Dev Log
 Mon, June 16 2025
 - tweaking home page colors and layout
+
+Wed, June 18 2025
+- fixed the routing... had to import RouterModule
+- working on accessiblity.. .need to implement the accessiblity features from last GPT chat before moving to dashboard. don't forget to clean up login page too
+
