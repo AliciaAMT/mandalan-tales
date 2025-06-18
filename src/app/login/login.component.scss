@@ -243,3 +243,8 @@ input:-moz-autofill {
 .flex-page, ion-content {
   pointer-events: auto; // should NOT be 'none'
 }
+a[routerLink] {
+  position: relative;
+  z-index: 10;
+  pointer-events: auto;
+}
