@@ -15,6 +15,7 @@
    * [Code Comments](#code-comments)
 4. [UI/UX Guidelines](#uiux-guidelines)
 
+   * [Accessibility](#accessibility)
    * [Component Libraries](#component-libraries)
    * [Color Palette](#color-palette)
    * [Typography](#typography)
@@ -66,6 +67,109 @@ The Mandalan Tales Style Guide outlines the conventions and best practices to be
 * Avoid unnecessary comments that only repeat what the code is doing.
 
 ## UI/UX Guidelines
+
+### Accessibility
+# Accessibility & Voice Navigation Style Guide
+
+## Purpose
+This section defines accessibility and voice control standards for all contributors to the Mandalan Tales project. It ensures that all pages are usable by:
+
+- Screen reader users
+- Voice navigation users (Dragon, Google Voice Access, etc.)
+- Keyboard-only and assistive tech users
+
+Accessibility is not an afterthought — it is part of our **design style**.
+
+---
+
+## General Rules
+
+### 1. Unique Labels for Interactive Elements
+- Every clickable/tappable element (buttons, links, form inputs) must have **a unique visible label per page**.
+- Do not reuse labels like "Submit" or "Click here" more than once on the same screen.
+- Remember that header and footer links are always visible — they count!
+
+**✅ Good:**
+```html
+<ion-button>Create Account</ion-button>
+```
+
+**❌ Avoid:**
+```html
+<ion-button>Submit</ion-button>
+<ion-button>Submit</ion-button>
+```
+
+---
+
+### 2. Match `aria-label` to Visible Text
+Voice users say what they see. Use `aria-label` only to reinforce clarity, not to replace text.
+
+**✅ Good:**
+```html
+<ion-button aria-label="Create Account">Create Account</ion-button>
+```
+
+**❌ Avoid:**
+```html
+<ion-button aria-label="Register">Create</ion-button>
+```
+
+---
+
+### 3. Use `aria-describedby` for Errors
+Link error messages to their inputs or to the submit button.
+
+```html
+<ion-text id="form-error" role="alert">Password is required.</ion-text>
+<ion-input aria-describedby="form-error"></ion-input>
+```
+
+---
+
+### 4. Avoid Vague Link Text
+- Links must be descriptive.
+- Never use "Click here" or "More."
+
+**✅ Good:** `View Inventory`  
+**❌ Bad:** `Click here`
+
+---
+
+### 5. All Forms Must Include Skip Link and Landmark Role
+```html
+<a href="#main-content" class="skip-link">Skip to main content</a>
+<div id="main-content" role="main">
+  <!-- Main content or form starts here -->
+</div>
+```
+
+---
+
+### 6. Label CAPTCHA Containers Clearly
+Wrap your reCAPTCHA widget in a labeled region so voice users know what it is.
+
+```html
+<div role="group" aria-label="Robot check">
+  <div class="g-recaptcha" data-sitekey="..."></div>
+</div>
+```
+
+---
+
+## Voice Navigation Notes
+
+- All `aria-label`s must match visible text for reliable voice control.
+- Do **not** depend on "Show Numbers" overlays — these are inconsistent on desktop.
+- Do **not** use duplicate button labels anywhere in the same visual page area.
+- Avoid modals or stacked actions with non-distinct labels (e.g. multiple "OK" buttons).
+
+---
+
+## Reminder
+If you're unsure whether something is voice-friendly, try saying it out loud. If it feels awkward or vague, **label it better**.
+
+All contributors must follow this guide for every page, form, and component added to Mandalan Tales.
 
 ### Component Libraries
 

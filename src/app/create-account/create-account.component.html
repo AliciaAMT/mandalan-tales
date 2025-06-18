@@ -5,7 +5,7 @@
 <div class="flex-page">
   <app-app-header></app-app-header>
 
-
+  <!-- <div class="g-recaptcha" data-sitekey="6LcYP2UrAAAAANpOHNicmadpslJ6_Pq0kfkSiCTC"></div> -->
 
   <ion-content class="ion-padding">
     <ion-card class="login-card" id="main-content" role="main">
@@ -17,15 +17,20 @@
         <ion-list lines="none">
           <ion-item>
             <ion-label position="stacked">Email</ion-label>
-            <ion-input type="email" name="email" [(ngModel)]="email" required autocomplete="email" inputmode="email"></ion-input>
+            <ion-input aria-label="email" type="email" name="email" [(ngModel)]="email" required autocomplete="email" inputmode="email"></ion-input>
           </ion-item>
 
           <ion-item>
             <ion-label position="stacked">Password</ion-label>
-            <ion-input type="password" name="password" [(ngModel)]="password" required autocomplete="new-password"></ion-input>
+            <ion-input
+           aria-label="Password" type="password" name="password" [(ngModel)]="password" required autocomplete="new-password"></ion-input>
           </ion-item>
         </ion-list>
 
+  <!-- ✅ Proper placement & styling -->
+  <div style="display: flex; justify-content: center; margin-top: 1rem;">
+    <div class="g-recaptcha" data-sitekey="6LcYP2UrAAAAANpOHNicmadpslJ6_Pq0kfkSiCTC"></div>
+  </div>
         <ion-button type="submit" expand="block" [disabled]="!registerForm.form.valid">
           Create Account
         </ion-button>
