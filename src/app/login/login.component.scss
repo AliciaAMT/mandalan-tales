@@ -66,185 +66,185 @@
 // }
 
 /* Bottom links */
-.login-links a {
-  color: #e6c265;
-  text-decoration: underline;
-  cursor: pointer;
-  display: inline-block;
-  margin-top: 0.5rem;
-  font-weight: 500;
-  transition: color 0.2s ease;
-  pointer-events: auto !important;
-  z-index: 10 !important;
-  position: relative;
-}
+// .login-links a {
+//   color: #e6c265;
+//   text-decoration: underline;
+//   cursor: pointer;
+//   display: inline-block;
+//   margin-top: 0.5rem;
+//   font-weight: 500;
+//   transition: color 0.2s ease;
+//   pointer-events: auto !important;
+//   z-index: 10 !important;
+//   position: relative;
+// }
 
-.login-links a:hover {
-  color: #fff;
-  text-decoration: underline;
-}
-.flex-page {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-}
+// .login-links a:hover {
+//   color: #fff;
+//   text-decoration: underline;
+// }
+// .flex-page {
+//   display: flex;
+//   flex-direction: column;
+//   min-height: 100vh;
+// }
 
-.page-content {
-  flex: 1 0 auto; /* main grows to fill space */
-}
+// .page-content {
+//   flex: 1 0 auto; /* main grows to fill space */
+// }
 
-app-footer {
-  flex-shrink: 0;
-}
-.skip-link {
-  position: absolute;
-  top: -40px;
-  left: 0;
-  background-color: #000;
-  color: #fff;
-  padding: 8px 12px;
-  z-index: 1000;
-  text-decoration: none;
+// app-footer {
+//   flex-shrink: 0;
+// }
+// .skip-link {
+//   position: absolute;
+//   top: -40px;
+//   left: 0;
+//   background-color: #000;
+//   color: #fff;
+//   padding: 8px 12px;
+//   z-index: 1000;
+//   text-decoration: none;
 
-  &:focus {
-    top: 0;
-  }
-}
-ion-content {
-  --background: #000;
-  color: #fff;
-}
+//   &:focus {
+//     top: 0;
+//   }
+// }
+// ion-content {
+//   --background: #000;
+//   color: #fff;
+// }
 
-/* Login card */
-.login-card {
-  background: linear-gradient(to bottom, #111, #000);
-  border: 1px solid #c8a34d;
-  border-radius: 10px;
-  padding: 1.5rem;
-  box-shadow: 0 0 12px rgba(255, 215, 0, 0.3);
-  margin-top: 2rem;
-}
+// /* Login card */
+// .login-card {
+//   background: linear-gradient(to bottom, #111, #000);
+//   border: 1px solid #c8a34d;
+//   border-radius: 10px;
+//   padding: 1.5rem;
+//   box-shadow: 0 0 12px rgba(255, 215, 0, 0.3);
+//   margin-top: 2rem;
+// }
 
-/* List wrapper */
-ion-list {
-  padding: 0;
-  margin: 0;
-  background: transparent;
-}
+// /* List wrapper */
+// ion-list {
+//   padding: 0;
+//   margin: 0;
+//   background: transparent;
+// }
 
-/* Field container */
-ion-item {
-  --background: transparent !important;
-  --ion-item-background: transparent !important;
-  background: transparent !important;
-  border: 1px solid #e6c265;
-  border-radius: 6px;
-  margin-bottom: 1rem;
-  padding: 0.75rem 1rem;
-  --inner-border-width: 0;
-  box-shadow: none !important;
-}
+// /* Field container */
+// ion-item {
+//   --background: transparent !important;
+//   --ion-item-background: transparent !important;
+//   background: transparent !important;
+//   border: 1px solid #e6c265;
+//   border-radius: 6px;
+//   margin-bottom: 1rem;
+//   padding: 0.75rem 1rem;
+//   --inner-border-width: 0;
+//   box-shadow: none !important;
+// }
 
-ion-item.ion-focused {
-  border-color: #f5d97e;
-  box-shadow: 0 0 6px rgba(255, 215, 0, 0.4);
-}
+// ion-item.ion-focused {
+//   border-color: #f5d97e;
+//   box-shadow: 0 0 6px rgba(255, 215, 0, 0.4);
+// }
 
-/* Field label */
-ion-label {
-  color: #f5d97e;
-  font-size: 0.95rem;
-  font-weight: 500;
-  padding-bottom: 0.2rem;
-}
+// /* Field label */
+// ion-label {
+//   color: #f5d97e;
+//   font-size: 0.95rem;
+//   font-weight: 500;
+//   padding-bottom: 0.2rem;
+// }
 
-/* Style input inside ion-input properly */
-ion-input {
-  --background: transparent;
-  --color: #fff;
-  font-size: 1rem;
-}
+// /* Style input inside ion-input properly */
+// ion-input {
+//   --background: transparent;
+//   --color: #fff;
+//   font-size: 1rem;
+// }
 
-/* 💥 Fix the native HTML input field */
-::ng-deep ion-input input {
-  background-color: #000 !important;
-  color: #fff !important;
-  border: none !important;
-  box-shadow: none !important;
-  caret-color: #f5d97e;
-}
+// /* 💥 Fix the native HTML input field */
+// ::ng-deep ion-input input {
+//   background-color: #000 !important;
+//   color: #fff !important;
+//   border: none !important;
+//   box-shadow: none !important;
+//   caret-color: #f5d97e;
+// }
 
-/* Autofill fix (Chrome, Edge) */
-input:-webkit-autofill {
-  background-color: #000 !important;
-  box-shadow: 0 0 0px 1000px #000 inset !important;
-  -webkit-text-fill-color: #fff !important;
-  caret-color: #f5d97e !important;
-}
+// /* Autofill fix (Chrome, Edge) */
+// input:-webkit-autofill {
+//   background-color: #000 !important;
+//   box-shadow: 0 0 0px 1000px #000 inset !important;
+//   -webkit-text-fill-color: #fff !important;
+//   caret-color: #f5d97e !important;
+// }
 
-/* Autofill fix (Firefox) */
-input:-moz-autofill {
-  box-shadow: 0 0 0px 1000px #000 inset !important;
-  color: #fff !important;
-}
+// /* Autofill fix (Firefox) */
+// input:-moz-autofill {
+//   box-shadow: 0 0 0px 1000px #000 inset !important;
+//   color: #fff !important;
+// }
 
-/* Remove underline from ion-item */
-::ng-deep ion-item::after {
-  display: none !important;
-}
+// /* Remove underline from ion-item */
+// ::ng-deep ion-item::after {
+//   display: none !important;
+// }
 
-/* Login button */
-ion-button {
-  --background: #c8a34d;
-  --color: #000;
-  --border-radius: 6px;
-  font-weight: bold;
-  margin-top: 1rem;
-}
+// /* Login button */
+// ion-button {
+//   --background: #c8a34d;
+//   --color: #000;
+//   --border-radius: 6px;
+//   font-weight: bold;
+//   margin-top: 1rem;
+// }
 
-/* Links below form */
-.login-links {
-  margin-top: 2rem;
-  text-align: center;
-  font-size: 0.95rem;
+// /* Links below form */
+// .login-links {
+//   margin-top: 2rem;
+//   text-align: center;
+//   font-size: 0.95rem;
 
-  a {
-    color: #e6c265;
-    text-decoration: underline;
-    display: inline-block;
-    margin-top: 0.5rem;
-  }
-}
-::ng-deep ion-input::part(native-input) {
-  background-color: #000 !important;
-  color: #fff !important;
-  box-shadow: none !important;
-  border: none !important;
-  caret-color: #f5d97e;
-}
-/* Fix autofill background leak in email fields (Chrome) */
-input:-webkit-autofill,
-input:-webkit-autofill:hover,
-input:-webkit-autofill:focus,
-input:-webkit-autofill:active {
-  background-color: #000 !important;
-  -webkit-box-shadow: 0 0 0 1000px #000 inset !important;
-  box-shadow: 0 0 0 1000px #000 inset !important;
-  -webkit-text-fill-color: #fff !important;
-  color: #fff !important;
-  caret-color: #f5d97e !important;
-  border: none !important;
-}
-input:-moz-autofill {
-  box-shadow: 0 0 0px 1000px #000 inset !important;
-  background-color: #000 !important;
-  color: #fff !important;
-}
-.flex-page, ion-content {
-  pointer-events: auto; // should NOT be 'none'
-}
-a[routerLink] {
-  position: relative;
-  z-index: 10;
-  pointer-events: auto;
-}
+//   a {
+//     color: #e6c265;
+//     text-decoration: underline;
+//     display: inline-block;
+//     margin-top: 0.5rem;
+//   }
+// }
+// ::ng-deep ion-input::part(native-input) {
+//   background-color: #000 !important;
+//   color: #fff !important;
+//   box-shadow: none !important;
+//   border: none !important;
+//   caret-color: #f5d97e;
+// }
+// /* Fix autofill background leak in email fields (Chrome) */
+// input:-webkit-autofill,
+// input:-webkit-autofill:hover,
+// input:-webkit-autofill:focus,
+// input:-webkit-autofill:active {
+//   background-color: #000 !important;
+//   -webkit-box-shadow: 0 0 0 1000px #000 inset !important;
+//   box-shadow: 0 0 0 1000px #000 inset !important;
+//   -webkit-text-fill-color: #fff !important;
+//   color: #fff !important;
+//   caret-color: #f5d97e !important;
+//   border: none !important;
+// }
+// input:-moz-autofill {
+//   box-shadow: 0 0 0px 1000px #000 inset !important;
+//   background-color: #000 !important;
+//   color: #fff !important;
+// }
+// .flex-page, ion-content {
+//   pointer-events: auto; // should NOT be 'none'
+// }
+// a[routerLink] {
+//   position: relative;
+//   z-index: 10;
+//   pointer-events: auto;
+// }

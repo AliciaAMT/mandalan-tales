@@ -1,23 +1,12 @@
-
+<!--
 <a href="#main-content" class="skip-link">Skip to main content</a>
 
-
-  <app-app-header></app-app-header>
-
-
-
+<app-app-header></app-app-header> -->
   <ion-content class="ion-padding">
-    <div style="position: relative; z-index: 999; background: #222; padding: 1rem;">
-
-      <div style="padding: 1rem; z-index: 999; position: relative; background: black;">
-        <a routerLink="/create-account" style="color: gold;">Test link to Create Account</a>
-      </div>
-
-    <ion-card class="login-card" id="main-content" role="main">
+    <!-- <ion-card class="login-card" id="main-content" role="main">
       <ion-card-header>
         <ion-card-title class="login-card-title">Login</ion-card-title>
       </ion-card-header>
-
       <form (ngSubmit)="login()" #loginForm="ngForm">
         <ion-list lines="none">
           <ion-item>
@@ -37,20 +26,20 @@
         <ion-text color="danger" *ngIf="error">{{ error }}</ion-text>
 
       </form>
-    </ion-card>
+    </ion-card> -->
 
-    <div class="login-links">
+    <!-- <div class="login-links"> -->
       <!-- <a routerLink="/forgot-password">Forgot your password?</a> -->
-      <div class="ion-margin-top">
-        New to Mandalan Tales?
-        <a routerLink="/create-account">Create an account and begin your journey!</a>
-      </div>
-    </div>
-    <ion-button fill="clear" routerLink="/create-account">
-      Create an account
-    </ion-button>
+      <!-- <div class="ion-margin-top"> -->
+        <ion-button expand="block" color="primary" routerLink="/create-account">
+          Start Your Journey
+        </ion-button>
+        <!-- New to Mandalan Tales?
+        <a routerLink="/create-account">Create an account and begin your journey!</a> -->
+      <!-- </div>
+    </div> -->
 
-    <app-app-footer></app-app-footer>
 
-</div>
+    <!-- <app-app-footer></app-app-footer> -->
+
   </ion-content>
