@@ -9,7 +9,7 @@ Install node using nvm to manage versions. Use Node 20LTS to install, but use 18
 
 A text based, turn based mmorpg (massively multiplayer online role playing game) written with Ionic Angular(Typescript) and Firebase. This game is especially designed for accessibility and is playable with a screen reader on desktop and mobile. Originally written for a LAMP stack, it is being ported to Firebase for better performance and scalability.
 
-See the [wiki](/WIKI.md) for more information on the game itself and the story.
+See the [wiki](https://app.gitbook.com/o/vC7p6tuPYXKweabts9Fs/s/TofJ2VU8Z9C03NJP41ux/) for more information on the game itself and the story.
 
 ## Getting Started
 ### Prerequisites
