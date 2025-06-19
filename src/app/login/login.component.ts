@@ -8,13 +8,14 @@ import { AuthService } from '../services/auth.service'; // update path if needed
 import { Router, RouterModule } from '@angular/router';
 import { NgIf } from "@angular/common";
 import { STANDALONE_IMPORTS } from '../shared/standalone-imports';
+import { SkipLinkComponent } from "../shared/skip-link/skip-link.component";
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
   standalone: true,
-  imports: [AppHeaderComponent, AppFooterComponent, FormsModule, NgIf, STANDALONE_IMPORTS, RouterModule],
+  imports: [AppHeaderComponent, AppFooterComponent, FormsModule, NgIf, STANDALONE_IMPORTS, RouterModule, SkipLinkComponent],
 })
 export class LoginComponent {
   email = '';
@@ -27,7 +28,7 @@ export class LoginComponent {
     this.error = null;
     this.authService.login(this.email, this.password)
       .then(() => {
-        this.router.navigate(['/dashboard']); // or your post-login route
+        this.router.navigate(['/dashboard']);
       })
       .catch(err => {
         this.error = 'Invalid credentials. Please try again.';
