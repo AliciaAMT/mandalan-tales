@@ -248,3 +248,8 @@ a[routerLink] {
   z-index: 10;
   pointer-events: auto;
 }
+.grecaptcha-badge {
+  position: static !important;
+  margin: 1rem auto;
+  display: block;
+}
