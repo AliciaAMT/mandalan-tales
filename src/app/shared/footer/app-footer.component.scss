@@ -1,0 +1,15 @@
+.app-footer {
+  width: 100%;
+  padding: 1rem 0;
+  text-align: center;
+  margin-top: 2rem;
+}
+
+ion-toolbar {
+  --background: var(--step-50);
+  --color: var(--ion-color-primary);
+  justify-content: center;
+  position: static !important;
+  bottom: unset !important;
+  top: unset !important;
+}

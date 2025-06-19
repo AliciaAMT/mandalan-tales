@@ -2,7 +2,9 @@ Current Node v18 LTS
 NPM 10 LTS
 Ionic 7
 
-Still works but there is no content yet  anyway. just start over, but keep this for reference. it has the wiki and timeline image and more. 
+## Version Notes!
+Install node using nvm to manage versions. Use Node 20LTS to install, but use 18 LTS for CLI usage. This is because Ionic Angular uses an earlier version, but Angular Fire and Firebase and other packages require a later version.
+
 # Mandalan Tales
 
 A text based, turn based mmorpg (massively multiplayer online role playing game) written with Ionic Angular(Typescript) and Firebase. This game is especially designed for accessibility and is playable with a screen reader on desktop and mobile. Originally written for a LAMP stack, it is being ported to Firebase for better performance and scalability.
@@ -193,4 +195,15 @@ See github project at https://github.com/users/AliciaAMT/projects/3
 `npm install @capacitor/core @capacitor/cli`
 `npx @capacitor/assets generate`
 
+## Dev Log
+Mon, June 16 2025
+- tweaking home page colors and layout
 
+Wed, June 18 2025
+- fixed the routing... had to import RouterModule
+- working on accessiblity.. .need to implement the accessiblity features from last GPT chat before moving to dashboard. don't forget to clean up login page too
+
+Thurs, June 19 2025
+- added the accessibility features to the login page
+- added the accessibility features to the home page
+- minor tweaks

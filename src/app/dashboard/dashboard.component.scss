@@ -1,0 +1,27 @@
+.flex-page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.page-content {
+  flex: 1 0 auto; /* main grows to fill space */
+}
+
+app-footer {
+  flex-shrink: 0;
+}
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background-color: #000;
+  color: #fff;
+  padding: 8px 12px;
+  z-index: 1000;
+  text-decoration: none;
+
+  &:focus {
+    top: 0;
+  }
+}

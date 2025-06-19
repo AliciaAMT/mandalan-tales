@@ -1,0 +1,53 @@
+
+
+<a href="#main-content" class="skip-link">Skip to main content</a>
+
+<div class="flex-page">
+  <app-app-header></app-app-header>
+
+  <!-- <div class="g-recaptcha" data-sitekey="6LcYP2UrAAAAANpOHNicmadpslJ6_Pq0kfkSiCTC"></div> -->
+
+  <ion-content class="ion-padding">
+    <ion-card class="login-card" id="main-content" role="main">
+      <ion-card-header>
+        <ion-card-title class="login-card-title">Create Account</ion-card-title>
+      </ion-card-header>
+
+      <form (ngSubmit)="createAccount()" #registerForm="ngForm">
+        <ion-list lines="none">
+          <ion-item>
+            <ion-label position="stacked">Email</ion-label>
+            <ion-input aria-label="email" type="email" name="email" [(ngModel)]="email" required autocomplete="email" inputmode="email"></ion-input>
+          </ion-item>
+
+          <ion-item>
+            <ion-label position="stacked">Password</ion-label>
+            <ion-input
+           aria-label="Password" type="password" name="password" [(ngModel)]="password" required autocomplete="new-password"></ion-input>
+          </ion-item>
+        </ion-list>
+
+  <!-- ✅ Proper placement & styling -->
+
+        <ion-button type="submit" expand="block" [disabled]="!registerForm.form.valid">
+          Create Account
+        </ion-button>
+        <ion-text color="danger" *ngIf="error">{{ error }}</ion-text>
+
+      </form>
+
+    </ion-card>
+    <div id="recaptcha-container" class="g-recaptcha"
+    data-sitekey="your-invisible-site-key"
+    data-size="invisible"
+    data-callback="onRecaptchaSuccess">
+   </div>
+<!--
+    <div role="group" aria-label="robot check" style="display: flex; flex-direction: column; justify-content: center; width: 100%; align-items: center; margin-top: 1rem;"> -->
+
+
+    <!-- </div> -->
+    <app-app-footer></app-app-footer>
+  </ion-content>
+
+</div>

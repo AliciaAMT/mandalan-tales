@@ -1,0 +1,54 @@
+<app-skip-link></app-skip-link>
+  <app-app-header></app-app-header>
+
+  <ion-content>
+    <main id="main-content" role="main">
+    <div style="position: relative; z-index: 999; background: #121212; padding: 1rem;">
+    <ion-card class="login-card" id="main-content" role="main">
+      <ion-card-header>
+        <ion-card-title class="login-card-title">Login</ion-card-title>
+      </ion-card-header>
+
+      <form (ngSubmit)="login()" #loginForm="ngForm">
+        <ion-list lines="none">
+          <ion-item>
+            <ion-label position="stacked">Email</ion-label>
+            <ion-input aria-label="email" type="email" name="email" [(ngModel)]="email" required autocomplete="email" inputmode="email"></ion-input>
+          </ion-item>
+
+          <ion-item>
+            <ion-label position="stacked">Password</ion-label>
+            <ion-input aria-label="password" type="password" name="password" [(ngModel)]="password" required autocomplete="current-password"></ion-input>
+          </ion-item>
+        </ion-list>
+
+        <ion-button
+        type="submit"
+        aria-label="Login"
+        aria-describedby="form-error"
+        color="primary"
+        class="ion-margin-top"
+        id="login-button"
+        [attr.aria-disabled]="!loginForm.form.valid ? 'true' : null"
+        [attr.disabled]="!loginForm.form.valid ? true : null"
+        expand="block"
+        [disabled]="!loginForm.form.valid"
+      >
+          Login
+        </ion-button>
+        <ion-text color="danger" *ngIf="error" id="form-error">{{ error }}</ion-text>
+
+      </form>
+    </ion-card>
+
+    <div class="login-links">
+      <!-- <a routerLink="/forgot-password">Forgot your password?</a> -->
+      <div class="ion-margin-top">
+        New to Mandalan Tales?
+        <a routerLink="/create-account">Create an account and begin your journey!</a>
+      </div>
+    </div>
+        <app-app-footer></app-app-footer>
+    </div>
+    </main>
+  </ion-content>

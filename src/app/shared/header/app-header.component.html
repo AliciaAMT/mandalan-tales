@@ -1,10 +1,12 @@
+<ion-header role="banner">
+  <ion-toolbar role="navigation" aria-label="Main menu">
+    <ion-buttons slot="start">
+      <ion-menu-button autoHide="false"></ion-menu-button>
+    </ion-buttons>
 
-    <ion-header>
-      <ion-toolbar color="primary">
-        <ion-title>Mandalan Tales</ion-title>
-        <ion-buttons slot="end">
-          <ion-button routerLink="/about">About</ion-button>
-          <ion-button routerLink="/legal">Legal</ion-button>
-        </ion-buttons>
-      </ion-toolbar>
-    </ion-header>
+    <div class="header-logo-link" routerLink="/">
+      <img src="assets/icon/header.png" alt="MT Logo" class="header-icon" aria-label="Image link to home" />
+      <span class="header-title">Mandalan Tales</span>
+    </div>
+  </ion-toolbar>
+</ion-header>
