@@ -31,7 +31,10 @@ export const routes: Routes = [
     path: 'create-account',
     loadComponent: () =>
       import('./create-account/create-account.component').then(m => m.CreateAccountComponent)
+  },
+  {
+    path: 'dashboard',
+    loadComponent: () =>
+      import('./dashboard/dashboard.component').then(m => m.DashboardComponent)
   }
-
-
 ];

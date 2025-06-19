@@ -1,4 +1,4 @@
-<a href="#main-content" class="skip-link">Skip to main content</a>
+<app-skip-link></app-skip-link>
 <div class="flex-page">
 
 <app-app-header></app-app-header>
@@ -8,11 +8,11 @@
     <div class="logo-wrapper">
       <img src="assets/icon.png" alt="Mandalan Tales Logo" class="hero-logo" />
     </div>
-    </div>
-    <div id="main-content">
+  </div>
+    <main id="main-content" role="main">
     <h1>Awaken in a world not your own</h1>
     <p class="tagline">Survive. Discover. Create.</p>
-    <ion-button expand="block" color="primary" routerLink="/login">
+    <ion-button aria-label="Start Your Journey" expand="block" color="primary" routerLink="/login">
       Start Your Journey
     </ion-button>
 
@@ -42,12 +42,12 @@
       Win the game to unlock the power of world-building and shape your own adventures.
     </ion-card-content>
   </ion-card>
-  </div>
+  </main>
   <section class="screenshots">
     <h2>In-Game Preview</h2>
     <div class="screenshot-gallery">
-      <img src="assets/screenshot.png" alt="Gameplay screenshot 1" />
-      <img src="assets/screenshot2.png" alt="Gameplay screenshot 2" />
+      <img src="assets/screenshot.png" alt="screenshot of Player Dashboard and Stats with Map and Tile options"  role="presentation" />
+      <img src="assets/screenshot2.png" alt="Gameplay screenshot of character battling a rat, with movement options and battle log" role="presentation" />
     </div>
   </section>
   <app-app-footer></app-app-footer>

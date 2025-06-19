@@ -235,3 +235,17 @@ input:-moz-autofill {
   background-color: #000 !important;
   color: #fff !important;
 }
+// .g-recaptcha {
+//   transform: scale(0.7);  // You can tweak this down to 0.7 if needed
+//   transform-origin: 0 0;
+// }
+// @media (max-width: 400px) {
+//   .g-recaptcha {
+//     transform: scale(0.5);
+//   }
+// }
+.grecaptcha-badge {
+  position: static !important;
+  margin: 1rem auto;
+  display: block;
+}

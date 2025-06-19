@@ -28,19 +28,25 @@
         </ion-list>
 
   <!-- ✅ Proper placement & styling -->
-  <div style="display: flex; justify-content: center; margin-top: 1rem;">
-    <div class="g-recaptcha" data-sitekey="6LcYP2UrAAAAANpOHNicmadpslJ6_Pq0kfkSiCTC"></div>
-  </div>
+
         <ion-button type="submit" expand="block" [disabled]="!registerForm.form.valid">
           Create Account
         </ion-button>
         <ion-text color="danger" *ngIf="error">{{ error }}</ion-text>
 
       </form>
+
     </ion-card>
+    <div id="recaptcha-container" class="g-recaptcha"
+    data-sitekey="your-invisible-site-key"
+    data-size="invisible"
+    data-callback="onRecaptchaSuccess">
+   </div>
+<!--
+    <div role="group" aria-label="robot check" style="display: flex; flex-direction: column; justify-content: center; width: 100%; align-items: center; margin-top: 1rem;"> -->
 
 
-
+    <!-- </div> -->
     <app-app-footer></app-app-footer>
   </ion-content>
 
