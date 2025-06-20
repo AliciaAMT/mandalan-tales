@@ -34,39 +34,58 @@ export class LoginComponent implements OnInit, AfterViewInit {
 
   constructor(private authService: AuthService, private router: Router) {}
  ngOnInit(): void {}
+ async ngAfterViewInit(): Promise<void> {
+  await this.waitForRecaptcha();
 
-  ngAfterViewInit(): void {
-    const checkExist = setInterval(() => {
-      if (typeof window.grecaptcha !== 'undefined') {
+  this.recaptchaWidgetId = window.grecaptcha.render('recaptcha-container', {
+    sitekey: this.recaptchaSiteKey,
+    size: 'invisible',
+    callback: (token: string) => this.onRecaptchaSuccess(token)
+  });
 
-        this.recaptchaWidgetId = window.grecaptcha.render('recaptcha-container', {
-          'sitekey': this.recaptchaSiteKey,
-          'size': 'invisible',
-          'callback': (token: string) => this.onRecaptchaSuccess(token)
-        });
-        this.recaptchaReady = true;
-        clearInterval(checkExist);
+  this.recaptchaReady = true;
+}
+
+waitForRecaptcha(): Promise<void> {
+  return new Promise(resolve => {
+    const interval = setInterval(() => {
+      if (window.grecaptcha && window.grecaptcha.render) {
+        clearInterval(interval);
+        resolve();
       }
     }, 100);
+  });
+}
+
+async login(): Promise<void> {
+  this.error = null;
+
+  if (!this.recaptchaReady && window.grecaptcha) {
+    await this.ngAfterViewInit(); // re-render if needed
   }
 
-  login(): void {
-    this.error = null;
-
-    if (this.recaptchaReady) {
-      window.grecaptcha.execute(this.recaptchaWidgetId);
-    } else {
-      this.error = 'reCAPTCHA is not ready. Please try again.';
-    }
+  if (this.recaptchaReady) {
+    window.grecaptcha.execute(this.recaptchaWidgetId);
+  } else {
+    this.error = 'reCAPTCHA failed to load. Please refresh and try again.';
   }
+}
 
-  onRecaptchaSuccess(token: string): void {
-    // Optional: send token to backend to verify
-    this.authService.login(this.email, this.password)
-      .then(() => this.router.navigate(['/dashboard']))
-      .catch(err => {
-        this.error = 'Invalid credentials. Please try again.';
-        console.error(err);
-      });
-  }
+onRecaptchaSuccess(token: string): void {
+  // Optional: send token to backend to verify
+  this.authService.login(this.email, this.password)
+    .then(() => this.router.navigate(['/dashboard']))
+    .catch(err => {
+      this.error = 'Invalid credentials. Please try again.';
+      console.error(err);
+
+      // Accessibility: move focus to error
+      setTimeout(() => {
+        const errorEl = document.getElementById('form-error');
+        if (errorEl) {
+          errorEl.focus();
+        }
+      }, 100);
+    });
+}
 }
