@@ -4,21 +4,22 @@
   <ion-content>
     <main id="main-content" role="main">
     <div style="position: relative; z-index: 999; background: #121212; padding: 1rem;">
-    <ion-card class="login-card" id="main-content" role="main">
+    <ion-card class="login-card">
       <ion-card-header>
         <ion-card-title class="login-card-title">Login</ion-card-title>
       </ion-card-header>
 
       <form (ngSubmit)="login()" #loginForm="ngForm">
+        <fieldset>
         <ion-list lines="none">
           <ion-item>
-            <ion-label position="stacked">Email</ion-label>
-            <ion-input aria-label="email" type="email" name="email" [(ngModel)]="email" required autocomplete="email" inputmode="email"></ion-input>
+            <ion-label for="emailInput" position="stacked">Email</ion-label>
+            <ion-input id="emailInput" aria-label="email" type="email" name="email" [(ngModel)]="email" required autocomplete="email" inputmode="email"></ion-input>
           </ion-item>
 
           <ion-item>
-            <ion-label position="stacked">Password</ion-label>
-            <ion-input aria-label="password" type="password" name="password" [(ngModel)]="password" required autocomplete="current-password"></ion-input>
+            <ion-label for="passwordInput" position="stacked">Password</ion-label>
+            <ion-input id="passwordInput" aria-label="password" type="password" name="password" [(ngModel)]="password" required autocomplete="current-password"></ion-input>
           </ion-item>
         </ion-list>
 
@@ -36,8 +37,11 @@
       >
           Login
         </ion-button>
-        <ion-text color="danger" *ngIf="error" id="form-error">{{ error }}</ion-text>
+        <ion-text color="danger" *ngIf="error" id="form-error" role="alert" aria-live="assertive" tabindex="-1">
+          {{ error }}
+        </ion-text>
 
+      </fieldset>
       </form>
     </ion-card>
 
