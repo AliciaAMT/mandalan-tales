@@ -249,3 +249,46 @@ input:-moz-autofill {
   margin: 1rem auto;
   display: block;
 }
+fieldset {
+  border: none;
+  margin: 0;
+  padding: 0;
+  min-inline-size: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+legend {
+  display: none; // Already handled by .sr-only
+}
+
+ion-item {
+  --highlight-color-focused: transparent !important;
+  --highlight-color-invalid: transparent !important;
+  --border-color: #f0d78c;
+}
+
+ion-input {
+  --highlight-color-focused: transparent !important;
+  --highlight-color: transparent !important;
+  color: #ffffff;
+  caret-color: #f0d78c;
+}
+
+input {
+  outline: none !important;
+  box-shadow: none !important;
+  border: none;
+  background: transparent;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

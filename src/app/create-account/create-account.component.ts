@@ -1,4 +1,5 @@
 import { AppHeaderComponent } from "../shared/header/app-header.component";
+
 import { AppFooterComponent } from "../shared/footer/app-footer.component";
 import { FormsModule } from '@angular/forms';
 import { AfterViewInit, Component, OnInit } from '@angular/core';
@@ -6,6 +7,7 @@ import { AuthService } from '../services/auth.service'; // update path if needed
 import { Router, RouterModule } from '@angular/router';
 import { NgIf } from "@angular/common";
 import { STANDALONE_IMPORTS } from '../shared/standalone-imports';
+import { SkipLinkComponent } from "../shared/skip-link/skip-link.component";
 
 declare global {
   interface Window {
@@ -18,7 +20,7 @@ declare global {
   templateUrl: './create-account.component.html',
   styleUrls: ['./create-account.component.scss'],
   standalone: true,
-  imports: [AppHeaderComponent, AppFooterComponent, FormsModule, NgIf, STANDALONE_IMPORTS, RouterModule],
+  imports: [AppHeaderComponent, AppFooterComponent, FormsModule, NgIf, STANDALONE_IMPORTS, RouterModule, SkipLinkComponent],
 })
 export class CreateAccountComponent implements OnInit, AfterViewInit {
   email = '';
@@ -60,7 +62,7 @@ export class CreateAccountComponent implements OnInit, AfterViewInit {
     this.error = null;
 
     if (!this.recaptchaReady && window.grecaptcha) {
-      await this.ngAfterViewInit(); // try to re-render
+      await this.ngAfterViewInit(); // fallback re-render
     }
 
     if (this.recaptchaReady) {
@@ -79,6 +81,15 @@ export class CreateAccountComponent implements OnInit, AfterViewInit {
       .catch(err => {
         console.error(err);
         this.error = err.message || 'Failed to create account.';
+
+        // Accessibility: move focus to error
+        setTimeout(() => {
+          const errorEl = document.getElementById('form-error');
+          if (errorEl) {
+            errorEl.focus();
+          }
+        }, 100);
+
         if (window.grecaptcha && this.recaptchaWidgetId !== null) {
           window.grecaptcha.reset(this.recaptchaWidgetId);
         }
