@@ -254,10 +254,11 @@ a[routerLink] {
   display: block;
 }
 .sr-only {
-  position: absolute;
+  position: absolute !important;
   width: 1px;
   height: 1px;
   padding: 0;
+  margin: -1px;
   overflow: hidden;
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
@@ -290,3 +291,15 @@ ion-button:focus {
 //   --color: white;
 //   transform: scale(1.02); // optional: subtle pop effect
 // }
+.error-message {
+  color: var(--ion-color-danger);
+  margin-top: 0.5rem;
+  font-weight: 500;
+}
+ion-input[type="text"] input,
+ion-input[type="password"] input {
+  color: white;
+}
+ion-input input {
+  color: white; // or your preferred text color
+}

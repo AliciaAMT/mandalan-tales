@@ -36,13 +36,21 @@ export const routes: Routes = [
     path: 'dashboard',
     loadComponent: () =>
       import('./dashboard/dashboard.component').then(m => m.DashboardComponent)
-  },  {
+  },
+  {
     path: 'main',
     loadComponent: () => import('./game/main/main.page').then( m => m.MainPage)
   },
   {
     path: 'inventory',
     loadComponent: () => import('./game/inventory/inventory.page').then( m => m.InventoryPage)
+  },
+  {
+    path: 'forgot-password',
+    loadComponent: () =>
+      import('./forgot-password/forgot-password.component').then(
+        m => m.ForgotPasswordComponent
+      )
   }
 
 ];

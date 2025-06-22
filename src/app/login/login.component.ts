@@ -1,4 +1,3 @@
-
 import { AppHeaderComponent } from "../shared/header/app-header.component";
 
 import { AppFooterComponent } from "../shared/footer/app-footer.component";
@@ -9,7 +8,13 @@ import { Router, RouterModule } from '@angular/router';
 import { NgIf } from "@angular/common";
 import { STANDALONE_IMPORTS } from '../shared/standalone-imports';
 import { SkipLinkComponent } from "../shared/skip-link/skip-link.component";
+import { addIcons } from 'ionicons';
+import { eye, eyeOff } from 'ionicons/icons';
 
+addIcons({
+  'eye': eye,
+  'eye-off': eyeOff
+});
 declare global {
   interface Window {
     grecaptcha: any;
@@ -31,61 +36,76 @@ export class LoginComponent implements OnInit, AfterViewInit {
   recaptchaSiteKey = '6LfCQmYrAAAAAAW9jUsKIkBm8uAc41MGahUqSbpe';
   private recaptchaWidgetId: any = null;
   recaptchaReady = false;
+  showPassword = false;
+
+  togglePasswordVisibility(): void {
+    this.showPassword = !this.showPassword;
+  }
 
   constructor(private authService: AuthService, private router: Router) {}
- ngOnInit(): void {}
- async ngAfterViewInit(): Promise<void> {
-  await this.waitForRecaptcha();
 
-  this.recaptchaWidgetId = window.grecaptcha.render('recaptcha-container', {
-    sitekey: this.recaptchaSiteKey,
-    size: 'invisible',
-    callback: (token: string) => this.onRecaptchaSuccess(token)
-  });
+  ngOnInit(): void {}
 
-  this.recaptchaReady = true;
-}
+  async ngAfterViewInit(): Promise<void> {
+    await this.waitForRecaptcha();
 
-waitForRecaptcha(): Promise<void> {
-  return new Promise(resolve => {
-    const interval = setInterval(() => {
-      if (window.grecaptcha && window.grecaptcha.render) {
-        clearInterval(interval);
-        resolve();
-      }
-    }, 100);
-  });
-}
+    this.recaptchaWidgetId = window.grecaptcha.render('recaptcha-container', {
+      sitekey: this.recaptchaSiteKey,
+      size: 'invisible',
+      callback: (token: string) => this.onRecaptchaSuccess(token)
+    });
 
-async login(): Promise<void> {
-  this.error = null;
-
-  if (!this.recaptchaReady && window.grecaptcha) {
-    await this.ngAfterViewInit(); // re-render if needed
+    this.recaptchaReady = true;
   }
 
-  if (this.recaptchaReady) {
-    window.grecaptcha.execute(this.recaptchaWidgetId);
-  } else {
-    this.error = 'reCAPTCHA failed to load. Please refresh and try again.';
-  }
-}
-
-onRecaptchaSuccess(token: string): void {
-  // Optional: send token to backend to verify
-  this.authService.login(this.email, this.password)
-    .then(() => this.router.navigate(['/dashboard']))
-    .catch(err => {
-      this.error = 'Invalid credentials. Please try again.';
-      console.error(err);
-
-      // Accessibility: move focus to error
-      setTimeout(() => {
-        const errorEl = document.getElementById('form-error');
-        if (errorEl) {
-          errorEl.focus();
+  waitForRecaptcha(): Promise<void> {
+    return new Promise(resolve => {
+      const interval = setInterval(() => {
+        if (window.grecaptcha && window.grecaptcha.render) {
+          clearInterval(interval);
+          resolve();
         }
       }, 100);
     });
-}
+  }
+
+  async login(): Promise<void> {
+    console.log('Login attempted', this.email, this.password);
+
+    const activeEl = document.activeElement as HTMLElement;
+    if (activeEl && typeof activeEl.blur === 'function') {
+      activeEl.blur();
+    }
+
+    if (!this.recaptchaReady && window.grecaptcha) {
+      await this.ngAfterViewInit(); // re-render if needed
+    }
+
+    if (this.recaptchaReady) {
+      window.grecaptcha.execute(this.recaptchaWidgetId);
+    } else {
+      this.error = 'reCAPTCHA failed to load. Please refresh and try again.';
+    }
+  }
+
+  onRecaptchaSuccess(token: string): void {
+    // Optional: send token to backend to verify
+    this.authService.login(this.email, this.password)
+      .then(() => {
+        this.error = null;
+        this.router.navigate(['/dashboard']);
+      })
+      .catch(err => {
+        this.error = 'Invalid credentials. Please try again.';
+        console.error(err);
+
+        // Accessibility: move focus to error
+        setTimeout(() => {
+          const errorEl = document.getElementById('form-error');
+          if (errorEl) {
+            errorEl.focus();
+          }
+        }, 100);
+      });
+  }
 }

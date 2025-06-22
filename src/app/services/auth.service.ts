@@ -1,7 +1,14 @@
 import { Injectable } from '@angular/core';
-import { Auth, signInWithEmailAndPassword, signOut,createUserWithEmailAndPassword,
-  sendEmailVerification } from '@angular/fire/auth';
+import {
+  Auth,
+  signInWithEmailAndPassword,
+  signOut,
+  createUserWithEmailAndPassword,
+  sendEmailVerification,
+  sendPasswordResetEmail
+} from '@angular/fire/auth';
 import { Router } from '@angular/router';
+// import { AngularFireAuth } from '@angular/fire/compat/auth';
 
 const actionCodeSettings = {
   url: 'http://localhost:8100/login', // ⬅️ CHANGE THIS for production
@@ -22,6 +29,10 @@ export class AuthService {
   }
   logout() {
     return signOut(this.auth);
+  }
+
+  sendPasswordResetEmail(email: string): Promise<void> {
+    return sendPasswordResetEmail(this.auth, email, actionCodeSettings);
   }
 
   get currentUser() {
