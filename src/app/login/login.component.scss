@@ -269,3 +269,24 @@ fieldset {
   padding: 0;
   min-inline-size: 0;
 }
+// Restore default focus outline for accessibility
+ion-input input:focus,
+ion-textarea textarea:focus {
+  outline: 2px solid white;
+  outline-offset: 2px;
+}
+
+// Optional: Enhance ion-item highlighting on focus
+ion-item:focus-within {
+  border: 2px solid white;
+  border-radius: 6px;
+}
+ion-button:focus {
+  outline: 2px solid white;
+  outline-offset: 2px;
+}
+// ion-button:focus {
+//   --background: var(--ion-color-primary-shade);
+//   --color: white;
+//   transform: scale(1.02); // optional: subtle pop effect
+// }
