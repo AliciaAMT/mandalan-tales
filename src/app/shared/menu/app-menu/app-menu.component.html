@@ -1,4 +1,4 @@
-<ion-menu content-id="main-content" type="overlay">
+<ion-menu content-id="main-content" type="overlay" role="navigation" aria-label="Side menu">
   <ion-header>
     <ion-toolbar color="primary">
       <ion-title>Menu</ion-title>
@@ -6,11 +6,27 @@
   </ion-header>
   <ion-content>
     <ion-list>
-      <ion-item routerLink="/" routerDirection="root">Home</ion-item>
-      <ion-item routerLink="/about" routerDirection="forward">About</ion-item>
-      <ion-item routerLink="/contact" routerDirection="forward">Contact</ion-item>
-      <ion-item routerLink="/legal" routerDirection="forward">Legal</ion-item>
+      <ion-menu-toggle auto-hide="true">
+        <ion-item routerLink="/" routerDirection="root" detail="false">
+          <ion-label>Home</ion-label>
+        </ion-item>
+      </ion-menu-toggle>
+      <ion-menu-toggle auto-hide="true">
+        <ion-item routerLink="/about" routerDirection="forward" detail="false">
+          <ion-label>About</ion-label>
+        </ion-item>
+      </ion-menu-toggle>
+      <ion-menu-toggle auto-hide="true">
+        <ion-item routerLink="/contact" routerDirection="forward" detail="false">
+          <ion-label>Contact</ion-label>
+        </ion-item>
+      </ion-menu-toggle>
+      <ion-menu-toggle auto-hide="true">
+        <ion-item routerLink="/legal" routerDirection="forward" detail="false">
+          <ion-label>Legal</ion-label>
+        </ion-item>
+      </ion-menu-toggle>
     </ion-list>
+
   </ion-content>
 </ion-menu>
-
