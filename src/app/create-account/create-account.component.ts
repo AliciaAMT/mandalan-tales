@@ -7,6 +7,13 @@ import { Router, RouterModule } from '@angular/router';
 import { NgIf } from "@angular/common";
 import { STANDALONE_IMPORTS } from '../shared/standalone-imports';
 import { SkipLinkComponent } from "../shared/skip-link/skip-link.component";
+import { addIcons } from 'ionicons';
+import { eye, eyeOff } from 'ionicons/icons';
+
+addIcons({
+  'eye': eye,
+  'eye-off': eyeOff
+});
 
 declare global {
   interface Window {
@@ -29,6 +36,11 @@ export class CreateAccountComponent implements OnInit, AfterViewInit {
   recaptchaSiteKey = '6LfCQmYrAAAAAAW9jUsKIkBm8uAc41MGahUqSbpe';
   private recaptchaWidgetId: any = null;
   recaptchaReady = false;
+  showPassword = false;
+
+  togglePasswordVisibility(): void {
+    this.showPassword = !this.showPassword;
+  }
 
   constructor(private authService: AuthService, private router: Router) {}
 
@@ -37,14 +49,13 @@ export class CreateAccountComponent implements OnInit, AfterViewInit {
   async ngAfterViewInit(): Promise<void> {
     await this.waitForRecaptcha();
 
-    if (window.grecaptcha && window.grecaptcha.render && this.recaptchaWidgetId === null) {
-      this.recaptchaWidgetId = window.grecaptcha.render('recaptcha-container', {
-        sitekey: this.recaptchaSiteKey,
-        size: 'invisible',
-        callback: (token: string) => this.onRecaptchaSuccess(token)
-      });
-      this.recaptchaReady = true;
-    }
+    this.recaptchaWidgetId = window.grecaptcha.render('recaptcha-container', {
+      sitekey: this.recaptchaSiteKey,
+      size: 'invisible',
+      callback: (token: string) => this.onRecaptchaSuccess(token)
+    });
+
+    this.recaptchaReady = true;
   }
 
   waitForRecaptcha(): Promise<void> {
@@ -66,14 +77,14 @@ export class CreateAccountComponent implements OnInit, AfterViewInit {
       activeEl.blur();
     }
 
-    if ((!this.recaptchaReady || this.recaptchaWidgetId === null) && window.grecaptcha) {
-      await this.ngAfterViewInit();
+    if (!this.recaptchaReady && window.grecaptcha) {
+      await this.ngAfterViewInit(); // re-render if needed
     }
 
-    if (this.recaptchaReady && this.recaptchaWidgetId !== null && window.grecaptcha) {
+    if (this.recaptchaReady) {
       window.grecaptcha.execute(this.recaptchaWidgetId);
     } else {
-      this.error = 'reCAPTCHA failed to initialize. Please try again.';
+      this.error = 'reCAPTCHA failed to load. Please refresh and try again.';
     }
   }
 
@@ -98,5 +109,11 @@ export class CreateAccountComponent implements OnInit, AfterViewInit {
           window.grecaptcha.reset(this.recaptchaWidgetId);
         }
       });
-  }
+      setTimeout(() => {
+        const errorEl = document.getElementById('form-error');
+        if (errorEl) {
+          errorEl.focus();
+        }
+      }, 100);
+    }
 }

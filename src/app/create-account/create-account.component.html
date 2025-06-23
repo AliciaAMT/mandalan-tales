@@ -1,11 +1,16 @@
+<div class="flex-page">
 <app-app-header></app-app-header>
-  <ion-content class="ion-padding">
-    <ion-card class="login-card" tabindex="-1">
+  <ion-content>
+    <main id="main-content" role="main">
+      <div style="position: relative; z-index: 999; background: #121212; padding: 1rem;">
+    <ion-card class="login-card">
       <ion-card-header>
+        <h1 class="sr-only">Create Account</h1>
         <ion-card-title class="login-card-title">Create Account</ion-card-title>
       </ion-card-header>
 
       <form (ngSubmit)="createAccount()" #registerForm="ngForm">
+        <fieldset>
         <ion-list lines="none">
           <ion-item>
             <ion-label for="emailInput" position="stacked">Email</ion-label>
@@ -14,26 +19,52 @@
 
           <ion-item>
             <ion-label for="passwordInput" position="stacked">Password</ion-label>
-            <ion-input id="passwordInput" aria-label="Password" type="password" name="password" [(ngModel)]="password" required autocomplete="new-password"></ion-input>
+            <ion-input
+            [(ngModel)]="password"
+            [ngModelOptions]="{ updateOn: 'change' }"
+            id="passwordInput"
+            [type]="showPassword ? 'text' : 'password'"
+            name="password"
+            required
+            autocomplete="new-password"></ion-input>
+            <ion-button
+              fill="clear"
+              slot="end"
+              type="button"
+              (click)="togglePasswordVisibility()"
+              [attr.aria-pressed]="showPassword"
+              [attr.aria-label]="showPassword ? 'Hide password' : 'Show password'"
+            >
+              <ion-icon [name]="showPassword ? 'eye-off' : 'eye'"></ion-icon>
+            </ion-button>
           </ion-item>
         </ion-list>
 
-        <ion-button type="submit" expand="block" aria-describedby="form-error" [disabled]="!registerForm.form.valid">
+        <ion-button
+        type="submit" expand="block"
+        aria-label="Create Account"
+        aria-describedby="form-error"
+        [attr.aria-disabled]="!registerForm.form.valid ? 'true' : null"
+        [disabled]="!registerForm.form.valid">
           Create Account
         </ion-button>
 
-        <ion-text color="danger" *ngIf="error" id="form-error" role="alert" aria-live="assertive" tabindex="-1">
+        <div
+        class="ion-text-danger error-message"
+        *ngIf="error" id="form-error" role="alert" aria-live="assertive" tabindex="-1">
           {{ error }}
-        </ion-text>
+      </div>
+    </fieldset>
       </form>
     </ion-card>
 
-    <div id="recaptcha-container" class="g-recaptcha"
-         style="display: none"
-         data-sitekey="your-invisible-site-key"
-         data-size="invisible"
-         data-callback="onRecaptchaSuccess">
-    </div>
+    <div id="recaptcha-container" class="g-recaptcha" data-sitekey="your-invisible-site-key" data-size="invisible" data-callback="onRecaptchaSuccess" aria-hidden="true"></div>
+    <p class="sr-only" id="recaptcha-desc">Invisible reCAPTCHA is used to prevent spam. No action is needed.</p>
+
 
     <app-app-footer></app-app-footer>
+      </div>
+    </main>
+
   </ion-content>
+  </div>
