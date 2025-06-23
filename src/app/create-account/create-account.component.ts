@@ -1,7 +1,7 @@
 import { AppHeaderComponent } from "../shared/header/app-header.component";
 import { AppFooterComponent } from "../shared/footer/app-footer.component";
 import { FormsModule } from '@angular/forms';
-import { AfterViewInit, Component, OnInit } from '@angular/core';
+import { AfterViewInit, Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { AuthService } from '../services/auth.service';
 import { Router, RouterModule } from '@angular/router';
 import { NgIf } from "@angular/common";
@@ -38,8 +38,15 @@ export class CreateAccountComponent implements OnInit, AfterViewInit {
   recaptchaReady = false;
   showPassword = false;
 
+  @ViewChild('submitBtn') submitBtn!: ElementRef<HTMLIonButtonElement>;
+
   togglePasswordVisibility(): void {
     this.showPassword = !this.showPassword;
+  }
+  submitFormIfValid(form: any): void {
+    if (form.valid) {
+      this.createAccount();
+    }
   }
 
   constructor(private authService: AuthService, private router: Router) {}
@@ -85,6 +92,9 @@ export class CreateAccountComponent implements OnInit, AfterViewInit {
       window.grecaptcha.execute(this.recaptchaWidgetId);
     } else {
       this.error = 'reCAPTCHA failed to load. Please refresh and try again.';
+      setTimeout(() => {
+        this.submitBtn?.nativeElement?.focus();
+      }, 100);
     }
   }
 
@@ -103,17 +113,12 @@ export class CreateAccountComponent implements OnInit, AfterViewInit {
           if (errorEl) {
             errorEl.focus();
           }
+          this.submitBtn?.nativeElement?.focus();
         }, 100);
 
         if (window.grecaptcha && this.recaptchaWidgetId !== null) {
           window.grecaptcha.reset(this.recaptchaWidgetId);
         }
       });
-      setTimeout(() => {
-        const errorEl = document.getElementById('form-error');
-        if (errorEl) {
-          errorEl.focus();
-        }
-      }, 100);
-    }
+  }
 }

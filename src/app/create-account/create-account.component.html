@@ -41,13 +41,17 @@
         </ion-list>
 
         <ion-button
-        type="submit" expand="block"
-        aria-label="Create Account"
-        aria-describedby="form-error"
-        [attr.aria-disabled]="!registerForm.form.valid ? 'true' : null"
-        [disabled]="!registerForm.form.valid">
-          Create Account
-        </ion-button>
+  #submitBtn
+  type="submit"
+  expand="block"
+  aria-label="Create Account"
+  aria-describedby="form-error recaptcha-desc"
+  [attr.aria-disabled]="!registerForm.form.valid ? 'true' : null"
+  [disabled]="!registerForm.form.valid"
+  [tabindex]="!registerForm.form.valid ? -1 : null"
+  (keydown.enter)="submitFormIfValid(registerForm)">
+  Create Account
+</ion-button>
 
         <div
         class="ion-text-danger error-message"
@@ -60,7 +64,6 @@
 
     <div id="recaptcha-container" class="g-recaptcha" data-sitekey="your-invisible-site-key" data-size="invisible" data-callback="onRecaptchaSuccess" aria-hidden="true"></div>
     <p class="sr-only" id="recaptcha-desc">Invisible reCAPTCHA is used to prevent spam. No action is needed.</p>
-
 
     <app-app-footer></app-app-footer>
       </div>

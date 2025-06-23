@@ -1,5 +1,4 @@
 import { AppHeaderComponent } from "../shared/header/app-header.component";
-
 import { AppFooterComponent } from "../shared/footer/app-footer.component";
 import { FormsModule } from '@angular/forms';
 import { AfterViewInit, Component, OnInit } from '@angular/core';
@@ -15,6 +14,7 @@ addIcons({
   'eye': eye,
   'eye-off': eyeOff
 });
+
 declare global {
   interface Window {
     grecaptcha: any;
@@ -49,11 +49,13 @@ export class LoginComponent implements OnInit, AfterViewInit {
   async ngAfterViewInit(): Promise<void> {
     await this.waitForRecaptcha();
 
-    this.recaptchaWidgetId = window.grecaptcha.render('recaptcha-container', {
-      sitekey: this.recaptchaSiteKey,
-      size: 'invisible',
-      callback: (token: string) => this.onRecaptchaSuccess(token)
-    });
+    if (this.recaptchaWidgetId === null) {
+      this.recaptchaWidgetId = window.grecaptcha.render('recaptcha-container', {
+        sitekey: this.recaptchaSiteKey,
+        size: 'invisible',
+        callback: (token: string) => this.onRecaptchaSuccess(token)
+      });
+    }
 
     this.recaptchaReady = true;
   }
@@ -77,14 +79,19 @@ export class LoginComponent implements OnInit, AfterViewInit {
       activeEl.blur();
     }
 
-    if (!this.recaptchaReady && window.grecaptcha) {
-      await this.ngAfterViewInit(); // re-render if needed
+    if (!this.recaptchaReady && window.grecaptcha && this.recaptchaWidgetId === null) {
+      await this.ngAfterViewInit(); // render if not yet rendered
     }
 
-    if (this.recaptchaReady) {
-      window.grecaptcha.execute(this.recaptchaWidgetId);
-    } else {
-      this.error = 'reCAPTCHA failed to load. Please refresh and try again.';
+    try {
+      if (this.recaptchaReady) {
+        window.grecaptcha.execute(this.recaptchaWidgetId);
+      } else {
+        this.error = 'reCAPTCHA failed to load. Please refresh and try again.';
+      }
+    } catch (e) {
+      console.error('reCAPTCHA error:', e);
+      this.error = 'reCAPTCHA error occurred. Please reload the page.';
     }
   }
 
