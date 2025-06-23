@@ -6,7 +6,7 @@ import { AuthService } from '../services/auth.service';
 import { Router, RouterModule } from '@angular/router';
 import { NgIf } from "@angular/common";
 import { STANDALONE_IMPORTS } from '../shared/standalone-imports';
-import { SkipLinkComponent } from "../shared/skip-link/skip-link.component";
+// import { SkipLinkComponent } from "../shared/skip-link/skip-link.component";
 import { addIcons } from 'ionicons';
 import { eye, eyeOff } from 'ionicons/icons';
 
@@ -26,7 +26,7 @@ declare global {
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
   standalone: true,
-  imports: [AppHeaderComponent, AppFooterComponent, FormsModule, NgIf, STANDALONE_IMPORTS, RouterModule, SkipLinkComponent],
+  imports: [AppHeaderComponent, AppFooterComponent, FormsModule, NgIf, STANDALONE_IMPORTS, RouterModule/*, SkipLinkComponent*/],
 })
 export class LoginComponent implements OnInit, AfterViewInit {
   email = '';

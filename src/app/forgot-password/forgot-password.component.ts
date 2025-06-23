@@ -7,14 +7,14 @@ import { AuthService } from '../services/auth.service';
 import { Router, RouterModule } from '@angular/router';
 import { NgIf } from "@angular/common";
 import { STANDALONE_IMPORTS } from '../shared/standalone-imports';
-import { SkipLinkComponent } from "../shared/skip-link/skip-link.component";
+// import { SkipLinkComponent } from "../shared/skip-link/skip-link.component";
 
 @Component({
   selector: 'app-forgot-password',
   templateUrl: './forgot-password.component.html',
   styleUrls: ['./forgot-password.component.scss'],
   standalone: true,
-  imports: [AppHeaderComponent, AppFooterComponent, FormsModule, NgIf, STANDALONE_IMPORTS, RouterModule, SkipLinkComponent],
+  imports: [AppHeaderComponent, AppFooterComponent, FormsModule, NgIf, STANDALONE_IMPORTS, RouterModule/*, SkipLinkComponent*/],
 })
 export class ForgotPasswordComponent implements OnInit {
   email = '';
