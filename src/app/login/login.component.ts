@@ -3,7 +3,7 @@ import { AppHeaderComponent } from "../shared/header/app-header.component";
 import { AppFooterComponent } from "../shared/footer/app-footer.component";
 import { FormsModule } from '@angular/forms';
 import { AfterViewInit, Component, OnInit } from '@angular/core';
-import { AuthService } from '../services/auth.service'; // update path if needed
+import { AuthService } from '../services/auth.service';
 import { Router, RouterModule } from '@angular/router';
 import { NgIf } from "@angular/common";
 import { STANDALONE_IMPORTS } from '../shared/standalone-imports';
@@ -89,17 +89,23 @@ export class LoginComponent implements OnInit, AfterViewInit {
   }
 
   onRecaptchaSuccess(token: string): void {
-    // Optional: send token to backend to verify
     this.authService.login(this.email, this.password)
-      .then(() => {
-        this.error = null;
-        this.router.navigate(['/dashboard']);
+      .then((cred) => {
+        if (!cred.user.emailVerified) {
+          this.authService.logout();
+          this.error = 'Your email is not verified. Please check your inbox before logging in.';
+        } else {
+          this.error = null;
+          this.router.navigate(['/dashboard']);
+        }
       })
       .catch(err => {
-        this.error = 'Invalid credentials. Please try again.';
+        const errorMsg = err?.message?.includes('email') || err?.message?.includes('verified')
+          ? 'Your email is not verified. Please check your inbox.'
+          : 'Invalid credentials. Please try again.';
+        this.error = errorMsg;
         console.error(err);
 
-        // Accessibility: move focus to error
         setTimeout(() => {
           const errorEl = document.getElementById('form-error');
           if (errorEl) {

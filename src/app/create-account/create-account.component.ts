@@ -1,9 +1,8 @@
 import { AppHeaderComponent } from "../shared/header/app-header.component";
-
 import { AppFooterComponent } from "../shared/footer/app-footer.component";
 import { FormsModule } from '@angular/forms';
 import { AfterViewInit, Component, OnInit } from '@angular/core';
-import { AuthService } from '../services/auth.service'; // update path if needed
+import { AuthService } from '../services/auth.service';
 import { Router, RouterModule } from '@angular/router';
 import { NgIf } from "@angular/common";
 import { STANDALONE_IMPORTS } from '../shared/standalone-imports';
@@ -38,13 +37,14 @@ export class CreateAccountComponent implements OnInit, AfterViewInit {
   async ngAfterViewInit(): Promise<void> {
     await this.waitForRecaptcha();
 
-    this.recaptchaWidgetId = window.grecaptcha.render('recaptcha-container', {
-      sitekey: this.recaptchaSiteKey,
-      size: 'invisible',
-      callback: (token: string) => this.onRecaptchaSuccess(token)
-    });
-
-    this.recaptchaReady = true;
+    if (window.grecaptcha && window.grecaptcha.render && this.recaptchaWidgetId === null) {
+      this.recaptchaWidgetId = window.grecaptcha.render('recaptcha-container', {
+        sitekey: this.recaptchaSiteKey,
+        size: 'invisible',
+        callback: (token: string) => this.onRecaptchaSuccess(token)
+      });
+      this.recaptchaReady = true;
+    }
   }
 
   waitForRecaptcha(): Promise<void> {
@@ -61,14 +61,19 @@ export class CreateAccountComponent implements OnInit, AfterViewInit {
   async createAccount(): Promise<void> {
     this.error = null;
 
-    if (!this.recaptchaReady && window.grecaptcha) {
-      await this.ngAfterViewInit(); // fallback re-render
+    const activeEl = document.activeElement as HTMLElement;
+    if (activeEl && typeof activeEl.blur === 'function') {
+      activeEl.blur();
     }
 
-    if (this.recaptchaReady) {
+    if ((!this.recaptchaReady || this.recaptchaWidgetId === null) && window.grecaptcha) {
+      await this.ngAfterViewInit();
+    }
+
+    if (this.recaptchaReady && this.recaptchaWidgetId !== null && window.grecaptcha) {
       window.grecaptcha.execute(this.recaptchaWidgetId);
     } else {
-      this.error = 'reCAPTCHA failed to load. Please refresh and try again.';
+      this.error = 'reCAPTCHA failed to initialize. Please try again.';
     }
   }
 
@@ -80,9 +85,8 @@ export class CreateAccountComponent implements OnInit, AfterViewInit {
       })
       .catch(err => {
         console.error(err);
-        this.error = err.message || 'Failed to create account.';
+        this.error = err?.message || 'Failed to create account. Please try again.';
 
-        // Accessibility: move focus to error
         setTimeout(() => {
           const errorEl = document.getElementById('form-error');
           if (errorEl) {

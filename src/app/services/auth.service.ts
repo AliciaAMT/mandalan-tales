@@ -19,9 +19,17 @@ const actionCodeSettings = {
 export class AuthService {
   constructor(private auth: Auth, private router: Router) {}
 
-  login(email: string, password: string) {
-    return signInWithEmailAndPassword(this.auth, email, password);
+  async login(email: string, password: string): Promise<any> {
+    const cred = await signInWithEmailAndPassword(this.auth, email, password);
+
+    if (!cred.user.emailVerified) {
+      await signOut(this.auth);
+      throw new Error('Your email address has not been verified.');
+    }
+
+    return cred;
   }
+
   register(email: string, password: string) {
     return createUserWithEmailAndPassword(this.auth, email, password).then(cred =>
       cred.user ? sendEmailVerification(cred.user, actionCodeSettings) : Promise.resolve()
