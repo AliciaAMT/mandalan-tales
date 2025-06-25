@@ -43,6 +43,10 @@ export const routes: Routes = [
       import('./forgot-password/forgot-password.component').then(
         m => m.ForgotPasswordComponent
       )
+  },  {
+    path: 'create-character',
+    loadComponent: () => import('./dashboard/create-character/create-character.page').then( m => m.CreateCharacterPage)
   },
+
 
 ];
