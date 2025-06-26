@@ -1,14 +1,17 @@
 import { AppHeaderComponent } from "../shared/header/app-header.component";
 import { AppFooterComponent } from "../shared/footer/app-footer.component";
 import { FormsModule } from '@angular/forms';
-import { AfterViewInit, Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { AfterViewInit, Component, OnInit, ViewChild, ElementRef, inject } from '@angular/core';
 import { AuthService } from '../services/auth.service';
+import { Firestore, doc, setDoc, serverTimestamp } from '@angular/fire/firestore';
 import { Router, RouterModule } from '@angular/router';
 import { NgIf } from "@angular/common";
 import { STANDALONE_IMPORTS } from '../shared/standalone-imports';
 // import { SkipLinkComponent } from "../shared/skip-link/skip-link.component";
 import { addIcons } from 'ionicons';
 import { eye, eyeOff } from 'ionicons/icons';
+import { sendEmailVerification } from '@angular/fire/auth';
+import { ToastController } from '@ionic/angular';
 
 addIcons({
   'eye': eye,
@@ -26,99 +29,86 @@ declare global {
   templateUrl: './create-account.component.html',
   styleUrls: ['./create-account.component.scss'],
   standalone: true,
-  imports: [AppHeaderComponent, AppFooterComponent, FormsModule, NgIf, STANDALONE_IMPORTS, RouterModule/*, SkipLinkComponent*/],
+  imports: [
+    AppHeaderComponent,
+    AppFooterComponent,
+    RouterModule,
+    FormsModule,
+    NgIf,
+    STANDALONE_IMPORTS
+  ]
 })
 export class CreateAccountComponent implements OnInit, AfterViewInit {
-  email = '';
-  password = '';
+  email: string = '';
+  password: string = '';
   error: string | null = null;
-  currentYear: number = new Date().getFullYear();
-  recaptchaSiteKey = '6LfCQmYrAAAAAAW9jUsKIkBm8uAc41MGahUqSbpe';
-  private recaptchaWidgetId: any = null;
-  recaptchaReady = false;
-  showPassword = false;
+  showPassword: boolean = false;
 
-  @ViewChild('submitBtn') submitBtn!: ElementRef<HTMLIonButtonElement>;
+  private firestore = inject(Firestore);
 
-  togglePasswordVisibility(): void {
-    this.showPassword = !this.showPassword;
-  }
-  submitFormIfValid(form: any): void {
-    if (form.valid) {
-      this.createAccount();
-    }
-  }
-
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(
+    private authService: AuthService,
+    private router: Router,
+    private toastCtrl: ToastController
+  ) {}
 
   ngOnInit(): void {}
 
-  async ngAfterViewInit(): Promise<void> {
-    await this.waitForRecaptcha();
+  ngAfterViewInit(): void {}
 
-    this.recaptchaWidgetId = window.grecaptcha.render('recaptcha-container', {
-      sitekey: this.recaptchaSiteKey,
-      size: 'invisible',
-      callback: (token: string) => this.onRecaptchaSuccess(token)
-    });
-
-    this.recaptchaReady = true;
-  }
-
-  waitForRecaptcha(): Promise<void> {
-    return new Promise(resolve => {
-      const interval = setInterval(() => {
-        if (window.grecaptcha && window.grecaptcha.render) {
-          clearInterval(interval);
-          resolve();
-        }
-      }, 100);
-    });
-  }
-
-  async createAccount(): Promise<void> {
+  async createAccount() {
     this.error = null;
+    try {
+      const cred = await this.authService.register(this.email, this.password);
 
-    const activeEl = document.activeElement as HTMLElement;
-    if (activeEl && typeof activeEl.blur === 'function') {
-      activeEl.blur();
-    }
+      await sendEmailVerification(cred.user);
+      await this.createUserInFirestore(cred.user);
+      await this.authService.logout();
 
-    if (!this.recaptchaReady && window.grecaptcha) {
-      await this.ngAfterViewInit(); // re-render if needed
-    }
+      const toast = await this.toastCtrl.create({
+        message: 'Account created! Please check your email and verify before logging in.',
+        duration: 4000,
+        color: 'success',
+        position: 'bottom'
+      });
 
-    if (this.recaptchaReady) {
-      window.grecaptcha.execute(this.recaptchaWidgetId);
-    } else {
-      this.error = 'reCAPTCHA failed to load. Please refresh and try again.';
+      // Patch for accessibility
+      toast.role = 'alert';
+      await toast.present();
+
       setTimeout(() => {
-        this.submitBtn?.nativeElement?.focus();
-      }, 100);
+        const toastEl = document.querySelector('ion-toast');
+        if (toastEl) {
+          toastEl.setAttribute('role', 'alert');
+          toastEl.setAttribute('aria-live', 'assertive');
+        }
+      }, 100); // Allow time for DOM render
+
+
+      this.router.navigate(['/login']);
+    } catch (err: any) {
+      this.error = err.message || 'An unknown error occurred.';
     }
   }
 
-  onRecaptchaSuccess(token: string): void {
-    this.authService.register(this.email, this.password)
-      .then(() => {
-        alert('Verification email sent. Please check your inbox before logging in.');
-        this.router.navigate(['/login']);
-      })
-      .catch(err => {
-        console.error(err);
-        this.error = err?.message || 'Failed to create account. Please try again.';
+  async createUserInFirestore(user: any) {
+    const userRef = doc(this.firestore, `users/${user.uid}`);
+    await setDoc(userRef, {
+      uid: user.uid,
+      email: user.email,
+      displayName: user.displayName || null,
+      createdAt: serverTimestamp(),
+      role: 'player',
+    }, { merge: true });
+  }
 
-        setTimeout(() => {
-          const errorEl = document.getElementById('form-error');
-          if (errorEl) {
-            errorEl.focus();
-          }
-          this.submitBtn?.nativeElement?.focus();
-        }, 100);
+  togglePasswordVisibility() {
+    this.showPassword = !this.showPassword;
+  }
 
-        if (window.grecaptcha && this.recaptchaWidgetId !== null) {
-          window.grecaptcha.reset(this.recaptchaWidgetId);
-        }
-      });
+  submitFormIfValid(form: any) {
+    if (form.valid) {
+      this.createAccount();
+    }
   }
 }

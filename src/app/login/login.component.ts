@@ -9,6 +9,8 @@ import { STANDALONE_IMPORTS } from '../shared/standalone-imports';
 // import { SkipLinkComponent } from "../shared/skip-link/skip-link.component";
 import { addIcons } from 'ionicons';
 import { eye, eyeOff } from 'ionicons/icons';
+import { signOut } from '@angular/fire/auth';
+import { ToastController } from '@ionic/angular';
 
 addIcons({
   'eye': eye,
@@ -42,7 +44,8 @@ export class LoginComponent implements OnInit, AfterViewInit {
     this.showPassword = !this.showPassword;
   }
 
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(private authService: AuthService, private router: Router,
+    private toastCtrl: ToastController) {}
 
   ngOnInit(): void {}
 
@@ -72,6 +75,7 @@ export class LoginComponent implements OnInit, AfterViewInit {
   }
 
   async login(): Promise<void> {
+    this.error = null;
     console.log('Login attempted', this.email, this.password);
 
     const activeEl = document.activeElement as HTMLElement;
@@ -85,15 +89,48 @@ export class LoginComponent implements OnInit, AfterViewInit {
 
     try {
       if (this.recaptchaReady) {
-        window.grecaptcha.execute(this.recaptchaWidgetId);
+        const token = await window.grecaptcha.execute(this.recaptchaWidgetId);
+        if (!token) {
+          this.error = 'reCAPTCHA verification failed.';
+          return;
+        }
+
+        const cred = await this.authService.login(this.email, this.password);
+
+        if (!cred.user.emailVerified) {
+          await this.authService.logout();
+          this.error = 'Your email address has not been verified.';
+          return;
+        }
+
+        const toast = await this.toastCtrl.create({
+          message: 'Login successful!',
+          duration: 3000,
+          color: 'success',
+          position: 'bottom'
+        });
+
+        await toast.present();
+
+        setTimeout(() => {
+          const toastEl = document.querySelector('ion-toast');
+          if (toastEl) {
+            toastEl.setAttribute('role', 'alert');
+            toastEl.setAttribute('aria-live', 'assertive');
+          }
+        }, 100);
+
+        this.router.navigate(['/dashboard']);
+
       } else {
         this.error = 'reCAPTCHA failed to load. Please refresh and try again.';
       }
-    } catch (e) {
-      console.error('reCAPTCHA error:', e);
-      this.error = 'reCAPTCHA error occurred. Please reload the page.';
+    } catch (e: any) {
+      console.error('Login error:', e);
+      this.error = e.message || 'Login failed. Please try again.';
     }
   }
+
 
   onRecaptchaSuccess(token: string): void {
     this.authService.login(this.email, this.password)

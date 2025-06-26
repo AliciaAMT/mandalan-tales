@@ -8,6 +8,8 @@ import {
   sendPasswordResetEmail
 } from '@angular/fire/auth';
 import { Router } from '@angular/router';
+import { Firestore, doc, setDoc, serverTimestamp } from '@angular/fire/firestore';
+
 // import { AngularFireAuth } from '@angular/fire/compat/auth';
 
 const actionCodeSettings = {
@@ -17,7 +19,7 @@ const actionCodeSettings = {
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  constructor(private auth: Auth, private router: Router) {}
+  constructor(private auth: Auth, private router: Router, private firestore: Firestore) {}
 
   async login(email: string, password: string): Promise<any> {
     const cred = await signInWithEmailAndPassword(this.auth, email, password);
@@ -30,11 +32,21 @@ export class AuthService {
     return cred;
   }
 
-  register(email: string, password: string) {
-    return createUserWithEmailAndPassword(this.auth, email, password).then(cred =>
-      cred.user ? sendEmailVerification(cred.user, actionCodeSettings) : Promise.resolve()
-    );
+  async register(email: string, password: string) {
+    const cred = await createUserWithEmailAndPassword(this.auth, email, password);
+
+    const userRef = doc(this.firestore, `users/${cred.user.uid}`);
+    await setDoc(userRef, {
+      uid: cred.user.uid,
+      email: cred.user.email,
+      displayName: cred.user.displayName || null,
+      createdAt: serverTimestamp(),
+      role: 'player'
+    });
+
+    return cred;
   }
+
   logout() {
     return signOut(this.auth);
   }
