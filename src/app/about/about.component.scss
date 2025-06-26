@@ -1,3 +1,44 @@
+
+
+.logo-wrapper {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.hero-logo {
+  width: 300px;
+  height: auto;
+  border-radius: 16px;
+  box-shadow: 0 0 12px rgba(255, 215, 0, 0.3);
+}
+.screenshots {
+  margin-top: 2rem;
+  text-align: center;
+
+  h2 {
+    font-size: 1.4rem;
+    color: var(--ion-color-primary);
+    margin-bottom: 1rem;
+  }
+
+  .screenshot-gallery {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+    padding: 0 1rem;
+  }
+
+  img {
+    max-width: 100%;
+    width: 500px;
+    height: auto;
+    border: 2px solid var(--ion-color-primary);
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.2);
+  }
+}
+
 .flex-page {
   display: flex;
   flex-direction: column;
@@ -11,17 +52,20 @@
 app-footer {
   flex-shrink: 0;
 }
-.skip-link {
-  position: absolute;
-  top: -40px;
-  left: 0;
-  background-color: #000;
-  color: #fff;
-  padding: 8px 12px;
-  z-index: 1000;
-  text-decoration: none;
+// .skip-link {
+//   position: absolute;
+//   top: -40px;
+//   left: 0;
+//   background-color: #000;
+//   color: #fff;
+//   padding: 8px 12px;
+//   z-index: 1000;
+//   text-decoration: none;
 
-  &:focus {
-    top: 0;
-  }
+//   &:focus {
+//     top: 0;
+//   }
+// }
+.page-wrapper {
+  scroll-margin-top: 200px; // Adjust based on your sticky header height
 }

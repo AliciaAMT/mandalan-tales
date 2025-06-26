@@ -66,17 +66,22 @@
 // }
 
 /* Bottom links */
-.login-links {
-  margin-top: 2rem;
-  text-align: center;
-  font-size: 0.95rem;
+.login-links a {
+  color: #e6c265;
+  text-decoration: underline;
+  cursor: pointer;
+  display: inline-block;
+  margin-top: 0.5rem;
+  font-weight: 500;
+  transition: color 0.2s ease;
+  pointer-events: auto !important;
+  z-index: 10 !important;
+  position: relative;
+}
 
-  a {
-    color: #e6c265;
-    text-decoration: underline;
-    display: inline-block;
-    margin-top: 0.5rem;
-  }
+.login-links a:hover {
+  color: #fff;
+  text-decoration: underline;
 }
 .flex-page {
   display: flex;
@@ -235,17 +240,66 @@ input:-moz-autofill {
   background-color: #000 !important;
   color: #fff !important;
 }
-// .g-recaptcha {
-//   transform: scale(0.7);  // You can tweak this down to 0.7 if needed
-//   transform-origin: 0 0;
-// }
-// @media (max-width: 400px) {
-//   .g-recaptcha {
-//     transform: scale(0.5);
-//   }
-// }
+.flex-page, ion-content {
+  pointer-events: auto; // should NOT be 'none'
+}
+a[routerLink] {
+  position: relative;
+  z-index: 10;
+  pointer-events: auto;
+}
 .grecaptcha-badge {
   position: static !important;
   margin: 1rem auto;
   display: block;
+}
+.sr-only {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+fieldset {
+  border: none;
+  margin: 0;
+  padding: 0;
+  min-inline-size: 0;
+}
+// Restore default focus outline for accessibility
+ion-input input:focus,
+ion-textarea textarea:focus {
+  outline: 2px solid white;
+  outline-offset: 2px;
+}
+
+// Optional: Enhance ion-item highlighting on focus
+ion-item:focus-within {
+  border: 2px solid white;
+  border-radius: 6px;
+}
+ion-button:focus {
+  outline: 2px solid white;
+  outline-offset: 2px;
+}
+// ion-button:focus {
+//   --background: var(--ion-color-primary-shade);
+//   --color: white;
+//   transform: scale(1.02); // optional: subtle pop effect
+// }
+.error-message {
+  color: var(--ion-color-danger);
+  margin-top: 0.5rem;
+  font-weight: 500;
+}
+ion-input[type="text"] input,
+ion-input[type="password"] input {
+  color: white;
+}
+ion-input input {
+  color: white; // or your preferred text color
 }

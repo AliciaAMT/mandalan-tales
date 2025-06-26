@@ -1,7 +1,14 @@
 import { Injectable } from '@angular/core';
-import { Auth, signInWithEmailAndPassword, signOut,createUserWithEmailAndPassword,
-  sendEmailVerification } from '@angular/fire/auth';
+import {
+  Auth,
+  signInWithEmailAndPassword,
+  signOut,
+  createUserWithEmailAndPassword,
+  sendEmailVerification,
+  sendPasswordResetEmail
+} from '@angular/fire/auth';
 import { Router } from '@angular/router';
+// import { AngularFireAuth } from '@angular/fire/compat/auth';
 
 const actionCodeSettings = {
   url: 'http://localhost:8100/login', // ⬅️ CHANGE THIS for production
@@ -12,9 +19,17 @@ const actionCodeSettings = {
 export class AuthService {
   constructor(private auth: Auth, private router: Router) {}
 
-  login(email: string, password: string) {
-    return signInWithEmailAndPassword(this.auth, email, password);
+  async login(email: string, password: string): Promise<any> {
+    const cred = await signInWithEmailAndPassword(this.auth, email, password);
+
+    if (!cred.user.emailVerified) {
+      await signOut(this.auth);
+      throw new Error('Your email address has not been verified.');
+    }
+
+    return cred;
   }
+
   register(email: string, password: string) {
     return createUserWithEmailAndPassword(this.auth, email, password).then(cred =>
       cred.user ? sendEmailVerification(cred.user, actionCodeSettings) : Promise.resolve()
@@ -22,6 +37,10 @@ export class AuthService {
   }
   logout() {
     return signOut(this.auth);
+  }
+
+  sendPasswordResetEmail(email: string): Promise<void> {
+    return sendPasswordResetEmail(this.auth, email, actionCodeSettings);
   }
 
   get currentUser() {

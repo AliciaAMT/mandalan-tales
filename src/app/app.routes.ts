@@ -36,5 +36,18 @@ export const routes: Routes = [
     path: 'dashboard',
     loadComponent: () =>
       import('./dashboard/dashboard.component').then(m => m.DashboardComponent)
+  },
+  {
+    path: 'forgot-password',
+    loadComponent: () =>
+      import('./forgot-password/forgot-password.component').then(
+        m => m.ForgotPasswordComponent
+      )
+  },
+  {
+    path: 'dashboard/create-character',
+    loadComponent: () =>
+      import('./dashboard/create-character/create-character.page').then(m => m.CreateCharacterPage)
   }
+
 ];

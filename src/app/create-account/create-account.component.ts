@@ -1,11 +1,19 @@
 import { AppHeaderComponent } from "../shared/header/app-header.component";
 import { AppFooterComponent } from "../shared/footer/app-footer.component";
 import { FormsModule } from '@angular/forms';
-import { AfterViewInit, Component, OnInit } from '@angular/core';
-import { AuthService } from '../services/auth.service'; // update path if needed
+import { AfterViewInit, Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { AuthService } from '../services/auth.service';
 import { Router, RouterModule } from '@angular/router';
 import { NgIf } from "@angular/common";
 import { STANDALONE_IMPORTS } from '../shared/standalone-imports';
+// import { SkipLinkComponent } from "../shared/skip-link/skip-link.component";
+import { addIcons } from 'ionicons';
+import { eye, eyeOff } from 'ionicons/icons';
+
+addIcons({
+  'eye': eye,
+  'eye-off': eyeOff
+});
 
 declare global {
   interface Window {
@@ -18,7 +26,7 @@ declare global {
   templateUrl: './create-account.component.html',
   styleUrls: ['./create-account.component.scss'],
   standalone: true,
-  imports: [AppHeaderComponent, AppFooterComponent, FormsModule, NgIf, STANDALONE_IMPORTS, RouterModule],
+  imports: [AppHeaderComponent, AppFooterComponent, FormsModule, NgIf, STANDALONE_IMPORTS, RouterModule/*, SkipLinkComponent*/],
 })
 export class CreateAccountComponent implements OnInit, AfterViewInit {
   email = '';
@@ -28,6 +36,18 @@ export class CreateAccountComponent implements OnInit, AfterViewInit {
   recaptchaSiteKey = '6LfCQmYrAAAAAAW9jUsKIkBm8uAc41MGahUqSbpe';
   private recaptchaWidgetId: any = null;
   recaptchaReady = false;
+  showPassword = false;
+
+  @ViewChild('submitBtn') submitBtn!: ElementRef<HTMLIonButtonElement>;
+
+  togglePasswordVisibility(): void {
+    this.showPassword = !this.showPassword;
+  }
+  submitFormIfValid(form: any): void {
+    if (form.valid) {
+      this.createAccount();
+    }
+  }
 
   constructor(private authService: AuthService, private router: Router) {}
 
@@ -59,14 +79,22 @@ export class CreateAccountComponent implements OnInit, AfterViewInit {
   async createAccount(): Promise<void> {
     this.error = null;
 
+    const activeEl = document.activeElement as HTMLElement;
+    if (activeEl && typeof activeEl.blur === 'function') {
+      activeEl.blur();
+    }
+
     if (!this.recaptchaReady && window.grecaptcha) {
-      await this.ngAfterViewInit(); // try to re-render
+      await this.ngAfterViewInit(); // re-render if needed
     }
 
     if (this.recaptchaReady) {
       window.grecaptcha.execute(this.recaptchaWidgetId);
     } else {
       this.error = 'reCAPTCHA failed to load. Please refresh and try again.';
+      setTimeout(() => {
+        this.submitBtn?.nativeElement?.focus();
+      }, 100);
     }
   }
 
@@ -78,7 +106,16 @@ export class CreateAccountComponent implements OnInit, AfterViewInit {
       })
       .catch(err => {
         console.error(err);
-        this.error = err.message || 'Failed to create account.';
+        this.error = err?.message || 'Failed to create account. Please try again.';
+
+        setTimeout(() => {
+          const errorEl = document.getElementById('form-error');
+          if (errorEl) {
+            errorEl.focus();
+          }
+          this.submitBtn?.nativeElement?.focus();
+        }, 100);
+
         if (window.grecaptcha && this.recaptchaWidgetId !== null) {
           window.grecaptcha.reset(this.recaptchaWidgetId);
         }

@@ -1,20 +1,17 @@
 .skip-link {
   position: absolute;
-  left: -9999px;
-  top: auto;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
+  top: 0;
+  left: 0;
+  padding: 1rem;
+  background: black;
+  color: white;
+  transform: translateY(-100%);
+  transition: transform 0.3s;
+  z-index: 9999;
+  text-decoration: none;
+}
 
-  &:focus {
-    position: absolute;
-    left: 1rem;
-    top: 1rem;
-    width: auto;
-    height: auto;
-    padding: 0.5rem 1rem;
-    background: #000;
-    color: #fff;
-    z-index: 9999;
-  }
+.skip-link:focus {
+  transform: translateY(0);
+  outline: 2px solid white;
 }

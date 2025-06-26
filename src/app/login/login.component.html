@@ -1,4 +1,5 @@
-<app-skip-link></app-skip-link>
+<!-- <app-skip-link></app-skip-link> -->
+<div class="flex-page">
   <app-app-header></app-app-header>
 
   <ion-content>
@@ -6,6 +7,7 @@
     <div style="position: relative; z-index: 999; background: #121212; padding: 1rem;">
     <ion-card class="login-card">
       <ion-card-header>
+        <h1 class="sr-only">Login to Mandalan Tales</h1>
         <ion-card-title class="login-card-title">Login</ion-card-title>
       </ion-card-header>
 
@@ -19,8 +21,27 @@
 
           <ion-item>
             <ion-label for="passwordInput" position="stacked">Password</ion-label>
-            <ion-input id="passwordInput" aria-label="password" type="password" name="password" [(ngModel)]="password" required autocomplete="current-password"></ion-input>
+            <ion-input
+              [(ngModel)]="password"
+              [ngModelOptions]="{ updateOn: 'change' }"
+              id="passwordInput"
+              [type]="showPassword ? 'text' : 'password'"
+              name="password"
+              required
+              autocomplete="current-password"
+            ></ion-input>
+            <ion-button
+              fill="clear"
+              slot="end"
+              type="button"
+              (click)="togglePasswordVisibility()"
+              [attr.aria-pressed]="showPassword"
+              [attr.aria-label]="showPassword ? 'Hide password' : 'Show password'"
+            >
+              <ion-icon [name]="showPassword ? 'eye-off' : 'eye'"></ion-icon>
+            </ion-button>
           </ion-item>
+
         </ion-list>
 
         <ion-button
@@ -37,27 +58,26 @@
       >
           Login
         </ion-button>
-        <ion-text color="danger" *ngIf="error" id="form-error" role="alert" aria-live="assertive" tabindex="-1">
+        <div class="ion-text-danger error-message" *ngIf="error" id="form-error" role="alert" aria-live="assertive" tabindex="-1">
           {{ error }}
-        </ion-text>
+        </div>
 
       </fieldset>
       </form>
     </ion-card>
 
     <div class="login-links">
-      <!-- <a routerLink="/forgot-password">Forgot your password?</a> -->
+      <a routerLink="/forgot-password">Forgot your password?</a>
       <div class="ion-margin-top">
         New to Mandalan Tales?
         <a routerLink="/create-account">Create an account and begin your journey!</a>
       </div>
     </div>
-    <div id="recaptcha-container" class="g-recaptcha"
-    data-sitekey="your-invisible-site-key"
-    data-size="invisible"
-    data-callback="onRecaptchaSuccess">
-   </div>
+    <div id="recaptcha-container" class="g-recaptcha" data-sitekey="your-invisible-site-key" data-size="invisible" data-callback="onRecaptchaSuccess" aria-hidden="true"></div>
+    <p class="sr-only" id="recaptcha-desc">Invisible reCAPTCHA is used to prevent spam. No action is needed.</p>
+
         <app-app-footer></app-app-footer>
     </div>
     </main>
   </ion-content>
+</div>

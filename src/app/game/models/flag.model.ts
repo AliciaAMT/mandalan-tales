@@ -1,0 +1,66 @@
+export interface Flags {
+  id?: string;
+  characterId: string;
+
+  flags: {
+    anubis: boolean;
+    barncow: boolean;
+    barnhay: boolean;
+    barnwood: boolean;
+    bedroombed: boolean;
+    bedroomchest: boolean;
+    bedroomcoatrack: boolean;
+    bedroomdesk: boolean;
+    bedroomrug: boolean;
+    bedroomshelf: boolean;
+    bedroomwardrobe: boolean;
+    cavea: boolean;
+    caveb: boolean;
+    cavec: boolean;
+    caved: boolean;
+    cavee: boolean;
+    cellarbottle: boolean;
+    cellarchest: boolean;
+    cellaritem: boolean;
+    cellarpotion: boolean;
+    cellarpurse: boolean;
+    cellarrice: boolean;
+    cellarshelf: boolean;
+    cellarspider: boolean;
+    cellarveggie: boolean;
+    firelit: boolean;
+    giantbat: boolean;
+    giantscorpion: boolean;
+    giantsnake: boolean;
+    guild: boolean;
+    homechest: boolean;
+    homedrawer: boolean;
+    homefireplace: boolean;
+    homepantry: boolean;
+    homerack: boolean;
+    homerug: boolean;
+    homeshelf: boolean;
+    homeshelf2: boolean;
+    hometable: boolean;
+    ishforestpyramid: boolean;
+    ishforesttreea: boolean;
+    ishforesttreeb: boolean;
+    ishforesttreec: boolean;
+    newcharacter: boolean;
+    pyramidachest1: boolean;
+    pyramidachest2: boolean;
+    pyramidachest3: boolean;
+    pyramidachest4: boolean;
+    quest1: boolean;
+    quest4: boolean;
+    shepfeed: boolean;
+    sheppet: boolean;
+    thehiddenkey: boolean;
+    yardcoop: boolean;
+    yardgarden: boolean;
+    yardmelon: boolean;
+    yardtrees: boolean;
+  };
+
+  updatedAt?: any;
+}

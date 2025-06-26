@@ -1,12 +1,63 @@
-<a href="#main-content" class="skip-link">Skip to main content</a>
+<!-- <app-skip-link></app-skip-link> -->
 <div class="flex-page">
 
-<app-app-header></app-app-header>
+  <app-app-header></app-app-header>
 
-<ion-content class="home-content fullscreen ion-padding">
-  
-  <app-app-footer></app-app-footer>
-</ion-content>
+  <ion-content class="home-content fullscreen ion-padding">
+    <div class="hero">
+      <div class="logo-wrapper">
+        <img src="assets/icon.png" alt="Mandalan Tales Logo" class="hero-logo" />
+      </div>
+    </div>
+    <div class="page-wrapper">
+      <main id="main-content" role="main" tabindex="-1">
+      <h1>Awaken in a world not your own</h1>
+      <p class="tagline">Survive. Discover. Create.</p>
+      <ion-button aria-label="Start Your Journey" expand="block" color="primary" routerLink="/login">
+        Start Your Journey
+      </ion-button>
+
+    <ion-card class="feature-card">
+      <ion-card-header>
+        <ion-card-title>Accessible Gameplay</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        Designed with inclusive controls and screen reader support for all players.
+      </ion-card-content>
+    </ion-card>
+
+    <ion-card class="feature-card">
+      <ion-card-header>
+        <ion-card-title>Story-Rich World</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        Explore a world crafted with deep lore, reactive quests, and engaging NPCs.
+      </ion-card-content>
+    </ion-card>
+
+    <ion-card class="feature-card">
+      <ion-card-header>
+        <ion-card-title>Create New Realms</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        Win the game to unlock the power of world-building and shape your own adventures.
+      </ion-card-content>
+    </ion-card>
+
+    <section class="screenshots">
+      <h2>In-Game Preview</h2>
+      <div class="screenshot-gallery">
+        <img src="assets/screenshot.png" alt="screenshot of Player Dashboard and Stats with Map and Tile options" />
+        <img src="assets/screenshot2.png" alt="Gameplay screenshot of character battling a rat, with movement options and battle log" />
+      </div>
+      <ion-button aria-label="Create Account" expand="block" color="primary" routerLink="/create-account">
+        Create Account
+      </ion-button>
+    </section>
+    <app-app-footer></app-app-footer>
+  </main>
+  </div>
+  </ion-content>
 
 
-</div>
+  </div>

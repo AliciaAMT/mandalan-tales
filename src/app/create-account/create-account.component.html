@@ -1,53 +1,78 @@
-
-
-<a href="#main-content" class="skip-link">Skip to main content</a>
-
 <div class="flex-page">
-  <app-app-header></app-app-header>
-
-  <!-- <div class="g-recaptcha" data-sitekey="6LcYP2UrAAAAANpOHNicmadpslJ6_Pq0kfkSiCTC"></div> -->
-
-  <ion-content class="ion-padding">
-    <ion-card class="login-card" id="main-content" role="main">
+<app-app-header></app-app-header>
+  <ion-content>
+    <main id="main-content" role="main">
+      <div style="position: relative; z-index: 999; background: #121212; padding: 1rem;">
+    <ion-card class="login-card">
       <ion-card-header>
+        <h1 class="sr-only">Create Account</h1>
         <ion-card-title class="login-card-title">Create Account</ion-card-title>
       </ion-card-header>
 
       <form (ngSubmit)="createAccount()" #registerForm="ngForm">
+        <fieldset>
         <ion-list lines="none">
           <ion-item>
-            <ion-label position="stacked">Email</ion-label>
-            <ion-input aria-label="email" type="email" name="email" [(ngModel)]="email" required autocomplete="email" inputmode="email"></ion-input>
+            <ion-label for="emailInput" position="stacked">Email</ion-label>
+            <ion-input id="emailInput" aria-label="Email" type="email" name="email" [(ngModel)]="email" required autocomplete="email" inputmode="email"></ion-input>
           </ion-item>
 
           <ion-item>
-            <ion-label position="stacked">Password</ion-label>
+            <ion-label for="passwordInput" position="stacked">Password</ion-label>
             <ion-input
-           aria-label="Password" type="password" name="password" [(ngModel)]="password" required autocomplete="new-password"></ion-input>
+            [(ngModel)]="password"
+            [ngModelOptions]="{ updateOn: 'change' }"
+            id="passwordInput"
+            [type]="showPassword ? 'text' : 'password'"
+            name="password"
+            required
+            autocomplete="new-password"></ion-input>
+            <ion-button
+              fill="clear"
+              slot="end"
+              type="button"
+              (click)="togglePasswordVisibility()"
+              [attr.aria-pressed]="showPassword"
+              [attr.aria-label]="showPassword ? 'Hide password' : 'Show password'"
+            >
+              <ion-icon [name]="showPassword ? 'eye-off' : 'eye'"></ion-icon>
+            </ion-button>
           </ion-item>
         </ion-list>
 
-  <!-- ✅ Proper placement & styling -->
+        <ion-button
+  #submitBtn
+  type="submit"
+  expand="block"
+  aria-label="Create Account"
+  aria-describedby="form-error recaptcha-desc"
+  [attr.aria-disabled]="!registerForm.form.valid ? 'true' : null"
+  [disabled]="!registerForm.form.valid"
+  [tabindex]="!registerForm.form.valid ? -1 : null"
+  (keydown.enter)="submitFormIfValid(registerForm)">
+  Create Account
+</ion-button>
 
-        <ion-button type="submit" expand="block" [disabled]="!registerForm.form.valid">
-          Create Account
-        </ion-button>
-        <ion-text color="danger" *ngIf="error">{{ error }}</ion-text>
-
+        <div
+        class="ion-text-danger error-message"
+        *ngIf="error" id="form-error" role="alert" aria-live="assertive" tabindex="-1">
+          {{ error }}
+      </div>
+    </fieldset>
       </form>
-
     </ion-card>
-    <div id="recaptcha-container" class="g-recaptcha"
-    data-sitekey="your-invisible-site-key"
-    data-size="invisible"
-    data-callback="onRecaptchaSuccess">
-   </div>
-<!--
-    <div role="group" aria-label="robot check" style="display: flex; flex-direction: column; justify-content: center; width: 100%; align-items: center; margin-top: 1rem;"> -->
+    <div class="login-links">
+      <div class="ion-margin-top">
+        Already have an account?
+        <a routerLink="/login">Go to login</a>
+      </div>
+    </div>
+    <div id="recaptcha-container" class="g-recaptcha" data-sitekey="your-invisible-site-key" data-size="invisible" data-callback="onRecaptchaSuccess" aria-hidden="true"></div>
+    <p class="sr-only" id="recaptcha-desc">Invisible reCAPTCHA is used to prevent spam. No action is needed.</p>
 
-
-    <!-- </div> -->
     <app-app-footer></app-app-footer>
-  </ion-content>
+      </div>
+    </main>
 
-</div>
+  </ion-content>
+  </div>
