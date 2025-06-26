@@ -6,7 +6,8 @@ import { CharacterService } from '../game/services/character.service';
 import { CharStats } from '../game/models/charstats.model';
 import { CommonModule } from '@angular/common';
 
-import { IonHeader } from "@ionic/angular/standalone";
+
+import { RouterModule } from '@angular/router';
 // import { AngularFirestoreModule } from '@angular/fire/compat/firestore';
 
 @Component({
@@ -14,7 +15,7 @@ import { IonHeader } from "@ionic/angular/standalone";
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss'],
   standalone: true,
-  imports: [AppHeaderComponent, AppFooterComponent, STANDALONE_IMPORTS, CommonModule],
+  imports: [AppHeaderComponent, AppFooterComponent, STANDALONE_IMPORTS, CommonModule, RouterModule],
 })
 export class DashboardComponent  {
   characters: CharStats[] = [];

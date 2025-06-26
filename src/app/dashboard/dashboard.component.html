@@ -1,6 +1,4 @@
 <app-app-header></app-app-header>
-
-
 <ion-content class="ion-padding">
   <ng-container *ngIf="characters.length > 0; else noCharacters">
     <ion-grid>
@@ -48,6 +46,7 @@
   </ion-button>
 
   <ion-button
+    [routerLink]="['/dashboard/create-character']"
     expand="block"
     color="medium"
     *ngIf="characters.length < maxCharacters"
@@ -55,5 +54,6 @@
   >
     Create New Character
   </ion-button>
+
   <app-app-footer></app-app-footer>
 </ion-content>
