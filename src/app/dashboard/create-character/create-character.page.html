@@ -1,41 +1,54 @@
-<ion-header>
-  <ion-toolbar>
-    <ion-title>Create Character</ion-title>
-  </ion-toolbar>
-</ion-header>
+<app-app-header></app-app-header>
 
 <ion-content class="ion-padding">
   <form [formGroup]="characterForm" (ngSubmit)="onSubmit()">
-    <ion-item>
-      <ion-label position="floating">Name</ion-label>
-      <ion-input formControlName="name" required></ion-input>
-    </ion-item>
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Character Info</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
 
-    <ion-item>
-      <ion-label>Race</ion-label>
-      <ion-select formControlName="race" interface="popover">
-        <ion-select-option *ngFor="let race of races" [value]="race">{{ race }}</ion-select-option>
-      </ion-select>
-    </ion-item>
+        <ion-item lines="full">
+          <ion-label position="stacked">Name</ion-label>
+          <ion-input formControlName="name" required></ion-input>
+        </ion-item>
 
-    <ion-item>
-      <ion-label>Class</ion-label>
-      <ion-select formControlName="class" interface="popover">
-        <ion-select-option *ngFor="let cls of classes" [value]="cls">{{ cls }}</ion-select-option>
-      </ion-select>
-    </ion-item>
+        <ion-item>
+          <ion-label>Race</ion-label>
+          <ion-select formControlName="race" interface="popover">
+            <ion-select-option *ngFor="let race of races" [value]="race">{{ race }}</ion-select-option>
+          </ion-select>
+        </ion-item>
 
-    <div formGroupName="stats">
-      <ion-item *ngFor="let stat of ['str','dex','int','wis','con','cha']">
-        <ion-label>{{ stat.toUpperCase() }}</ion-label>
-        <ion-input type="number" min="0" max="12" [formControlName]="stat"></ion-input>
-      </ion-item>
-    </div>
+        <ion-item>
+          <ion-label>Class</ion-label>
+          <ion-select formControlName="class" interface="popover">
+            <ion-select-option *ngFor="let cls of classes" [value]="cls">{{ cls }}</ion-select-option>
+          </ion-select>
+        </ion-item>
 
-    <p>Points used: {{ allocatedPoints }} / {{ totalPoints }}</p>
+        <div formGroupName="stats">
+          <ion-item *ngFor="let stat of ['str','dex','int','wis','con','cha']">
+            <ion-label>{{ stat.toUpperCase() }}</ion-label>
+            <ion-input type="number" min="0" max="12" [formControlName]="stat"></ion-input>
+          </ion-item>
+        </div>
 
-    <ion-button expand="full" type="submit" [disabled]="allocatedPoints > totalPoints || !characterForm.valid">
-      Create Character
-    </ion-button>
+        <p>Points used: {{ allocatedPoints }} / {{ totalPoints }}</p>
+
+        <ion-item button (click)="openPortraitSelector()">
+          <ion-label>Portrait</ion-label>
+          <ion-thumbnail slot="end" *ngIf="selectedPortrait">
+            <ion-img [src]="'assets/webp-output/portraits/' + selectedPortrait + '.webp'"></ion-img>
+          </ion-thumbnail>
+        </ion-item>
+
+        <ion-button expand="full" type="submit" [disabled]="allocatedPoints > totalPoints || !characterForm.valid">
+          Create Character
+        </ion-button>
+
+      </ion-card-content>
+    </ion-card>
   </form>
+  <app-app-footer></app-app-footer>
 </ion-content>

@@ -1,16 +1,17 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { IonicModule } from '@ionic/angular';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { IonicModule, ActionSheetController } from '@ionic/angular';
 import { RouterModule } from '@angular/router';
+import { AppHeaderComponent } from 'src/app/shared/header/app-header.component';
+import { AppFooterComponent } from 'src/app/shared/footer/app-footer.component';
 
 @Component({
   selector: 'app-create-character',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, IonicModule, RouterModule ],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, IonicModule, RouterModule, AppHeaderComponent, AppFooterComponent],
   templateUrl: './create-character.page.html',
-  styleUrls: ['./create-character.page.scss']
+  styleUrls: ['./create-character.page.scss'],
 })
 export class CreateCharacterPage {
   characterForm: FormGroup;
@@ -19,7 +20,16 @@ export class CreateCharacterPage {
   races = ['Human', 'Elf', 'Dwarf', 'Orc'];
   classes = ['Warrior', 'Mage', 'Thief', 'Healer'];
 
-  constructor(private fb: FormBuilder) {
+  portraits: string[] = [
+    ...Array.from({ length: 10 }, (_, i) => `male${i + 1}`),
+    ...Array.from({ length: 10 }, (_, i) => `female${i + 1}`)
+  ];
+  selectedPortrait = '';
+
+  constructor(
+    private fb: FormBuilder,
+    private actionSheetCtrl: ActionSheetController
+  ) {
     this.characterForm = this.fb.group({
       name: ['', Validators.required],
       race: ['', Validators.required],
@@ -40,14 +50,36 @@ export class CreateCharacterPage {
     return Object.values(stats).reduce((a, b) => a + b, 0);
   }
 
-  onSubmit() {
+  async openPortraitSelector() {
+    const buttons = this.portraits.map(portrait => ({
+      text: portrait,
+      icon: undefined,
+      handler: () => this.selectPortrait(portrait)
+    }));
+
+    const actionSheet = await this.actionSheetCtrl.create({
+      header: 'Choose a Portrait',
+      buttons: [...buttons, { text: 'Cancel', role: 'cancel' }]
+    });
+
+    await actionSheet.present();
+  }
+
+  selectPortrait(portrait: string): void {
+    this.selectedPortrait = portrait;
+  }
+
+  onSubmit(): void {
     if (this.characterForm.valid && this.allocatedPoints <= this.totalPoints) {
+      const formData = this.characterForm.value;
       const characterData = {
-        ...this.characterForm.value,
+        ...formData,
+        portrait: this.selectedPortrait,
         createdAt: Date.now()
       };
+
       console.log('Character Created:', characterData);
-      // TODO: send to Firebase
+      // TODO: Save to Firebase
     }
   }
 }
