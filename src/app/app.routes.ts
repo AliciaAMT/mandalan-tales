@@ -34,23 +34,7 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./create-account/create-account.component').then(m => m.CreateAccountComponent)
   },
-  {
-    path: 'dashboard',
-    canActivate: [AuthGuard],
-    loadComponent: () => import('./dashboard/dashboard.component').then(m => m.DashboardComponent),
-    children: [
-      {
-        path: 'create-character',
-        canActivate: [AuthGuard],
-        loadComponent: () =>
-          import('./dashboard/create-character/create-character.page').then(m => m.CreateCharacterPage),
-      },
-    ],
-  },
-  {
-    path: '**',
-    redirectTo: '',
-  },
+
   {
     path: 'forgot-password',
     loadComponent: () =>
@@ -58,10 +42,21 @@ export const routes: Routes = [
         m => m.ForgotPasswordComponent
       )
   },
-  // {
-  //   path: 'dashboard/create-character',
-  //   loadComponent: () =>
-  //     import('./dashboard/create-character/create-character.page').then(m => m.CreateCharacterPage)
-  // }
+  {
+    path: 'dashboard',
+    canActivate: [AuthGuard],
+    loadComponent: () =>
+      import('./dashboard/dashboard.component').then((m) => m.DashboardComponent),
+  },
+  {
+    path: 'create-character',
+    loadComponent: () =>
+      import('./dashboard/create-character/create-character.page').then((m) => m.CreateCharacterPage),
+  },
+
+  {
+    path: '**',
+    redirectTo: '',
+  },
 
 ];

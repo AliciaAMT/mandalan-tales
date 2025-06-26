@@ -46,13 +46,16 @@
   </ion-button>
 
   <ion-button
-    [routerLink]="['/dashboard/create-character']"
+    [routerLink]="['/create-character']"
     expand="block"
     color="medium"
     *ngIf="characters.length < maxCharacters"
-    routerLink="/game/character/create"
   >
     Create New Character
+  </ion-button>
+  <ion-button expand="block" color="danger" (click)="logout()">
+    <ion-icon slot="start" name="log-out-outline"></ion-icon>
+    Logout
   </ion-button>
 
   <app-app-footer></app-app-footer>

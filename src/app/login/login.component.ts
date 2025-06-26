@@ -39,6 +39,8 @@ export class LoginComponent implements OnInit, AfterViewInit {
   private recaptchaWidgetId: any = null;
   recaptchaReady = false;
   showPassword = false;
+  alreadyLoggedIn: boolean = false;
+
 
   togglePasswordVisibility(): void {
     this.showPassword = !this.showPassword;
@@ -47,7 +49,11 @@ export class LoginComponent implements OnInit, AfterViewInit {
   constructor(private authService: AuthService, private router: Router,
     private toastCtrl: ToastController) {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    if (this.authService.currentUser) {
+      this.alreadyLoggedIn = true;
+    }
+  }
 
   async ngAfterViewInit(): Promise<void> {
     await this.waitForRecaptcha();
@@ -124,14 +130,24 @@ export class LoginComponent implements OnInit, AfterViewInit {
         this.router.navigate(['/dashboard']);
 
       } else {
-        this.error = 'reCAPTCHA failed to load. Please refresh and try again.';
+        this.error = 'Login failed. Try reloading the page.';
       }
     } catch (e: any) {
       console.error('Login error:', e);
       this.error = e.message || 'Login failed. Please try again.';
     }
   }
-
+  async logout(): Promise<void> {
+    await this.authService.logout();
+    this.alreadyLoggedIn = false;
+    const toast = await this.toastCtrl.create({
+      message: 'You have been logged out.',
+      duration: 2000,
+      color: 'medium',
+      position: 'bottom',
+    });
+    await toast.present();
+  }
 
   onRecaptchaSuccess(token: string): void {
     this.authService.login(this.email, this.password)
