@@ -89,6 +89,7 @@ export class LoginComponent implements OnInit, AfterViewInit {
 
     try {
       if (this.recaptchaReady) {
+        window.grecaptcha.reset(this.recaptchaWidgetId);
         const token = await window.grecaptcha.execute(this.recaptchaWidgetId);
         if (!token) {
           this.error = 'reCAPTCHA verification failed.';
