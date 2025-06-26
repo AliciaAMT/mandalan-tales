@@ -1,4 +1,6 @@
 import { Routes } from '@angular/router';
+import { AuthGuard } from './guards/auth.guard';
+
 
 export const routes: Routes = [
   {
@@ -34,8 +36,20 @@ export const routes: Routes = [
   },
   {
     path: 'dashboard',
-    loadComponent: () =>
-      import('./dashboard/dashboard.component').then(m => m.DashboardComponent)
+    canActivate: [AuthGuard],
+    loadComponent: () => import('./dashboard/dashboard.component').then(m => m.DashboardComponent),
+    children: [
+      {
+        path: 'create-character',
+        canActivate: [AuthGuard],
+        loadComponent: () =>
+          import('./dashboard/create-character/create-character.page').then(m => m.CreateCharacterPage),
+      },
+    ],
+  },
+  {
+    path: '**',
+    redirectTo: '',
   },
   {
     path: 'forgot-password',
@@ -44,10 +58,10 @@ export const routes: Routes = [
         m => m.ForgotPasswordComponent
       )
   },
-  {
-    path: 'dashboard/create-character',
-    loadComponent: () =>
-      import('./dashboard/create-character/create-character.page').then(m => m.CreateCharacterPage)
-  }
+  // {
+  //   path: 'dashboard/create-character',
+  //   loadComponent: () =>
+  //     import('./dashboard/create-character/create-character.page').then(m => m.CreateCharacterPage)
+  // }
 
 ];
