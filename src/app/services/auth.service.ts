@@ -1,36 +1,18 @@
-import { Injectable } from '@angular/core';
-import {
-  Auth,
-  signInWithEmailAndPassword,
-  signOut,
-  createUserWithEmailAndPassword,
-  sendEmailVerification,
-  sendPasswordResetEmail
-} from '@angular/fire/auth';
+import { Injectable, inject } from '@angular/core';
+import { Auth, User, authState, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from '@angular/fire/auth';
+import { Firestore, collection, doc, setDoc, serverTimestamp } from '@angular/fire/firestore';
 import { Router } from '@angular/router';
-import { Firestore, doc, setDoc, serverTimestamp } from '@angular/fire/firestore';
+import { Observable } from 'rxjs';
 
-// import { AngularFireAuth } from '@angular/fire/compat/auth';
-
-const actionCodeSettings = {
-  url: 'http://localhost:8100/login', // ⬅️ CHANGE THIS for production
-  handleCodeInApp: false
-};
-
-@Injectable({ providedIn: 'root' })
+@Injectable({
+  providedIn: 'root',
+})
 export class AuthService {
-  constructor(private auth: Auth, private router: Router, private firestore: Firestore) {}
+  private auth: Auth = inject(Auth);
+  private firestore: Firestore = inject(Firestore);
+  private router: Router = inject(Router);
 
-  async login(email: string, password: string): Promise<any> {
-    const cred = await signInWithEmailAndPassword(this.auth, email, password);
-
-    if (!cred.user.emailVerified) {
-      await signOut(this.auth);
-      throw new Error('Your email address has not been verified.');
-    }
-
-    return cred;
-  }
+  currentUser$: Observable<User | null> = authState(this.auth);
 
   async register(email: string, password: string) {
     const cred = await createUserWithEmailAndPassword(this.auth, email, password);
@@ -41,21 +23,17 @@ export class AuthService {
       email: cred.user.email,
       displayName: cred.user.displayName || null,
       createdAt: serverTimestamp(),
-      role: 'player'
+      role: 'player',
     });
 
     return cred;
   }
 
-  logout() {
+  async login(email: string, password: string) {
+    return await signInWithEmailAndPassword(this.auth, email, password);
+  }
+
+  logout(): Promise<void> {
     return signOut(this.auth);
-  }
-
-  sendPasswordResetEmail(email: string): Promise<void> {
-    return sendPasswordResetEmail(this.auth, email, actionCodeSettings);
-  }
-
-  get currentUser() {
-    return this.auth.currentUser;
   }
 }

@@ -50,7 +50,7 @@ export class LoginComponent implements OnInit, AfterViewInit {
     private toastCtrl: ToastController) {}
 
   ngOnInit(): void {
-    if (this.authService.currentUser) {
+    if (this.authService.currentUser$) {
       this.alreadyLoggedIn = true;
     }
   }
