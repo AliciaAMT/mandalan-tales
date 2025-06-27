@@ -6,7 +6,8 @@ import { CharacterService } from '../game/services/character.service';
 import { CharStats } from '../game/models/charstats.model';
 import { CommonModule } from '@angular/common';
 
-
+import { firstValueFrom } from 'rxjs';
+import { User } from '@angular/fire/auth';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../services/auth.service';
 // import { AngularFirestoreModule } from '@angular/fire/compat/firestore';
@@ -23,18 +24,29 @@ export class DashboardComponent  {
   selectedCharacterId: string | null = null;
   maxCharacters = 6;
   currentYear: number = new Date().getFullYear();
-
+  user: User | null = null;
   constructor(
     private characterService: CharacterService,
     private authService: AuthService,
     private router: Router
     ) {}
 
-  ngOnInit(): void {
-    this.characterService.getCharacters().subscribe(chars => {
-      this.characters = chars || [];
-    });
-  }
+
+    async ngOnInit(): Promise<void> {
+      const user = await firstValueFrom(this.authService.currentUser$);
+
+      if (!user) {
+        this.router.navigate(['/login']);
+        return;
+      }
+
+      this.user = user;
+
+      this.characterService.getCharacters().subscribe(chars => {
+        this.characters = chars || [];
+      });
+    }
+
 
   selectCharacter(id: string): void {
     this.selectedCharacterId = id;

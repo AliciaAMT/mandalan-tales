@@ -1,8 +1,16 @@
 import { Injectable, inject } from '@angular/core';
-import { Auth, User, authState, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from '@angular/fire/auth';
-import { Firestore, collection, doc, setDoc, serverTimestamp } from '@angular/fire/firestore';
+import {
+  Auth,
+  User,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signOut,
+  sendPasswordResetEmail
+} from '@angular/fire/auth';
+import { Firestore, doc, setDoc, serverTimestamp } from '@angular/fire/firestore';
 import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
+import { onAuthStateChanged } from 'firebase/auth';
 
 @Injectable({
   providedIn: 'root',
@@ -12,12 +20,17 @@ export class AuthService {
   private firestore: Firestore = inject(Firestore);
   private router: Router = inject(Router);
 
-  currentUser$: Observable<User | null> = authState(this.auth);
+  currentUser$: Observable<User | null> = new Observable((observer) => {
+    const unsubscribe = onAuthStateChanged(this.auth, (user) => {
+      observer.next(user);
+    });
+    return { unsubscribe };
+  });
 
   async register(email: string, password: string) {
     const cred = await createUserWithEmailAndPassword(this.auth, email, password);
-
     const userRef = doc(this.firestore, `users/${cred.user.uid}`);
+
     await setDoc(userRef, {
       uid: cred.user.uid,
       email: cred.user.email,
@@ -35,5 +48,10 @@ export class AuthService {
 
   logout(): Promise<void> {
     return signOut(this.auth);
+  }
+
+  // ✅ Password reset method
+  async resetPassword(email: string): Promise<void> {
+    return await sendPasswordResetEmail(this.auth, email);
   }
 }
