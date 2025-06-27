@@ -1,50 +1,45 @@
 import { Component } from '@angular/core';
+import { IonicModule, ToastController } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonicModule, ToastController } from '@ionic/angular';
-import { Router } from '@angular/router';
-import { AuthService } from '../services/auth.service';
+import { RouterModule } from '@angular/router';
+import { sendPasswordResetEmail } from 'firebase/auth';
+import { auth } from 'src/app/firebase-init';
 
 @Component({
   selector: 'app-forgot-password',
   standalone: true,
-  imports: [CommonModule, FormsModule, IonicModule],
+  imports: [CommonModule, FormsModule, IonicModule, RouterModule],
   templateUrl: './forgot-password.component.html',
   styleUrls: ['./forgot-password.component.scss']
 })
 export class ForgotPasswordComponent {
-  email: string = '';
-  error: string = '';
-  success: string = '';
+  email = '';
+  error = '';
+  message = '';
 
-  constructor(
-    private authService: AuthService,
-    private toastController: ToastController,
-    private router: Router
-  ) {}
+  constructor(private toastController: ToastController) {}
 
-  async resetPassword() {
+  async resetPassword(): Promise<void> {
     this.error = '';
-    this.success = '';
-
+    this.message = '';
     try {
-      await this.authService.resetPassword(this.email);
-      this.success = 'Password reset email sent. Check your inbox.';
-      // this.showToast(this.success);
-      this.email = '';
+      await sendPasswordResetEmail(auth, this.email);
+      this.message = 'Reset link sent to your email.';
+      this.showToast(this.message);
     } catch (err: any) {
-      console.error('Reset error:', err);
-      // this.error = err.message || 'An error occurred.';
-      // this.showToast(this.error);
+      this.error = err.message || 'Failed to send reset email.';
     }
   }
 
-  // async showToast(message: string) {
-  //   const toast = await this.toastController.create({
-  //     message,
-  //     duration: 3000,
-  //     position: 'bottom',
-  //   });
-  //   await toast.present();
-  // }
+  async showToast(msg: string) {
+    const toast = await this.toastController.create({
+      message: msg,
+      duration: 3000,
+      position: 'bottom',
+      color: 'success',
+      buttons: [{ text: 'OK', role: 'cancel' }]
+    });
+    await toast.present();
+  }
 }
