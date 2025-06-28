@@ -1,10 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { IonicModule, ToastController } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
-import { sendPasswordResetEmail } from 'firebase/auth';
-import { auth } from 'src/app/firebase-init';
+import { AuthService } from '../services/auth.service';
 
 @Component({
   selector: 'app-forgot-password',
@@ -14,17 +13,18 @@ import { auth } from 'src/app/firebase-init';
   styleUrls: ['./forgot-password.component.scss']
 })
 export class ForgotPasswordComponent {
+  private toastController: ToastController = inject(ToastController);
+  private authService: AuthService = inject(AuthService);
+
   email = '';
   error = '';
   message = '';
-
-  constructor(private toastController: ToastController) {}
 
   async resetPassword(): Promise<void> {
     this.error = '';
     this.message = '';
     try {
-      await sendPasswordResetEmail(auth, this.email);
+      await this.authService.resetPassword(this.email);
       this.message = 'Reset link sent to your email.';
       this.showToast(this.message);
     } catch (err: any) {

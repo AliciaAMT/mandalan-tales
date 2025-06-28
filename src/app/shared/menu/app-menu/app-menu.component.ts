@@ -1,8 +1,7 @@
 import { IonicModule, MenuController } from '@ionic/angular';
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterModule, Router } from '@angular/router';
 import { AuthService } from 'src/app/services/auth.service';
-import { Subscription } from 'rxjs';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -13,15 +12,13 @@ import { CommonModule } from '@angular/common';
   imports: [IonicModule, RouterModule, CommonModule],
 })
 
-export class AppMenuComponent implements OnInit, OnDestroy {
-  isLoggedIn = false;
-  private authSub: Subscription;
+export class AppMenuComponent {
+  private menuCtrl: MenuController = inject(MenuController);
+  private router: Router = inject(Router);
+  private authService: AuthService = inject(AuthService);
 
-  constructor(private menuCtrl: MenuController, private router: Router, private authService: AuthService) {
-    this.authSub = this.authService.isLoggedIn$.subscribe(
-      status => this.isLoggedIn = status
-    );
-  }
+  // Use signals instead of subscription
+  isLoggedIn = this.authService.isLoggedIn;
 
   async navigateAndClose(path: string) {
     await this.menuCtrl.close();  // Ensure menu starts closing
@@ -36,10 +33,4 @@ export class AppMenuComponent implements OnInit, OnDestroy {
     await this.menuCtrl.close();           // optional: close the menu
     this.router.navigate(['/login']);      // redirect
   }
-
-
-  ngOnDestroy() {
-    this.authSub?.unsubscribe();
-  }
-  ngOnInit() {}
 }

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { IonicModule, ActionSheetController } from '@ionic/angular';
@@ -14,6 +14,9 @@ import { AppFooterComponent } from 'src/app/shared/footer/app-footer.component';
   styleUrls: ['./create-character.page.scss'],
 })
 export class CreateCharacterPage {
+  private fb: FormBuilder = inject(FormBuilder);
+  private actionSheetCtrl: ActionSheetController = inject(ActionSheetController);
+
   characterForm: FormGroup;
   totalPoints = 36;
 
@@ -26,10 +29,7 @@ export class CreateCharacterPage {
   ];
   selectedPortrait = '';
 
-  constructor(
-    private fb: FormBuilder,
-    private actionSheetCtrl: ActionSheetController
-  ) {
+  constructor() {
     this.characterForm = this.fb.group({
       name: ['', Validators.required],
       race: ['', Validators.required],

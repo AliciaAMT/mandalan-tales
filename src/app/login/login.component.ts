@@ -1,7 +1,7 @@
 import { AppHeaderComponent } from "../shared/header/app-header.component";
 import { AppFooterComponent } from "../shared/footer/app-footer.component";
 import { FormsModule } from '@angular/forms';
-import { AfterViewInit, Component, OnInit } from '@angular/core';
+import { AfterViewInit, Component, inject } from '@angular/core';
 import { AuthService } from '../services/auth.service';
 import { Router, RouterModule } from '@angular/router';
 import { NgIf } from "@angular/common";
@@ -9,8 +9,8 @@ import { STANDALONE_IMPORTS } from '../shared/standalone-imports';
 // import { SkipLinkComponent } from "../shared/skip-link/skip-link.component";
 import { addIcons } from 'ionicons';
 import { eye, eyeOff } from 'ionicons/icons';
-import { signOut } from '@angular/fire/auth';
-import { ToastController } from '@ionic/angular';
+import { signOut, sendEmailVerification } from '@angular/fire/auth';
+import { ToastController, AlertController } from '@ionic/angular';
 
 addIcons({
   'eye': eye,
@@ -30,7 +30,12 @@ declare global {
   standalone: true,
   imports: [AppHeaderComponent, AppFooterComponent, FormsModule, NgIf, STANDALONE_IMPORTS, RouterModule/*, SkipLinkComponent*/],
 })
-export class LoginComponent implements OnInit, AfterViewInit {
+export class LoginComponent implements AfterViewInit {
+  private authService: AuthService = inject(AuthService);
+  private router: Router = inject(Router);
+  private toastCtrl: ToastController = inject(ToastController);
+  private alertCtrl: AlertController = inject(AlertController);
+
   email = '';
   password = '';
   error: string | null = null;
@@ -39,20 +44,12 @@ export class LoginComponent implements OnInit, AfterViewInit {
   private recaptchaWidgetId: any = null;
   recaptchaReady = false;
   showPassword = false;
-  alreadyLoggedIn: boolean = false;
 
+  // Use the signal directly
+  alreadyLoggedIn = this.authService.isLoggedIn;
 
   togglePasswordVisibility(): void {
     this.showPassword = !this.showPassword;
-  }
-
-  constructor(private authService: AuthService, private router: Router,
-    private toastCtrl: ToastController) {}
-
-  ngOnInit(): void {
-    if (this.authService.currentUser$) {
-      this.alreadyLoggedIn = true;
-    }
   }
 
   async ngAfterViewInit(): Promise<void> {
@@ -62,7 +59,9 @@ export class LoginComponent implements OnInit, AfterViewInit {
       this.recaptchaWidgetId = window.grecaptcha.render('recaptcha-container', {
         sitekey: this.recaptchaSiteKey,
         size: 'invisible',
-        callback: (token: string) => this.onRecaptchaSuccess(token)
+        callback: (token: string) => this.onRecaptchaSuccess(token),
+        'expired-callback': () => this.onRecaptchaExpired(),
+        'error-callback': () => this.onRecaptchaError()
       });
     }
 
@@ -89,57 +88,90 @@ export class LoginComponent implements OnInit, AfterViewInit {
       activeEl.blur();
     }
 
-    if (!this.recaptchaReady && window.grecaptcha && this.recaptchaWidgetId === null) {
-      await this.ngAfterViewInit(); // render if not yet rendered
-    }
-
     try {
-      if (this.recaptchaReady) {
-        window.grecaptcha.reset(this.recaptchaWidgetId);
-        const token = await window.grecaptcha.execute(this.recaptchaWidgetId);
-        if (!token) {
-          this.error = 'reCAPTCHA verification failed.';
-          return;
-        }
+      // Temporarily disable reCAPTCHA for now
+      // TODO: Re-enable once proper invisible reCAPTCHA v2 is configured
 
-        const cred = await this.authService.login(this.email, this.password);
+      // Proceed with login directly
+      const cred = await this.authService.login(this.email, this.password);
 
-        if (!cred.user.emailVerified) {
-          await this.authService.logout();
-          this.error = 'Your email address has not been verified.';
-          return;
-        }
-
-        const toast = await this.toastCtrl.create({
-          message: 'Login successful!',
-          duration: 3000,
-          color: 'success',
-          position: 'bottom'
-        });
-
-        await toast.present();
-
-        setTimeout(() => {
-          const toastEl = document.querySelector('ion-toast');
-          if (toastEl) {
-            toastEl.setAttribute('role', 'alert');
-            toastEl.setAttribute('aria-live', 'assertive');
-          }
-        }, 100);
-
-        this.router.navigate(['/dashboard']);
-
-      } else {
-        this.error = 'Login failed. Try reloading the page.';
+      if (!cred.user.emailVerified) {
+        await this.showEmailVerificationAlert(cred.user);
+        await this.authService.logout();
+        return;
       }
+
+      const toast = await this.toastCtrl.create({
+        message: 'Login successful!',
+        duration: 3000,
+        color: 'success',
+        position: 'bottom'
+      });
+
+      await toast.present();
+
+      setTimeout(() => {
+        const toastEl = document.querySelector('ion-toast');
+        if (toastEl) {
+          toastEl.setAttribute('role', 'alert');
+          toastEl.setAttribute('aria-live', 'assertive');
+        }
+      }, 100);
+
+      this.router.navigate(['/dashboard']);
+
     } catch (e: any) {
       console.error('Login error:', e);
       this.error = e.message || 'Login failed. Please try again.';
     }
   }
+
+  async showEmailVerificationAlert(user: any): Promise<void> {
+    const alert = await this.alertCtrl.create({
+      header: 'Email Not Verified',
+      message: 'Your email address has not been verified. Would you like us to resend the verification email?',
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel',
+          cssClass: 'secondary'
+        },
+        {
+          text: 'Resend Email',
+          handler: () => {
+            this.resendVerificationEmail(user);
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+  }
+
+  async resendVerificationEmail(user: any): Promise<void> {
+    try {
+      await sendEmailVerification(user);
+      const toast = await this.toastCtrl.create({
+        message: 'Verification email sent! Please check your inbox.',
+        duration: 4000,
+        color: 'success',
+        position: 'bottom'
+      });
+      await toast.present();
+    } catch (error) {
+      console.error('Error sending verification email:', error);
+      const toast = await this.toastCtrl.create({
+        message: 'Failed to send verification email. Please try again.',
+        duration: 3000,
+        color: 'danger',
+        position: 'bottom'
+      });
+      await toast.present();
+    }
+  }
+
   async logout(): Promise<void> {
     await this.authService.logout();
-    this.alreadyLoggedIn = false;
     const toast = await this.toastCtrl.create({
       message: 'You have been logged out.',
       duration: 2000,
@@ -151,21 +183,19 @@ export class LoginComponent implements OnInit, AfterViewInit {
 
   onRecaptchaSuccess(token: string): void {
     this.authService.login(this.email, this.password)
-      .then((cred) => {
+      .then(async (cred) => {
         if (!cred.user.emailVerified) {
-          this.authService.logout();
-          this.error = 'Your email is not verified. Please check your inbox before logging in.';
+          await this.showEmailVerificationAlert(cred.user);
+          await this.authService.logout();
         } else {
           this.error = null;
           this.router.navigate(['/dashboard']);
         }
       })
       .catch(err => {
-        const errorMsg = err?.message?.includes('email') || err?.message?.includes('verified')
-          ? 'Your email is not verified. Please check your inbox.'
-          : 'Invalid credentials. Please try again.';
+        console.error('Login error in reCAPTCHA callback:', err);
+        const errorMsg = err?.message || 'Login failed. Please try again.';
         this.error = errorMsg;
-        console.error(err);
 
         setTimeout(() => {
           const errorEl = document.getElementById('form-error');
@@ -174,5 +204,15 @@ export class LoginComponent implements OnInit, AfterViewInit {
           }
         }, 100);
       });
+  }
+
+  onRecaptchaExpired(): void {
+    console.log('reCAPTCHA expired');
+    this.error = 'reCAPTCHA expired. Please try again.';
+  }
+
+  onRecaptchaError(): void {
+    console.log('reCAPTCHA error occurred');
+    this.error = 'reCAPTCHA error occurred. Please try again.';
   }
 }

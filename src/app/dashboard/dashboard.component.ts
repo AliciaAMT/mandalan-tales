@@ -1,12 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { AppHeaderComponent } from "../shared/header/app-header.component";
 import { AppFooterComponent } from "../shared/footer/app-footer.component";
 import { STANDALONE_IMPORTS } from '../shared/standalone-imports';
 import { CharacterService } from '../game/services/character.service';
 import { CharStats } from '../game/models/charstats.model';
 import { CommonModule } from '@angular/common';
-
-import { firstValueFrom } from 'rxjs';
 import { User } from '@angular/fire/auth';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../services/auth.service';
@@ -19,34 +17,30 @@ import { AuthService } from '../services/auth.service';
   standalone: true,
   imports: [AppHeaderComponent, AppFooterComponent, STANDALONE_IMPORTS, CommonModule, RouterModule],
 })
-export class DashboardComponent  {
+export class DashboardComponent implements OnInit {
+  private characterService: CharacterService = inject(CharacterService);
+  private authService: AuthService = inject(AuthService);
+  private router: Router = inject(Router);
+
   characters: CharStats[] = [];
   selectedCharacterId: string | null = null;
   maxCharacters = 6;
   currentYear: number = new Date().getFullYear();
   user: User | null = null;
-  constructor(
-    private characterService: CharacterService,
-    private authService: AuthService,
-    private router: Router
-    ) {}
 
+  async ngOnInit(): Promise<void> {
+    const user = this.authService.getCurrentUser();
 
-    async ngOnInit(): Promise<void> {
-      const user = await firstValueFrom(this.authService.currentUser$);
-
-      if (!user) {
-        this.router.navigate(['/login']);
-        return;
-      }
-
-      this.user = user;
-
-      this.characterService.getCharacters().subscribe(chars => {
-        this.characters = chars || [];
-      });
+    if (!user) {
+      this.router.navigate(['/login']);
+      return;
     }
 
+    this.user = user;
+
+    // Use signals to get characters
+    this.characters = this.characterService.getCharacters();
+  }
 
   selectCharacter(id: string): void {
     this.selectedCharacterId = id;
@@ -64,5 +58,4 @@ export class DashboardComponent  {
       console.log('Starting game with character:', this.selectedCharacterId);
     }
   }
-
 }

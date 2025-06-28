@@ -1,7 +1,7 @@
 import { AppHeaderComponent } from "../shared/header/app-header.component";
 import { AppFooterComponent } from "../shared/footer/app-footer.component";
 import { FormsModule } from '@angular/forms';
-import { AfterViewInit, Component, OnInit, ViewChild, ElementRef, inject } from '@angular/core';
+import { Component, ViewChild, ElementRef, inject } from '@angular/core';
 import { AuthService } from '../services/auth.service';
 import { Firestore, doc, setDoc, serverTimestamp } from '@angular/fire/firestore';
 import { Router, RouterModule } from '@angular/router';
@@ -38,23 +38,16 @@ declare global {
     STANDALONE_IMPORTS
   ]
 })
-export class CreateAccountComponent implements OnInit, AfterViewInit {
+export class CreateAccountComponent {
+  private authService: AuthService = inject(AuthService);
+  private router: Router = inject(Router);
+  private toastCtrl: ToastController = inject(ToastController);
+  private firestore: Firestore = inject(Firestore);
+
   email: string = '';
   password: string = '';
   error: string | null = null;
   showPassword: boolean = false;
-
-  private firestore = inject(Firestore);
-
-  constructor(
-    private authService: AuthService,
-    private router: Router,
-    private toastCtrl: ToastController
-  ) {}
-
-  ngOnInit(): void {}
-
-  ngAfterViewInit(): void {}
 
   async createAccount() {
     this.error = null;
@@ -83,7 +76,6 @@ export class CreateAccountComponent implements OnInit, AfterViewInit {
           toastEl.setAttribute('aria-live', 'assertive');
         }
       }, 100); // Allow time for DOM render
-
 
       this.router.navigate(['/login']);
     } catch (err: any) {
