@@ -9,17 +9,24 @@ import {
 } from '@angular/fire/auth';
 import { Firestore, doc, setDoc, serverTimestamp } from '@angular/fire/firestore';
 import { Router } from '@angular/router';
-import { Observable } from 'rxjs';
+import { BehaviorSubject, map, Observable } from 'rxjs';
 import { onAuthStateChanged } from 'firebase/auth';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
+  private userSubject = new BehaviorSubject<User | null>(null);
+  user$ = this.userSubject.asObservable();
+  isLoggedIn$ = this.user$.pipe(map(user => !!user));
+
+  constructor() {
+    onAuthStateChanged(this.auth, user => this.userSubject.next(user));
+  }
+
   private auth: Auth = inject(Auth);
   private firestore: Firestore = inject(Firestore);
   private router: Router = inject(Router);
-
   currentUser$: Observable<User | null> = new Observable((observer) => {
     const unsubscribe = onAuthStateChanged(this.auth, (user) => {
       observer.next(user);

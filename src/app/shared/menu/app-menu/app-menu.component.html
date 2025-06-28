@@ -11,22 +11,42 @@
           <ion-label>Home</ion-label>
         </ion-item>
       </ion-menu-toggle>
+
       <ion-menu-toggle auto-hide="true">
         <ion-item routerLink="/about" routerDirection="forward" detail="false">
           <ion-label>About</ion-label>
         </ion-item>
       </ion-menu-toggle>
+
       <ion-menu-toggle auto-hide="true">
         <ion-item routerLink="/contact" routerDirection="forward" detail="false">
           <ion-label>Contact</ion-label>
         </ion-item>
       </ion-menu-toggle>
+
       <ion-menu-toggle auto-hide="true">
         <ion-item routerLink="/legal" routerDirection="forward" detail="false">
           <ion-label>Legal</ion-label>
         </ion-item>
       </ion-menu-toggle>
-    </ion-list>
 
+      <ion-menu-toggle auto-hide="true" *ngIf="isLoggedIn">
+        <ion-item routerLink="/dashboard" routerDirection="forward" detail="false">
+          <ion-label>Dashboard</ion-label>
+        </ion-item>
+      </ion-menu-toggle>
+
+      <ion-menu-toggle auto-hide="true" *ngIf="isLoggedIn">
+        <ion-item (click)="logout()" detail="false">
+          <ion-label>Logout</ion-label>
+        </ion-item>
+      </ion-menu-toggle>
+
+      <ion-menu-toggle auto-hide="true" *ngIf="!isLoggedIn">
+        <ion-item routerLink="/login" routerDirection="forward" detail="false">
+          <ion-label>Login</ion-label>
+        </ion-item>
+      </ion-menu-toggle>
+    </ion-list>
   </ion-content>
 </ion-menu>
