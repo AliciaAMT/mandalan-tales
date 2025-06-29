@@ -31,8 +31,75 @@ app-footer {
 .character-card {
   position: relative;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  cursor: pointer;
+  --background: #1a1a1a !important;
+  --color: #d3bd85 !important;
+  background-color: #1a1a1a !important;
+  color: #d3bd85 !important;
 
   &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+
+  /* Focus styles for the entire card - light grey */
+  &:focus {
+    outline: 2px solid #cccccc !important;
+    outline-offset: 4px !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+
+  /* Remove default focus outline from ion-card */
+  &::part(native):focus {
+    outline: none !important;
+  }
+
+  /* Selected character styling - light grey */
+  &.selected-character {
+    --background: #666666 !important;
+    --color: #000000 !important;
+    border: 2px solid #cccccc !important;
+    --ion-color-light: #666666 !important;
+    --ion-color-light-rgb: 102, 102, 102 !important;
+    --ion-color-light-contrast: #000000 !important;
+    --ion-color-light-contrast-rgb: 0, 0, 0 !important;
+    --ion-color-light-shade: #666666 !important;
+    --ion-color-light-tint: #666666 !important;
+    background-color: #666666 !important;
+    color: #000000 !important;
+  }
+
+  /* Target the card's internal elements for selected state */
+  &.selected-character::part(native) {
+    --background: #666666 !important;
+    --color: #000000 !important;
+    background-color: #666666 !important;
+    color: #000000 !important;
+  }
+
+  /* Override Ionic's card background and text color */
+  &.selected-character ion-card-header {
+    --background: #666666 !important;
+    --color: #000000 !important;
+    background-color: #666666 !important;
+    color: #000000 !important;
+  }
+
+  &.selected-character ion-card-title {
+    --color: #000000 !important;
+    color: #000000 !important;
+  }
+
+  &.selected-character ion-card-subtitle {
+    --color: #000000 !important;
+    color: #000000 !important;
+  }
+
+  /* Selected character focus state */
+  &.selected-character:focus {
+    outline: 2px solid #cccccc !important;
+    outline-offset: 4px !important;
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   }
@@ -65,62 +132,21 @@ app-footer {
   padding: 4px;
 }
 
-.select-button, .expand-button {
+.expand-button {
   --padding-start: 8px;
   --padding-end: 8px;
   --border-radius: 50%;
   min-width: 32px;
   height: 32px;
+  --color: var(--ion-color-medium);
 
   ion-icon {
     font-size: 16px;
   }
 
-  /* Focus styling with grey color */
-  &:focus {
-    outline: 2px solid #cccccc !important;
-    outline-offset: 2px !important;
-    --color: #cccccc !important;
-  }
-
-  &:focus-within {
-    outline: 2px solid #cccccc !important;
-    outline-offset: 2px !important;
-    --color: #cccccc !important;
-  }
-}
-
-.select-button {
-  &.ion-color-primary {
-    --color: var(--ion-color-primary);
-  }
-
-  &:focus {
-    --color: #cccccc !important;
-  }
-}
-
-.expand-button {
-  --color: var(--ion-color-medium);
-
   &:hover {
     --color: var(--ion-color-medium-shade);
   }
-
-  &:focus {
-    --color: #cccccc !important;
-  }
-}
-
-.select-button:focus,
-.expand-button:focus,
-ion-button.select-button::part(native):focus,
-ion-button.expand-button::part(native):focus {
-  outline: 2px solid #cccccc !important;
-  outline-offset: 2px !important;
-  box-shadow: none !important;
-  --color: #cccccc !important;
-  background: none !important;
 }
 
 /* Responsive adjustments */
@@ -137,7 +163,7 @@ ion-button.expand-button::part(native):focus {
     padding: 2px;
   }
 
-  .select-button, .expand-button {
+  .expand-button {
     min-width: 28px;
     height: 28px;
 

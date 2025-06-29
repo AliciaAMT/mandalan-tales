@@ -118,13 +118,66 @@ export class CreateCharacterPage {
     const raceBonus = getRaceBonus(formData.race);
     const classBonus = getClassBonus(formData.class);
 
+    // Helper function to add bonuses safely (no negative stats)
+    const addBonus = (base: number, bonus: number | undefined): number => {
+      const result = base + (bonus || 0);
+      return Math.max(1, result); // Ensure minimum of 1 for all stats
+    };
+
+    // Combine base stats with bonuses
     this.generatedStats = {
-      ...baseStats,
-      ...baseResistances,
-      ...baseSkills,
-      // Apply bonuses
-      ...(raceBonus?.bonuses || {}),
-      ...(classBonus?.bonuses || {})
+      // Core stats with bonuses
+      speed: addBonus(baseStats.speed,
+        (raceBonus?.bonuses.speed || 0) + (classBonus?.bonuses.speed || 0)),
+      accuracy: addBonus(baseStats.accuracy,
+        (raceBonus?.bonuses.accuracy || 0) + (classBonus?.bonuses.accuracy || 0)),
+      strength: addBonus(baseStats.strength,
+        (raceBonus?.bonuses.strength || 0) + (classBonus?.bonuses.strength || 0)),
+      agility: addBonus(baseStats.agility,
+        (raceBonus?.bonuses.agility || 0) + (classBonus?.bonuses.agility || 0)),
+      wisdom: addBonus(baseStats.wisdom,
+        (raceBonus?.bonuses.wisdom || 0) + (classBonus?.bonuses.wisdom || 0)),
+      luck: baseStats.luck, // Luck doesn't get bonuses in the old demo
+
+      // Resistances with bonuses
+      fireResist: Math.max(0, baseResistances.fireResist +
+        (raceBonus?.bonuses.fireResist || 0) + (classBonus?.bonuses.fireResist || 0)),
+      iceResist: Math.max(0, baseResistances.iceResist +
+        (raceBonus?.bonuses.iceResist || 0) + (classBonus?.bonuses.iceResist || 0)),
+      airResist: Math.max(0, baseResistances.airResist +
+        (raceBonus?.bonuses.airResist || 0) + (classBonus?.bonuses.airResist || 0)),
+      earthResist: Math.max(0, baseResistances.earthResist +
+        (raceBonus?.bonuses.earthResist || 0) + (classBonus?.bonuses.earthResist || 0)),
+      lightResist: Math.max(0, baseResistances.lightResist +
+        (raceBonus?.bonuses.lightResist || 0) + (classBonus?.bonuses.lightResist || 0)),
+      darkResist: Math.max(0, baseResistances.darkResist +
+        (raceBonus?.bonuses.darkResist || 0) + (classBonus?.bonuses.darkResist || 0)),
+      poisonResist: Math.max(0, baseResistances.poisonResist +
+        (raceBonus?.bonuses.poisonResist || 0) + (classBonus?.bonuses.poisonResist || 0)),
+      mindResist: Math.max(0, baseResistances.mindResist +
+        (raceBonus?.bonuses.mindResist || 0) + (classBonus?.bonuses.mindResist || 0)),
+      holdResist: Math.max(0, baseResistances.holdResist +
+        (raceBonus?.bonuses.holdResist || 0) + (classBonus?.bonuses.holdResist || 0)),
+      criticalResist: Math.max(0, baseResistances.criticalResist +
+        (raceBonus?.bonuses.criticalResist || 0) + (classBonus?.bonuses.criticalResist || 0)),
+      bleedResist: Math.max(0, baseResistances.bleedResist +
+        (raceBonus?.bonuses.bleedResist || 0) + (classBonus?.bonuses.bleedResist || 0)),
+
+      // Skills with bonuses
+      cooking: baseSkills.cooking,
+      alchemy: baseSkills.alchemy + (classBonus?.bonuses.alchemy || 0),
+      enchanting: baseSkills.enchanting + (classBonus?.bonuses.enchanting || 0),
+      lockpicking: baseSkills.lockpicking + (classBonus?.bonuses.lockpicking || 0),
+      magicFind: baseSkills.magicFind + (raceBonus?.bonuses.magicFind || 0),
+
+      // Life and mana bonuses
+      life: raceBonus?.bonuses.life || 0,
+      maxLife: raceBonus?.bonuses.maxLife || 0,
+      mana: classBonus?.bonuses.mana || 0,
+      maxMana: classBonus?.bonuses.maxMana || 0,
+
+      // Skill points
+      skillPoints: 5 + (classBonus?.bonuses.skillPoints || 0)
     };
   }
 

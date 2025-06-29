@@ -63,3 +63,18 @@ input:-moz-autofill {
   -ms-user-select: text !important;
   user-select: text !important;
 }
+
+/* Global focus styles for better accessibility */
+ion-card:focus {
+  outline: 2px solid #cccccc !important;
+  outline-offset: 4px !important;
+}
+
+/* Ensure focus is visible on interactive elements */
+a:focus,
+input:focus,
+textarea:focus,
+select:focus {
+  outline: 2px solid #cccccc !important;
+  outline-offset: 2px !important;
+}

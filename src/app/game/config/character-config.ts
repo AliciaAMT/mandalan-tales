@@ -46,9 +46,11 @@ export interface ClassBonus {
     earthResist?: number;
     lightResist?: number;
     darkResist?: number;
+    poisonResist?: number;
     mindResist?: number;
     holdResist?: number;
     criticalResist?: number;
+    bleedResist?: number;
     skillPoints?: number;
     lockpicking?: number;
     enchanting?: number;

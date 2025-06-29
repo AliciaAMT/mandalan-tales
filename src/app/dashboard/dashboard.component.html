@@ -10,8 +10,14 @@
           *ngFor="let char of characters()"
         >
           <ion-card
-            [color]="char.id === selectedCharacterId ? 'primary' : 'light'"
+            [class.selected-character]="char.id === selectedCharacterId"
             class="character-card"
+            tabindex="0"
+            (click)="selectCharacter(char.id!)"
+            (keydown.enter)="selectCharacter(char.id!)"
+            (keydown.space)="selectCharacter(char.id!)"
+            [attr.aria-label]="'Character card for ' + char.name + ', ' + char.class + ' level ' + char.level"
+            [attr.aria-pressed]="char.id === selectedCharacterId"
           >
             <div class="character-card-content">
               <img [src]="'/assets/portraits/transparent/' + char.portrait + '.png'" alt="{{ char.name }}" />
@@ -26,18 +32,7 @@
                 <ion-button
                   fill="clear"
                   size="small"
-                  (click)="selectCharacter(char.id!)"
-                  [color]="char.id === selectedCharacterId ? 'primary' : 'medium'"
-                  class="select-button"
-                  [attr.aria-label]="'Select ' + char.name + ' character'"
-                  [attr.aria-pressed]="char.id === selectedCharacterId">
-                  <ion-icon slot="icon-only" name="checkmark-circle-outline"></ion-icon>
-                </ion-button>
-
-                <ion-button
-                  fill="clear"
-                  size="small"
-                  (click)="openCharacterDetails(char)"
+                  (click)="openCharacterDetails(char); $event.stopPropagation()"
                   color="medium"
                   class="expand-button"
                   [attr.aria-label]="'View details for ' + char.name + ' character'">
