@@ -40,10 +40,7 @@
                     formControlName="race"
                     placeholder="Select race"
                     aria-label="Character race">
-                    <ion-select-option value="human">Human</ion-select-option>
-                    <ion-select-option value="elf">Elf</ion-select-option>
-                    <ion-select-option value="dwarf">Dwarf</ion-select-option>
-                    <ion-select-option value="halfling">Halfling</ion-select-option>
+                    <ion-select-option *ngFor="let race of races" [value]="race.toLowerCase()">{{ race }}</ion-select-option>
                   </ion-select>
                 </ion-item>
 
@@ -53,15 +50,12 @@
                     formControlName="class"
                     placeholder="Select class"
                     aria-label="Character class">
-                    <ion-select-option value="warrior">Warrior</ion-select-option>
-                    <ion-select-option value="mage">Mage</ion-select-option>
-                    <ion-select-option value="thief">Thief</ion-select-option>
-                    <ion-select-option value="healer">Healer</ion-select-option>
+                    <ion-select-option *ngFor="let class of classes" [value]="class.toLowerCase()">{{ class }}</ion-select-option>
                   </ion-select>
                 </ion-item>
               </div>
 
-              <div formGroupName="stats">
+              <div>
                 <h3 class="stats-heading">Character Stats</h3>
                 <p class="stats-description">Distribute {{ totalPoints }} points across your character's attributes.</p>
 
@@ -163,7 +157,7 @@
                   type="button"
                   (click)="openPortraitSelector()"
                   aria-label="Choose character portrait">
-                  <ion-icon name="image-outline"></ion-icon>
+                  <ion-icon name="person-outline"></ion-icon>
                 </ion-button>
               </ion-item>
 

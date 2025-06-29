@@ -2,9 +2,12 @@ import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { IonicModule, ActionSheetController, ModalController } from '@ionic/angular';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 import { AppHeaderComponent } from 'src/app/shared/header/app-header.component';
 import { AppFooterComponent } from 'src/app/shared/footer/app-footer.component';
+import { RACE_BONUSES, CLASS_BONUSES } from 'src/app/game/config/character-config';
+import { CharacterService } from 'src/app/game/services/character.service';
+import { CharStats } from 'src/app/game/models/charstats.model';
 
 @Component({
   selector: 'app-create-character',
@@ -17,13 +20,15 @@ export class CreateCharacterPage {
   private fb: FormBuilder = inject(FormBuilder);
   private actionSheetCtrl: ActionSheetController = inject(ActionSheetController);
   private modalCtrl: ModalController = inject(ModalController);
+  private router: Router = inject(Router);
+  private characterService: CharacterService = inject(CharacterService);
 
   characterForm: FormGroup;
   totalPoints = 36;
   formError: string | null = null;
 
-  races = ['Human', 'Elf', 'Dwarf', 'Orc'];
-  classes = ['Warrior', 'Mage', 'Thief', 'Healer'];
+  races = RACE_BONUSES.map(race => race.name);
+  classes = CLASS_BONUSES.map(cls => cls.name);
 
   portraits: string[] = [
     ...Array.from({ length: 10 }, (_, i) => `male${i + 1}`),
@@ -62,30 +67,29 @@ export class CreateCharacterPage {
       race: ['', Validators.required],
       class: ['', Validators.required],
       gender: ['', Validators.required],
-      stats: this.fb.group({
-        strength: [0],
-        agility: [0],
-        wisdom: [0],
-        luck: [0],
-        speed: [0],
-        accuracy: [0]
-      })
+      strength: [8, [Validators.required, Validators.min(1), Validators.max(20)]],
+      dexterity: [8, [Validators.required, Validators.min(1), Validators.max(20)]],
+      constitution: [8, [Validators.required, Validators.min(1), Validators.max(20)]],
+      intelligence: [8, [Validators.required, Validators.min(1), Validators.max(20)]],
+      wisdom: [8, [Validators.required, Validators.min(1), Validators.max(20)]],
+      charisma: [8, [Validators.required, Validators.min(1), Validators.max(20)]]
     });
   }
 
   get allocatedPoints(): number {
-    const stats = this.characterForm.get('stats')?.value as { [key: string]: number };
-    return Object.values(stats).reduce((a, b) => a + b, 0);
+    const formValue = this.characterForm.value;
+    return formValue.strength + formValue.dexterity + formValue.constitution +
+           formValue.intelligence + formValue.wisdom + formValue.charisma;
   }
 
   getStatDisplayName(stat: string): string {
     const statNames: { [key: string]: string } = {
       strength: 'Strength',
-      agility: 'Agility',
+      dexterity: 'Dexterity',
+      constitution: 'Constitution',
+      intelligence: 'Intelligence',
       wisdom: 'Wisdom',
-      luck: 'Luck',
-      speed: 'Speed',
-      accuracy: 'Accuracy'
+      charisma: 'Charisma'
     };
     return statNames[stat] || stat.charAt(0).toUpperCase() + stat.slice(1);
   }
@@ -123,19 +127,75 @@ export class CreateCharacterPage {
     return portrait ? portrait.name : 'Unknown portrait';
   }
 
-  onSubmit(): void {
+  async onSubmit(): Promise<void> {
     this.formError = null;
 
     if (this.characterForm.valid && this.allocatedPoints <= this.totalPoints) {
-      const formData = this.characterForm.value;
-      const characterData = {
-        ...formData,
-        portrait: this.selectedPortrait,
-        createdAt: Date.now()
-      };
+      try {
+        const formData = this.characterForm.value;
 
-      console.log('Character Created:', characterData);
-      // TODO: Save to Firebase
+        // Create character data with all required fields
+        const characterData: CharStats = {
+          id: '', // Will be set by Firebase
+          userId: '', // Will be set by the service
+          name: formData.name,
+          race: formData.race,
+          class: formData.class,
+          gender: formData.gender,
+          portrait: this.selectedPortrait,
+          level: 1,
+          experience: 0,
+          skillPoints: 0,
+          life: 100,
+          maxLife: 100,
+          mana: 100,
+          maxMana: 100,
+          speed: formData.dexterity,
+          accuracy: formData.dexterity,
+          strength: formData.strength,
+          agility: formData.dexterity,
+          wisdom: formData.wisdom,
+          luck: formData.charisma,
+          guild: '',
+          title: '',
+          cond: 'Good',
+          fireResist: 0,
+          iceResist: 0,
+          airResist: 0,
+          earthResist: 0,
+          lightResist: 0,
+          darkResist: 0,
+          poisonResist: 0,
+          mindResist: 0,
+          holdResist: 0,
+          criticalResist: 0,
+          bleedResist: 0,
+          cooking: 0,
+          alchemy: 0,
+          enchanting: 0,
+          lockpicking: 0,
+          magicFind: 0,
+          map: '1',
+          mapdimensions: 1,
+          xaxis: 0,
+          yaxis: 0,
+          savemap: '1',
+          savemapdimensions: 1,
+          savexaxis: 0,
+          saveyaxis: 0,
+          createdAt: Date.now(),
+          updatedAt: Date.now()
+        };
+
+        // Save character to Firebase
+        await this.characterService.createCharacter(characterData);
+
+        // Navigate to game page
+        this.router.navigate(['/game']);
+      } catch (error) {
+        console.error('Error creating character:', error);
+        this.formError = 'Failed to create character. Please try again.';
+      }
     } else {
       this.formError = 'Please fill in all required fields and ensure you have not exceeded the point limit.';
     }

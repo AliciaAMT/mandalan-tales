@@ -8,15 +8,23 @@ export interface CharStats {
   class: string;
   gender: string;
 
+  // Character status
+  guild: string;
+  title: string;
+  cond: string; // condition (Good, etc.)
+
+  // Level and experience
   level: number;
   experience: number;
   skillPoints: number;
 
+  // Health and mana
   life: number;
   maxLife: number;
   mana: number;
   maxMana: number;
 
+  // Core stats
   speed: number;
   accuracy: number;
   strength: number;
@@ -24,6 +32,7 @@ export interface CharStats {
   wisdom: number;
   luck: number;
 
+  // Resistances
   fireResist: number;
   iceResist: number;
   airResist: number;
@@ -36,12 +45,24 @@ export interface CharStats {
   criticalResist: number;
   bleedResist: number;
 
+  // Skills
   cooking: number;
   alchemy: number;
   enchanting: number;
   lockpicking: number;
   magicFind: number;
 
+  // Map and position
+  map: string;
+  mapdimensions: number;
+  xaxis: number;
+  yaxis: number;
+  savemap: string;
+  savemapdimensions: number;
+  savexaxis: number;
+  saveyaxis: number;
+
+  // Timestamps
   createdAt?: any;
   updatedAt?: any;
 }

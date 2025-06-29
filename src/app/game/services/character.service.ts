@@ -1,5 +1,5 @@
 import { Injectable, inject, signal, computed, Signal, effect } from '@angular/core';
-import { Firestore, collection, collectionData, query, where } from '@angular/fire/firestore';
+import { Firestore, collection, collectionData, query, where, addDoc, doc, updateDoc } from '@angular/fire/firestore';
 import { CharStats } from '../models/charstats.model';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { AuthService } from '../../services/auth.service';
@@ -34,6 +34,31 @@ export class CharacterService {
   // Helper method to get character by ID
   getCharacterById(id: string): CharStats | undefined {
     return this.characters().find((char: CharStats) => char.id === id);
+  }
+
+  // Method to create a new character
+  async createCharacter(characterData: CharStats): Promise<string> {
+    const currentUser = this.authService.getCurrentUser();
+    if (!currentUser) {
+      throw new Error('User not authenticated');
+    }
+
+    const characterWithUserId = {
+      ...characterData,
+      userId: currentUser.uid
+    };
+
+    const docRef = await addDoc(collection(this.firestore, 'charstats'), characterWithUserId);
+    return docRef.id;
+  }
+
+  // Method to update an existing character
+  async updateCharacter(characterId: string, updates: Partial<CharStats>): Promise<void> {
+    const docRef = doc(this.firestore, 'charstats', characterId);
+    await updateDoc(docRef, {
+      ...updates,
+      updatedAt: Date.now()
+    });
   }
 
   // Method to refresh characters when user changes
