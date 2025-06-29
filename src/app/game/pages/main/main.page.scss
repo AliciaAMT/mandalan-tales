@@ -231,12 +231,20 @@
 }
 
 .player-tile {
+  /* Remove default yellow border and shadow */
+}
+
+.player-tile:hover {
+  /* Remove default hover effects */
+}
+
+.player-tile:focus {
   border-color: #ffd700;
   border-width: 3px;
   box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
 }
 
-.player-tile:hover {
+.player-tile:focus:hover {
   border-color: #ffed4e;
   box-shadow: 0 0 30px rgba(255, 215, 0, 0.7);
 }
@@ -252,6 +260,14 @@
   align-items: center;
   justify-content: center;
   pointer-events: none;
+  /* Hide overlay by default */
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.player-tile:focus .tile-overlay {
+  /* Show overlay only when player tile is focused */
+  opacity: 1;
 }
 
 .player-indicator {
