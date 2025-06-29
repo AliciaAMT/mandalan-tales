@@ -204,15 +204,6 @@ fieldset {
   margin-bottom: 0;
 }
 
-.stat-info {
-  display: flex;
-  align-items: center;
-  color: var(--ion-color-medium);
-  font-size: 0.8rem;
-  min-width: 60px;
-  text-align: right;
-}
-
 .character-info-grid {
   display: grid;
   grid-template-columns: 1fr;
