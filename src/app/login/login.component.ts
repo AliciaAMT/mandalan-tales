@@ -1,7 +1,7 @@
 import { AppHeaderComponent } from "../shared/header/app-header.component";
 import { AppFooterComponent } from "../shared/footer/app-footer.component";
 import { FormsModule } from '@angular/forms';
-import { AfterViewInit, Component, inject } from '@angular/core';
+import { AfterViewInit, Component, inject, OnDestroy } from '@angular/core';
 import { AuthService } from '../services/auth.service';
 import { Router, RouterModule } from '@angular/router';
 import { NgIf } from "@angular/common";
@@ -30,7 +30,7 @@ declare global {
   standalone: true,
   imports: [AppHeaderComponent, AppFooterComponent, FormsModule, NgIf, STANDALONE_IMPORTS, RouterModule/*, SkipLinkComponent*/],
 })
-export class LoginComponent implements AfterViewInit {
+export class LoginComponent implements AfterViewInit, OnDestroy {
   private authService: AuthService = inject(AuthService);
   private router: Router = inject(Router);
   private toastCtrl: ToastController = inject(ToastController);
@@ -44,6 +44,7 @@ export class LoginComponent implements AfterViewInit {
   private recaptchaWidgetId: any = null;
   recaptchaReady = false;
   showPassword = false;
+  private timeouts: number[] = [];
 
   // Use the signal directly
   alreadyLoggedIn = this.authService.isLoggedIn;
@@ -66,6 +67,12 @@ export class LoginComponent implements AfterViewInit {
     }
 
     this.recaptchaReady = true;
+  }
+
+  ngOnDestroy(): void {
+    // Clean up all timeouts to prevent memory leaks
+    this.timeouts.forEach(timeoutId => clearTimeout(timeoutId));
+    this.timeouts = [];
   }
 
   waitForRecaptcha(): Promise<void> {
@@ -110,13 +117,14 @@ export class LoginComponent implements AfterViewInit {
 
       await toast.present();
 
-      setTimeout(() => {
+      const timeoutId = window.setTimeout(() => {
         const toastEl = document.querySelector('ion-toast');
         if (toastEl) {
           toastEl.setAttribute('role', 'alert');
           toastEl.setAttribute('aria-live', 'assertive');
         }
       }, 100);
+      this.timeouts.push(timeoutId);
 
       this.router.navigate(['/dashboard']);
 
@@ -197,12 +205,13 @@ export class LoginComponent implements AfterViewInit {
         const errorMsg = err?.message || 'Login failed. Please try again.';
         this.error = errorMsg;
 
-        setTimeout(() => {
+        const timeoutId = window.setTimeout(() => {
           const errorEl = document.getElementById('form-error');
           if (errorEl) {
             errorEl.focus();
           }
         }, 100);
+        this.timeouts.push(timeoutId);
       });
   }
 

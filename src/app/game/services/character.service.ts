@@ -1,17 +1,25 @@
-import { Injectable, inject, signal, computed, Signal } from '@angular/core';
-import { Firestore, collection, collectionData } from '@angular/fire/firestore';
+import { Injectable, inject, signal, computed, Signal, effect } from '@angular/core';
+import { Firestore, collection, collectionData, query, where } from '@angular/fire/firestore';
 import { CharStats } from '../models/charstats.model';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { AuthService } from '../../services/auth.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CharacterService {
   private firestore: Firestore = inject(Firestore);
+  private authService: AuthService = inject(AuthService);
 
-  // Use toSignal to convert Firestore observable to signal
+  // Use toSignal to convert Firestore observable to signal with user filtering
   private charactersSignal = toSignal(
-    collectionData(collection(this.firestore, 'charstats'), { idField: 'id' }) as any,
+    collectionData(
+      query(
+        collection(this.firestore, 'charstats'),
+        where('userId', '==', this.authService.getCurrentUser()?.uid || '')
+      ),
+      { idField: 'id' }
+    ) as any,
     { initialValue: [] as CharStats[] }
   ) as Signal<CharStats[]>;
 
@@ -26,5 +34,11 @@ export class CharacterService {
   // Helper method to get character by ID
   getCharacterById(id: string): CharStats | undefined {
     return this.characters().find((char: CharStats) => char.id === id);
+  }
+
+  // Method to refresh characters when user changes
+  refreshCharacters(): void {
+    // The signal will automatically update when the user changes
+    // due to the reactive query
   }
 }

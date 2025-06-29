@@ -1,4 +1,4 @@
-import { Component, inject, effect } from '@angular/core';
+import { Component, inject, effect, OnDestroy } from '@angular/core';
 import { IonApp, IonRouterOutlet } from '@ionic/angular/standalone';
 import { AppMenuComponent } from './shared/menu/app-menu/app-menu.component';
 import { Router, NavigationEnd } from '@angular/router';
@@ -10,8 +10,9 @@ import { filter } from 'rxjs';
   templateUrl: 'app.component.html',
   imports: [IonApp, IonRouterOutlet, AppMenuComponent],
 })
-export class AppComponent {
+export class AppComponent implements OnDestroy {
   private router: Router = inject(Router);
+  private timeouts: number[] = [];
 
   constructor() {
     // Use toSignal to convert router events to signals
@@ -25,13 +26,20 @@ export class AppComponent {
     effect(() => {
       const event = navigationEnd$();
       if (event) {
-        setTimeout(() => {
+        const timeoutId = window.setTimeout(() => {
           const main = document.getElementById('main-content');
           if (main) {
             main.focus();
           }
         }, 100);
+        this.timeouts.push(timeoutId);
       }
     });
+  }
+
+  ngOnDestroy(): void {
+    // Clean up all timeouts to prevent memory leaks
+    this.timeouts.forEach(timeoutId => clearTimeout(timeoutId));
+    this.timeouts = [];
   }
 }

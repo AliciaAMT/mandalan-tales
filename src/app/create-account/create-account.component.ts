@@ -1,7 +1,7 @@
 import { AppHeaderComponent } from "../shared/header/app-header.component";
 import { AppFooterComponent } from "../shared/footer/app-footer.component";
 import { FormsModule } from '@angular/forms';
-import { Component, ViewChild, ElementRef, inject } from '@angular/core';
+import { Component, ViewChild, ElementRef, inject, OnDestroy } from '@angular/core';
 import { AuthService } from '../services/auth.service';
 import { Firestore, doc, setDoc, serverTimestamp } from '@angular/fire/firestore';
 import { Router, RouterModule } from '@angular/router';
@@ -38,16 +38,23 @@ declare global {
     STANDALONE_IMPORTS
   ]
 })
-export class CreateAccountComponent {
+export class CreateAccountComponent implements OnDestroy {
   private authService: AuthService = inject(AuthService);
   private router: Router = inject(Router);
   private toastCtrl: ToastController = inject(ToastController);
   private firestore: Firestore = inject(Firestore);
+  private timeouts: number[] = [];
 
   email: string = '';
   password: string = '';
   error: string | null = null;
   showPassword: boolean = false;
+
+  ngOnDestroy(): void {
+    // Clean up all timeouts to prevent memory leaks
+    this.timeouts.forEach(timeoutId => clearTimeout(timeoutId));
+    this.timeouts = [];
+  }
 
   async createAccount() {
     this.error = null;
@@ -69,13 +76,14 @@ export class CreateAccountComponent {
       toast.role = 'alert';
       await toast.present();
 
-      setTimeout(() => {
+      const timeoutId = window.setTimeout(() => {
         const toastEl = document.querySelector('ion-toast');
         if (toastEl) {
           toastEl.setAttribute('role', 'alert');
           toastEl.setAttribute('aria-live', 'assertive');
         }
       }, 100); // Allow time for DOM render
+      this.timeouts.push(timeoutId);
 
       this.router.navigate(['/login']);
     } catch (err: any) {
