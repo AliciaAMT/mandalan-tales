@@ -49,7 +49,64 @@
   <div class="main-section map" [ngClass]="{'collapsed': !isMapOpen}" [style.grid-area]="mapArea">
     <button class="collapsible-header" (click)="toggleMap()">Map</button>
     <div class="section-content" *ngIf="isMapOpen">
-      <span>Map Placeholder</span>
+      <div class="map-container" *ngIf="currentCharacter; else noMap">
+        <div class="map-grid">
+          <div
+            *ngFor="let row of mapTiles; let rowIndex = index"
+            class="map-row"
+          >
+            <div
+              *ngFor="let tile of row; let colIndex = index"
+              class="map-tile"
+              [class.player-tile]="tile.isPlayer"
+              [class.clickable-tile]="tile.isClickable"
+              [class.invalid-tile]="tile.imageSrc.includes('yard00.webp') && !tile.isPlayer"
+              (click)="onTileClick(tile)"
+              [attr.aria-label]="getTileAriaLabel(tile)"
+            >
+              <img
+                [src]="tile.imageSrc"
+                [alt]="getTileAltText(tile)"
+                class="tile-image"
+                (error)="onTileImageError($event, tile)"
+              />
+              <div class="tile-overlay" *ngIf="tile.isPlayer">
+                <div class="player-indicator">YOU</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Debug section -->
+        <div class="debug-info" style="margin-top: 20px; padding: 10px; background: rgba(0,0,0,0.1); border-radius: 8px;">
+          <h4>Debug Info:</h4>
+          <p>Map Tiles Count: {{ mapTiles.length }}</p>
+          <p *ngIf="mapTiles.length > 0">First Row Tiles: {{ mapTiles[0].length }}</p>
+
+          <!-- Test buttons -->
+          <div style="margin: 10px 0;">
+            <button (click)="generateTestMap()" style="margin-right: 10px; padding: 5px 10px;">Generate Test Map</button>
+            <button (click)="generateMap()" style="padding: 5px 10px;">Generate Real Map</button>
+          </div>
+
+          <div *ngFor="let row of mapTiles; let rowIndex = index">
+            <p>Row {{ rowIndex }}:</p>
+            <ul>
+              <li *ngFor="let tile of row">
+                ({{ tile.x }}, {{ tile.y }}) - {{ tile.imageSrc }} - Player: {{ tile.isPlayer }} - Clickable: {{ tile.isClickable }}
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="map-info">
+          <p>Location: {{ currentCharacter.map }} ({{ currentCharacter.xaxis }}, {{ currentCharacter.yaxis }})</p>
+          <p>Map Dimensions: {{ currentCharacter.mapdimensions }}</p>
+        </div>
+      </div>
+      <ng-template #noMap>
+        <div class="no-map-message">No character loaded.</div>
+      </ng-template>
     </div>
   </div>
 
