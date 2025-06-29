@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
+const STORAGE_KEY = 'mainPageSectionState';
+
 @Component({
   selector: 'app-main',
   templateUrl: './main.page.html',
@@ -17,12 +19,32 @@ export class MainPage implements OnInit {
 
   constructor() { }
 
-  ngOnInit() {}
+  ngOnInit() {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      try {
+        const state = JSON.parse(saved);
+        if (typeof state.isPlayerStatsOpen === 'boolean') this.isPlayerStatsOpen = state.isPlayerStatsOpen;
+        if (typeof state.isMapOpen === 'boolean') this.isMapOpen = state.isMapOpen;
+        if (typeof state.isTileActionsOpen === 'boolean') this.isTileActionsOpen = state.isTileActionsOpen;
+        if (typeof state.isMenuOpen === 'boolean') this.isMenuOpen = state.isMenuOpen;
+      } catch {}
+    }
+  }
 
-  togglePlayerStats() { this.isPlayerStatsOpen = !this.isPlayerStatsOpen; }
-  toggleMap() { this.isMapOpen = !this.isMapOpen; }
-  toggleTileActions() { this.isTileActionsOpen = !this.isTileActionsOpen; }
-  toggleMenu() { this.isMenuOpen = !this.isMenuOpen; }
+  saveState() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({
+      isPlayerStatsOpen: this.isPlayerStatsOpen,
+      isMapOpen: this.isMapOpen,
+      isTileActionsOpen: this.isTileActionsOpen,
+      isMenuOpen: this.isMenuOpen
+    }));
+  }
+
+  togglePlayerStats() { this.isPlayerStatsOpen = !this.isPlayerStatsOpen; this.saveState(); }
+  toggleMap() { this.isMapOpen = !this.isMapOpen; this.saveState(); }
+  toggleTileActions() { this.isTileActionsOpen = !this.isTileActionsOpen; this.saveState(); }
+  toggleMenu() { this.isMenuOpen = !this.isMenuOpen; this.saveState(); }
 
   get gridTemplateRows() {
     // If menu is open, bottom row is 1fr, else just header (auto)
