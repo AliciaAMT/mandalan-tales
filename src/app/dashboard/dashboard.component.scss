@@ -172,3 +172,32 @@ app-footer {
     }
   }
 }
+
+.theme-settings {
+  margin-bottom: 20px;
+}
+
+.color-picker {
+  --padding-start: 0;
+  --padding-end: 0;
+}
+
+.preset-colors {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.preset-colors ion-button {
+  --border-radius: 8px;
+  --padding-start: 12px;
+  --padding-end: 12px;
+  min-width: 60px;
+}
+
+.preset-colors ion-button.selected {
+  --border-width: 2px;
+  --border-color: #fff;
+  --border-style: solid;
+}

@@ -3,6 +3,9 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CharacterService } from '../../../game/services/character.service';
 import { CharStats } from '../../../game/models/charstats.model';
+import { SettingsService } from '../../../game/services/settings.service';
+import { AuthService } from '../../../services/auth.service';
+import { DEFAULT_THEME_COLOR } from '../../../game/models/settings.model';
 
 const STORAGE_KEY = 'mainPageSectionState';
 
@@ -20,6 +23,8 @@ export class MainPage implements OnInit {
   isMenuOpen = true;
 
   characterService = inject(CharacterService);
+  settingsService = inject(SettingsService);
+  authService = inject(AuthService);
 
   get currentCharacter(): CharStats | undefined {
     const chars = this.characterService.getCharacters();
@@ -28,7 +33,8 @@ export class MainPage implements OnInit {
 
   constructor() { }
 
-  ngOnInit() {
+  async ngOnInit() {
+    await this.loadUserSettings();
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) {
       try {
@@ -39,6 +45,39 @@ export class MainPage implements OnInit {
         if (typeof state.isMenuOpen === 'boolean') this.isMenuOpen = state.isMenuOpen;
       } catch {}
     }
+  }
+
+  async loadUserSettings(): Promise<void> {
+    const user = this.authService.getCurrentUser();
+    if (user) {
+      const settings = await this.settingsService.getUserSettings(user.uid);
+      if (settings) {
+        // Apply theme color to CSS custom property
+        document.documentElement.style.setProperty('--theme-color', settings.themeColor);
+
+        // Set text color based on theme brightness
+        const textColor = this.getTextColorForTheme(settings.themeColor);
+        document.documentElement.style.setProperty('--header-text-color', textColor);
+      } else {
+        // Apply default theme color
+        document.documentElement.style.setProperty('--theme-color', DEFAULT_THEME_COLOR);
+        document.documentElement.style.setProperty('--header-text-color', '#181200');
+      }
+    }
+  }
+
+  private getTextColorForTheme(themeColor: string): string {
+    // Convert hex to RGB and calculate brightness
+    const hex = themeColor.replace('#', '');
+    const r = parseInt(hex.substr(0, 2), 16);
+    const g = parseInt(hex.substr(2, 2), 16);
+    const b = parseInt(hex.substr(4, 2), 16);
+
+    // Calculate relative luminance
+    const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+
+    // Use white text for dark themes (luminance < 0.5)
+    return luminance < 0.5 ? '#ffffff' : '#181200';
   }
 
   saveState() {
