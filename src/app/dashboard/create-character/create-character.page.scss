@@ -118,6 +118,54 @@ ion-button {
   overflow: hidden;
 }
 
+/* Portrait grid styling (for future use) */
+.portrait-grid ion-img {
+  border: 2px solid transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.2s ease-in-out;
+  max-width: 100%;
+  aspect-ratio: 1 / 1;
+}
+
+.portrait-grid ion-img:hover {
+  filter: brightness(1.1);
+  transform: scale(1.05);
+}
+
+.portrait-grid ion-img.selected {
+  border-color: var(--ion-color-primary);
+  box-shadow: 0 0 10px var(--ion-color-primary);
+}
+
+/* Portrait modal focus styles - using light grey instead of yellow */
+.portrait-item:focus {
+  outline: 2px solid #cccccc !important;
+  outline-offset: 2px !important;
+  border-color: #cccccc !important;
+  background: rgba(255, 255, 255, 0.1) !important;
+}
+
+.portrait-item:focus ion-img {
+  opacity: 1 !important;
+  filter: none !important;
+}
+
+.portrait-item:focus .portrait-name {
+  color: #cccccc !important;
+}
+
+/* Ensure portrait images maintain proper opacity on focus */
+.portrait-item ion-img {
+  opacity: 1;
+  transition: opacity 0.2s ease;
+}
+
+.portrait-item:focus-within ion-img {
+  opacity: 1 !important;
+  filter: none !important;
+}
+
 /* Error message styling */
 .error-message {
   color: var(--ion-color-danger);
@@ -140,26 +188,6 @@ ion-select:focus {
 ion-button:focus {
   outline: 2px solid white;
   outline-offset: 2px;
-}
-
-/* Portrait grid styling (for future use) */
-.portrait-grid ion-img {
-  border: 2px solid transparent;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: 0.2s ease-in-out;
-  max-width: 100%;
-  aspect-ratio: 1 / 1;
-}
-
-.portrait-grid ion-img:hover {
-  filter: brightness(1.1);
-  transform: scale(1.05);
-}
-
-.portrait-grid ion-img.selected {
-  border-color: var(--ion-color-primary);
-  box-shadow: 0 0 10px var(--ion-color-primary);
 }
 
 /* Form structure */

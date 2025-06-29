@@ -11,6 +11,7 @@
 app-footer {
   flex-shrink: 0;
 }
+
 .skip-link {
   position: absolute;
   top: -40px;
@@ -23,5 +24,86 @@ app-footer {
 
   &:focus {
     top: 0;
+  }
+}
+
+/* Character card styling */
+.character-card {
+  position: relative;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+}
+
+.character-card-content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.character-card img {
+  width: 100%;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 8px 8px 0 0;
+}
+
+.character-actions {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  gap: 4px;
+  background: rgba(0, 0, 0, 0.7);
+  border-radius: 20px;
+  padding: 4px;
+}
+
+.select-button, .expand-button {
+  --padding-start: 8px;
+  --padding-end: 8px;
+  --border-radius: 50%;
+  min-width: 32px;
+  height: 32px;
+
+  ion-icon {
+    font-size: 16px;
+  }
+}
+
+.select-button {
+  &.ion-color-primary {
+    --color: var(--ion-color-primary);
+  }
+}
+
+.expand-button {
+  --color: var(--ion-color-medium);
+
+  &:hover {
+    --color: var(--ion-color-medium-shade);
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 576px) {
+  .character-actions {
+    top: 4px;
+    right: 4px;
+    gap: 2px;
+    padding: 2px;
+  }
+
+  .select-button, .expand-button {
+    min-width: 28px;
+    height: 28px;
+
+    ion-icon {
+      font-size: 14px;
+    }
   }
 }

@@ -40,7 +40,7 @@
                     formControlName="race"
                     placeholder="Select race"
                     aria-label="Character race">
-                    <ion-select-option *ngFor="let race of races" [value]="race.toLowerCase()">{{ race }}</ion-select-option>
+                    <ion-select-option *ngFor="let race of races" [value]="race">{{ race }}</ion-select-option>
                   </ion-select>
                 </ion-item>
 
@@ -50,14 +50,15 @@
                     formControlName="class"
                     placeholder="Select class"
                     aria-label="Character class">
-                    <ion-select-option *ngFor="let class of classes" [value]="class.toLowerCase()">{{ class }}</ion-select-option>
+                    <ion-select-option *ngFor="let class of classes" [value]="class">{{ class }}</ion-select-option>
                   </ion-select>
                 </ion-item>
               </div>
 
-              <div>
-                <h3 class="stats-heading">Character Stats</h3>
-                <p class="stats-description">Distribute {{ totalPoints }} points across your character's attributes.</p>
+              <!-- Generated Stats Display -->
+              <div *ngIf="generatedStats">
+                <h3 class="stats-heading">Generated Character Stats</h3>
+                <p class="stats-description">Your character's stats are randomly generated with race and class bonuses applied.</p>
 
                 <ion-item>
                   <ion-label position="stacked">Character Stats</ion-label>
@@ -67,45 +68,19 @@
                         <ion-label position="stacked">Strength</ion-label>
                         <ion-input
                           type="number"
-                          formControlName="strength"
-                          min="1"
-                          max="20"
+                          [value]="generatedStats.strength"
+                          readonly
                           aria-label="Strength stat">
                         </ion-input>
                       </ion-item>
 
                       <ion-item>
-                        <ion-label position="stacked">Dexterity</ion-label>
+                        <ion-label position="stacked">Agility</ion-label>
                         <ion-input
                           type="number"
-                          formControlName="dexterity"
-                          min="1"
-                          max="20"
-                          aria-label="Dexterity stat">
-                        </ion-input>
-                      </ion-item>
-
-                      <ion-item>
-                        <ion-label position="stacked">Constitution</ion-label>
-                        <ion-input
-                          type="number"
-                          formControlName="constitution"
-                          min="1"
-                          max="20"
-                          aria-label="Constitution stat">
-                        </ion-input>
-                      </ion-item>
-                    </div>
-
-                    <div class="stats-column">
-                      <ion-item>
-                        <ion-label position="stacked">Intelligence</ion-label>
-                        <ion-input
-                          type="number"
-                          formControlName="intelligence"
-                          min="1"
-                          max="20"
-                          aria-label="Intelligence stat">
+                          [value]="generatedStats.agility"
+                          readonly
+                          aria-label="Agility stat">
                         </ion-input>
                       </ion-item>
 
@@ -113,33 +88,75 @@
                         <ion-label position="stacked">Wisdom</ion-label>
                         <ion-input
                           type="number"
-                          formControlName="wisdom"
-                          min="1"
-                          max="20"
+                          [value]="generatedStats.wisdom"
+                          readonly
                           aria-label="Wisdom stat">
+                        </ion-input>
+                      </ion-item>
+                    </div>
+
+                    <div class="stats-column">
+                      <ion-item>
+                        <ion-label position="stacked">Speed</ion-label>
+                        <ion-input
+                          type="number"
+                          [value]="generatedStats.speed"
+                          readonly
+                          aria-label="Speed stat">
                         </ion-input>
                       </ion-item>
 
                       <ion-item>
-                        <ion-label position="stacked">Charisma</ion-label>
+                        <ion-label position="stacked">Accuracy</ion-label>
                         <ion-input
                           type="number"
-                          formControlName="charisma"
-                          min="1"
-                          max="20"
-                          aria-label="Charisma stat">
+                          [value]="generatedStats.accuracy"
+                          readonly
+                          aria-label="Accuracy stat">
+                        </ion-input>
+                      </ion-item>
+
+                      <ion-item>
+                        <ion-label position="stacked">Luck</ion-label>
+                        <ion-input
+                          type="number"
+                          [value]="generatedStats.luck"
+                          readonly
+                          aria-label="Luck stat">
                         </ion-input>
                       </ion-item>
                     </div>
                   </div>
                 </ion-item>
-              </div>
 
-              <div class="points-display" role="status" aria-live="polite">
-                <p>Points used: <span [class]="allocatedPoints > totalPoints ? 'points-over' : 'points-ok'">{{ allocatedPoints }}</span> / {{ totalPoints }}</p>
-                <p *ngIf="allocatedPoints > totalPoints" class="error-message" role="alert">
-                  You have used too many points. Please reduce some stats.
-                </p>
+                <!-- Health and Mana -->
+                <ion-item>
+                  <ion-label position="stacked">Health & Mana</ion-label>
+                  <div class="stats-grid">
+                    <div class="stats-column">
+                      <ion-item>
+                        <ion-label position="stacked">Health</ion-label>
+                        <ion-input
+                          type="number"
+                          [value]="50 + (generatedStats.life || 0)"
+                          readonly
+                          aria-label="Health">
+                        </ion-input>
+                      </ion-item>
+                    </div>
+                    <div class="stats-column">
+                      <ion-item>
+                        <ion-label position="stacked">Mana</ion-label>
+                        <ion-input
+                          type="number"
+                          [value]="30 + (generatedStats.mana || 0)"
+                          readonly
+                          aria-label="Mana">
+                        </ion-input>
+                      </ion-item>
+                    </div>
+                  </div>
+                </ion-item>
               </div>
 
               <ion-item button (click)="openPortraitSelector()" class="portrait-selector">
@@ -164,7 +181,7 @@
               <ion-button
                 expand="block"
                 type="submit"
-                [disabled]="allocatedPoints > totalPoints || !characterForm.valid"
+                [disabled]="!characterForm.valid || !selectedPortrait"
                 aria-label="Create character"
                 aria-describedby="form-error"
                 class="ion-margin-top">
