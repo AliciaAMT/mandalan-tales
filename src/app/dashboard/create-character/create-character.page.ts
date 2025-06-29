@@ -35,13 +35,14 @@ export class CreateCharacterPage {
       name: ['', Validators.required],
       race: ['', Validators.required],
       class: ['', Validators.required],
+      gender: ['', Validators.required],
       stats: this.fb.group({
-        str: [0],
-        dex: [0],
-        int: [0],
-        wis: [0],
-        con: [0],
-        cha: [0]
+        strength: [0],
+        agility: [0],
+        wisdom: [0],
+        luck: [0],
+        speed: [0],
+        accuracy: [0]
       })
     });
   }
@@ -53,14 +54,14 @@ export class CreateCharacterPage {
 
   getStatDisplayName(stat: string): string {
     const statNames: { [key: string]: string } = {
-      str: 'Strength',
-      dex: 'Dexterity',
-      int: 'Intelligence',
-      wis: 'Wisdom',
-      con: 'Constitution',
-      cha: 'Charisma'
+      strength: 'Strength',
+      agility: 'Agility',
+      wisdom: 'Wisdom',
+      luck: 'Luck',
+      speed: 'Speed',
+      accuracy: 'Accuracy'
     };
-    return statNames[stat] || stat.toUpperCase();
+    return statNames[stat] || stat.charAt(0).toUpperCase() + stat.slice(1);
   }
 
   async openPortraitSelector() {

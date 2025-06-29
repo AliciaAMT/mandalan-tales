@@ -47,6 +47,19 @@
                   <ion-select-option *ngFor="let cls of classes" [value]="cls">{{ cls }}</ion-select-option>
                 </ion-select>
               </ion-item>
+
+              <ion-item>
+                <ion-label for="genderSelect" position="stacked">Gender</ion-label>
+                <ion-select
+                  id="genderSelect"
+                  formControlName="gender"
+                  interface="popover"
+                  aria-label="Select character gender"
+                  placeholder="Choose gender">
+                  <ion-select-option value="male">Male</ion-select-option>
+                  <ion-select-option value="female">Female</ion-select-option>
+                </ion-select>
+              </ion-item>
             </ion-list>
 
             <div formGroupName="stats">
@@ -54,7 +67,7 @@
               <p class="stats-description">Distribute {{ totalPoints }} points across your character's attributes.</p>
 
               <ion-list lines="none">
-                <ion-item *ngFor="let stat of ['str','dex','int','wis','con','cha']">
+                <ion-item *ngFor="let stat of ['strength','agility','wisdom','luck','speed','accuracy']">
                   <ion-label position="stacked">{{ getStatDisplayName(stat) }}</ion-label>
                   <ion-input
                     [id]="stat + 'Input'"
