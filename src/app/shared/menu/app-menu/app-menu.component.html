@@ -35,21 +35,21 @@
       </ion-menu-toggle>
 
       <ion-menu-toggle auto-hide="true" *ngIf="isLoggedIn()">
-        <ion-item routerLink="/dashboard" routerDirection="forward" detail="false" role="menuitem">
+        <ion-item routerLink="/dashboard" routerDirection="forward" detail="false" role="menuitem" button>
           <ion-icon name="home-outline" slot="start" aria-hidden="true"></ion-icon>
           <ion-label>Dashboard</ion-label>
         </ion-item>
       </ion-menu-toggle>
 
       <ion-menu-toggle auto-hide="true" *ngIf="isLoggedIn()">
-        <ion-item (click)="logout()" detail="false" role="menuitem" aria-label="Logout from account">
+        <ion-item (click)="logout()" detail="false" role="menuitem" aria-label="Logout from account" button>
           <ion-icon name="log-out-outline" slot="start" aria-hidden="true"></ion-icon>
           <ion-label>Logout</ion-label>
         </ion-item>
       </ion-menu-toggle>
 
       <ion-menu-toggle auto-hide="true" *ngIf="!isLoggedIn()">
-        <ion-item routerLink="/login" routerDirection="forward" detail="false" role="menuitem">
+        <ion-item routerLink="/login" routerDirection="forward" detail="false" role="menuitem" button>
           <ion-icon name="person-outline" slot="start" aria-hidden="true"></ion-icon>
           <ion-label>Login</ion-label>
         </ion-item>
