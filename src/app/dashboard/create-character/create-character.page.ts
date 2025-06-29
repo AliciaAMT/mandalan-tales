@@ -279,11 +279,23 @@ export class CreateCharacterPage {
         // Save character to Firebase
         await this.characterService.createCharacter(characterData);
 
-        // Navigate to game page
-        this.router.navigate(['/game']);
+        // Navigate to dashboard
+        this.router.navigate(['/dashboard']);
       } catch (error) {
         console.error('Error creating character:', error);
-        this.formError = 'Failed to create character. Please try again.';
+
+        // Check for specific error types and provide user-friendly messages
+        if (error instanceof Error) {
+          if (error.message === 'Character name already exists') {
+            this.formError = 'A character with this name already exists. Please choose a different name.';
+          } else if (error.message === 'User not authenticated') {
+            this.formError = 'You must be logged in to create a character. Please log in and try again.';
+          } else {
+            this.formError = 'Failed to create character. Please try again.';
+          }
+        } else {
+          this.formError = 'Failed to create character. Please try again.';
+        }
       }
     } else {
       this.formError = 'Please fill in all required fields and select a portrait.';
