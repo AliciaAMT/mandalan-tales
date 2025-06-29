@@ -32,26 +32,26 @@ export class CreateCharacterPage {
 
   // Portrait options with display names and image paths
   portraitOptions = [
-    { id: 'male1', name: 'Male 1', image: 'assets/portraits/male1i.png', gender: 'male' },
-    { id: 'male2', name: 'Male 2', image: 'assets/portraits/male2i.png', gender: 'male' },
-    { id: 'male3', name: 'Male 3', image: 'assets/portraits/male3i.png', gender: 'male' },
-    { id: 'male4', name: 'Male 4', image: 'assets/portraits/male4i.png', gender: 'male' },
-    { id: 'male5', name: 'Male 5', image: 'assets/portraits/male5i.png', gender: 'male' },
-    { id: 'male6', name: 'Male 6', image: 'assets/portraits/male6i.png', gender: 'male' },
-    { id: 'male7', name: 'Male 7', image: 'assets/portraits/male7i.png', gender: 'male' },
-    { id: 'male8', name: 'Male 8', image: 'assets/portraits/male8i.png', gender: 'male' },
-    { id: 'male9', name: 'Male 9', image: 'assets/portraits/male9i.png', gender: 'male' },
-    { id: 'male10', name: 'Male 10', image: 'assets/portraits/male10i.png', gender: 'male' },
-    { id: 'female1', name: 'Female 1', image: 'assets/portraits/female1i.png', gender: 'female' },
-    { id: 'female2', name: 'Female 2', image: 'assets/portraits/female2i.png', gender: 'female' },
-    { id: 'female3', name: 'Female 3', image: 'assets/portraits/female3i.png', gender: 'female' },
-    { id: 'female4', name: 'Female 4', image: 'assets/portraits/female4i.png', gender: 'female' },
-    { id: 'female5', name: 'Female 5', image: 'assets/portraits/female5i.png', gender: 'female' },
-    { id: 'female6', name: 'Female 6', image: 'assets/portraits/female6i.png', gender: 'female' },
-    { id: 'female7', name: 'Female 7', image: 'assets/portraits/female7i.png', gender: 'female' },
-    { id: 'female8', name: 'Female 8', image: 'assets/portraits/female8i.png', gender: 'female' },
-    { id: 'female9', name: 'Female 9', image: 'assets/portraits/female9i.png', gender: 'female' },
-    { id: 'female10', name: 'Female 10', image: 'assets/portraits/female10i.png', gender: 'female' }
+    { id: 'male1', name: 'Male 1', image: 'assets/portraits/transparent/male1.png', gender: 'male' },
+    { id: 'male2', name: 'Male 2', image: 'assets/portraits/transparent/male2.png', gender: 'male' },
+    { id: 'male3', name: 'Male 3', image: 'assets/portraits/transparent/male3.png', gender: 'male' },
+    { id: 'male4', name: 'Male 4', image: 'assets/portraits/transparent/male4.png', gender: 'male' },
+    { id: 'male5', name: 'Male 5', image: 'assets/portraits/transparent/male5.png', gender: 'male' },
+    { id: 'male6', name: 'Male 6', image: 'assets/portraits/transparent/male6.png', gender: 'male' },
+    { id: 'male7', name: 'Male 7', image: 'assets/portraits/transparent/male7.png', gender: 'male' },
+    { id: 'male8', name: 'Male 8', image: 'assets/portraits/transparent/male8.png', gender: 'male' },
+    { id: 'male9', name: 'Male 9', image: 'assets/portraits/transparent/male9.png', gender: 'male' },
+    { id: 'male10', name: 'Male 10', image: 'assets/portraits/transparent/male10.png', gender: 'male' },
+    { id: 'female1', name: 'Female 1', image: 'assets/portraits/transparent/female1.png', gender: 'female' },
+    { id: 'female2', name: 'Female 2', image: 'assets/portraits/transparent/female2.png', gender: 'female' },
+    { id: 'female3', name: 'Female 3', image: 'assets/portraits/transparent/female3.png', gender: 'female' },
+    { id: 'female4', name: 'Female 4', image: 'assets/portraits/transparent/female4.png', gender: 'female' },
+    { id: 'female5', name: 'Female 5', image: 'assets/portraits/transparent/female5.png', gender: 'female' },
+    { id: 'female6', name: 'Female 6', image: 'assets/portraits/transparent/female6.png', gender: 'female' },
+    { id: 'female7', name: 'Female 7', image: 'assets/portraits/transparent/female7.png', gender: 'female' },
+    { id: 'female8', name: 'Female 8', image: 'assets/portraits/transparent/female8.png', gender: 'female' },
+    { id: 'female9', name: 'Female 9', image: 'assets/portraits/transparent/female9.png', gender: 'female' },
+    { id: 'female10', name: 'Female 10', image: 'assets/portraits/transparent/female10.png', gender: 'female' }
   ];
 
   selectedPortrait = '';
@@ -219,7 +219,7 @@ export class CreateCharacterPage {
       margin: 0.5rem 0 0 0;
       font-size: 0.8rem;
       text-align: center;
-      color: var(--ion-color-light);
+      color: white;
     }
   `],
   standalone: true,
