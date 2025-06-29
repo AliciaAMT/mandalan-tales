@@ -226,7 +226,6 @@ export class CreateCharacterPage {
 
         // Create character data with all required fields
         const characterData: CharStats = {
-          id: '', // Will be set by Firebase
           userId: '', // Will be set by the service
           name: formData.name,
           race: formData.race,
@@ -247,7 +246,7 @@ export class CreateCharacterPage {
           wisdom: this.generatedStats.wisdom,
           luck: this.generatedStats.luck,
           guild: '',
-          title: '',
+          title: 'Peasant',
           cond: 'Good',
           fireResist: this.generatedStats.fireResist,
           iceResist: this.generatedStats.iceResist,
@@ -265,14 +264,14 @@ export class CreateCharacterPage {
           enchanting: this.generatedStats.enchanting,
           lockpicking: this.generatedStats.lockpicking,
           magicFind: this.generatedStats.magicFind,
-          map: '1',
-          mapdimensions: 1,
-          xaxis: 0,
-          yaxis: 0,
-          savemap: '1',
-          savemapdimensions: 1,
-          savexaxis: 0,
-          saveyaxis: 0,
+          map: 'homeup',
+          mapdimensions: 33,
+          xaxis: 2,
+          yaxis: 2,
+          savemap: 'homeup',
+          savemapdimensions: 33,
+          savexaxis: 1,
+          saveyaxis: 3,
           createdAt: Date.now(),
           updatedAt: Date.now()
         };

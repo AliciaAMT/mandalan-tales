@@ -1,5 +1,5 @@
 export interface CharStats {
-  id?: string; // Firestore document ID
+  id?: string; // Added automatically by Firestore query with { idField: 'id' }
   userId: string; // Firebase UID or user ref
 
   name: string;
