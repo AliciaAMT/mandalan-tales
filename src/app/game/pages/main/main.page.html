@@ -1,51 +1,33 @@
-<ion-content>
-  <div class="main-game-responsive-grid">
-    <!-- Player Stats (Left/Top) -->
-    <div class="main-section player-stats">
-      <ion-accordion-group>
-        <ion-accordion value="playerStats">
-          <ion-item slot="header">Player Stats</ion-item>
-          <div slot="content" class="section-content">
-            <span>Player Stats Placeholder</span>
-          </div>
-        </ion-accordion>
-      </ion-accordion-group>
-    </div>
-
-    <!-- Map (Center/Second) -->
-    <div class="main-section map">
-      <ion-accordion-group>
-        <ion-accordion value="map">
-          <ion-item slot="header">Map</ion-item>
-          <div slot="content" class="section-content">
-            <span>Map Placeholder</span>
-          </div>
-        </ion-accordion>
-      </ion-accordion-group>
-    </div>
-
-    <!-- Tile Actions (Right/Third) -->
-    <div class="main-section tile-actions">
-      <ion-accordion-group>
-        <ion-accordion value="tileActions">
-          <ion-item slot="header">Tile Actions</ion-item>
-          <div slot="content" class="section-content">
-            <span>Tile Actions Placeholder</span>
-          </div>
-        </ion-accordion>
-      </ion-accordion-group>
-    </div>
-
-    <!-- Menu (Bottom/Last) -->
-    <div class="main-section menu">
-      <ion-accordion-group>
-        <ion-accordion value="menu">
-          <ion-item slot="header">Menu</ion-item>
-          <div slot="content" class="section-content">
-            <span>Menu Placeholder</span>
-          </div>
-        </ion-accordion>
-      </ion-accordion-group>
+<div class="main-game-responsive-grid">
+  <!-- Player Stats (Left/Top) -->
+  <div class="main-section player-stats" [ngClass]="{'collapsed': !isPlayerStatsOpen}">
+    <button class="collapsible-header" (click)="togglePlayerStats()">Player Stats</button>
+    <div class="section-content" *ngIf="isPlayerStatsOpen">
+      <span>Player Stats Placeholder</span>
     </div>
   </div>
-</ion-content>
+
+  <!-- Map (Center/Second) -->
+  <div class="main-section map" [ngClass]="{'collapsed': !isMapOpen}">
+    <button class="collapsible-header" (click)="toggleMap()">Map</button>
+    <div class="section-content" *ngIf="isMapOpen">
+      <span>Map Placeholder</span>
+    </div>
+  </div>
+
+  <!-- Tile Actions (Right/Third) -->
+  <div class="main-section tile-actions" [ngClass]="{'collapsed': !isTileActionsOpen}">
+    <button class="collapsible-header" (click)="toggleTileActions()">Tile Actions</button>
+    <div class="section-content" *ngIf="isTileActionsOpen">
+      <span>Tile Actions Placeholder</span>
+    </div>
+  </div>
+
+  <!-- Menu (Bottom/Last) -->
+  <div class="main-section menu" [ngClass]="{'collapsed': !isMenuOpen}">
+    <button class="collapsible-header" (click)="toggleMenu()">Menu</button>
+    <div class="section-content" *ngIf="isMenuOpen">
+      <span>Menu Placeholder</span>
+    </div>
+  </div>
+</div>
