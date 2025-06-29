@@ -1,6 +1,13 @@
-<div class="main-game-responsive-grid">
+<div
+  class="main-game-responsive-grid"
+  [ngStyle]="{
+    'grid-template-rows': gridTemplateRows,
+    'grid-template-columns': gridTemplateColumns,
+    'grid-template-areas': gridTemplateAreas
+  }"
+>
   <!-- Player Stats (Left/Top) -->
-  <div class="main-section player-stats" [ngClass]="{'collapsed': !isPlayerStatsOpen}">
+  <div class="main-section player-stats" [ngClass]="{'collapsed': !isPlayerStatsOpen}" [style.grid-area]="playerStatsArea">
     <button class="collapsible-header" (click)="togglePlayerStats()">Player Stats</button>
     <div class="section-content" *ngIf="isPlayerStatsOpen">
       <span>Player Stats Placeholder</span>
@@ -8,7 +15,7 @@
   </div>
 
   <!-- Map (Center/Second) -->
-  <div class="main-section map" [ngClass]="{'collapsed': !isMapOpen}">
+  <div class="main-section map" [ngClass]="{'collapsed': !isMapOpen}" [style.grid-area]="mapArea">
     <button class="collapsible-header" (click)="toggleMap()">Map</button>
     <div class="section-content" *ngIf="isMapOpen">
       <span>Map Placeholder</span>
@@ -16,7 +23,7 @@
   </div>
 
   <!-- Tile Actions (Right/Third) -->
-  <div class="main-section tile-actions" [ngClass]="{'collapsed': !isTileActionsOpen}">
+  <div class="main-section tile-actions" [ngClass]="{'collapsed': !isTileActionsOpen}" [style.grid-area]="tileActionsArea">
     <button class="collapsible-header" (click)="toggleTileActions()">Tile Actions</button>
     <div class="section-content" *ngIf="isTileActionsOpen">
       <span>Tile Actions Placeholder</span>
@@ -24,7 +31,7 @@
   </div>
 
   <!-- Menu (Bottom/Last) -->
-  <div class="main-section menu" [ngClass]="{'collapsed': !isMenuOpen}">
+  <div class="main-section menu" [ngClass]="{'collapsed': !isMenuOpen}" [style.grid-area]="menuArea">
     <button class="collapsible-header" (click)="toggleMenu()">Menu</button>
     <div class="section-content" *ngIf="isMenuOpen">
       <span>Menu Placeholder</span>
