@@ -28,7 +28,9 @@
                   size="small"
                   (click)="selectCharacter(char.id!)"
                   [color]="char.id === selectedCharacterId ? 'primary' : 'medium'"
-                  class="select-button">
+                  class="select-button"
+                  [attr.aria-label]="'Select ' + char.name + ' character'"
+                  [attr.aria-pressed]="char.id === selectedCharacterId">
                   <ion-icon slot="icon-only" name="checkmark-circle-outline"></ion-icon>
                 </ion-button>
 
@@ -37,7 +39,8 @@
                   size="small"
                   (click)="openCharacterDetails(char)"
                   color="medium"
-                  class="expand-button">
+                  class="expand-button"
+                  [attr.aria-label]="'View details for ' + char.name + ' character'">
                   <ion-icon slot="icon-only" name="information-circle-outline"></ion-icon>
                 </ion-button>
               </div>
