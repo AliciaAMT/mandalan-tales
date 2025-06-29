@@ -19,6 +19,7 @@ export class CreateCharacterPage {
 
   characterForm: FormGroup;
   totalPoints = 36;
+  formError: string | null = null;
 
   races = ['Human', 'Elf', 'Dwarf', 'Orc'];
   classes = ['Warrior', 'Mage', 'Thief', 'Healer'];
@@ -50,6 +51,18 @@ export class CreateCharacterPage {
     return Object.values(stats).reduce((a, b) => a + b, 0);
   }
 
+  getStatDisplayName(stat: string): string {
+    const statNames: { [key: string]: string } = {
+      str: 'Strength',
+      dex: 'Dexterity',
+      int: 'Intelligence',
+      wis: 'Wisdom',
+      con: 'Constitution',
+      cha: 'Charisma'
+    };
+    return statNames[stat] || stat.toUpperCase();
+  }
+
   async openPortraitSelector() {
     const buttons = this.portraits.map(portrait => ({
       text: portrait,
@@ -70,6 +83,8 @@ export class CreateCharacterPage {
   }
 
   onSubmit(): void {
+    this.formError = null;
+
     if (this.characterForm.valid && this.allocatedPoints <= this.totalPoints) {
       const formData = this.characterForm.value;
       const characterData = {
@@ -80,6 +95,8 @@ export class CreateCharacterPage {
 
       console.log('Character Created:', characterData);
       // TODO: Save to Firebase
+    } else {
+      this.formError = 'Please fill in all required fields and ensure you have not exceeded the point limit.';
     }
   }
 }
