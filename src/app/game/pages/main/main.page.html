@@ -10,7 +10,36 @@
   <div class="main-section player-stats" [ngClass]="{'collapsed': !isPlayerStatsOpen}" [style.grid-area]="playerStatsArea">
     <button class="collapsible-header" (click)="togglePlayerStats()">Player Stats</button>
     <div class="section-content" *ngIf="isPlayerStatsOpen">
-      <span>Player Stats Placeholder</span>
+      <ng-container *ngIf="currentCharacter; else noChar">
+        <div class="player-stats-list">
+          <div class="player-stats-row">
+            <img class="stat-icon portrait" [src]="'assets/portraits/transparent/' + currentCharacter.portrait + '.png'" alt="Portrait" />
+            <div>
+              <strong>{{ currentCharacter.name }}</strong>
+              <span *ngIf="currentCharacter.title">({{ currentCharacter.title }})</span>
+            </div>
+          </div>
+          <div class="player-stats-row">
+            <img class="stat-icon" src="assets/items/hourglass.webp" alt="Level" />
+            <div>Level {{ currentCharacter.level }}<br>XP: {{ currentCharacter.experience }}</div>
+          </div>
+          <div class="player-stats-row">
+            <img class="stat-icon" src="assets/items/life.webp" alt="Life" />
+            <div>Life: {{ currentCharacter.life }} / {{ currentCharacter.maxLife }}</div>
+          </div>
+          <div class="player-stats-row">
+            <img class="stat-icon" src="assets/items/mana.webp" alt="Mana" />
+            <div>Mana: {{ currentCharacter.mana }} / {{ currentCharacter.maxMana }}</div>
+          </div>
+          <div class="player-stats-row">
+            <img class="stat-icon" src="assets/items/gold.webp" alt="Gold" />
+            <div>Gold: <span class="gold-amount">{{ currentCharacter.gold }}</span></div>
+          </div>
+        </div>
+      </ng-container>
+      <ng-template #noChar>
+        <div>No character loaded.</div>
+      </ng-template>
     </div>
   </div>
 

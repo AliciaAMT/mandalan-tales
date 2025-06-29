@@ -239,6 +239,7 @@ export class CreateCharacterPage {
           maxLife: 50 + (this.generatedStats.maxLife || 0),
           mana: 30 + (this.generatedStats.mana || 0),
           maxMana: 30 + (this.generatedStats.maxMana || 0),
+          gold: 0,
           speed: this.generatedStats.speed,
           accuracy: this.generatedStats.accuracy,
           strength: this.generatedStats.strength,

@@ -90,3 +90,36 @@
     margin-bottom: 0;
   }
 }
+
+.player-stats-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.player-stats-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.stat-icon {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  border-radius: 6px;
+  background: rgba(255,255,255,0.05);
+}
+
+.stat-icon.portrait {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.10);
+}
+
+.gold-amount {
+  color: #ffd700;
+  font-weight: bold;
+}

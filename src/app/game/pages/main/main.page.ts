@@ -1,6 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { CharacterService } from '../../../game/services/character.service';
+import { CharStats } from '../../../game/models/charstats.model';
 
 const STORAGE_KEY = 'mainPageSectionState';
 
@@ -16,6 +18,13 @@ export class MainPage implements OnInit {
   isMapOpen = true;
   isTileActionsOpen = true;
   isMenuOpen = true;
+
+  characterService = inject(CharacterService);
+
+  get currentCharacter(): CharStats | undefined {
+    const chars = this.characterService.getCharacters();
+    return chars.length > 0 ? chars[0] : undefined;
+  }
 
   constructor() { }
 
