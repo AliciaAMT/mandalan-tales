@@ -94,8 +94,8 @@
               <ion-label for="portraitButton">Portrait</ion-label>
               <ion-thumbnail slot="end" *ngIf="selectedPortrait">
                 <ion-img
-                  [src]="'assets/webp-output/portraits/' + selectedPortrait + '.webp'"
-                  [alt]="'Selected portrait: ' + selectedPortrait">
+                  [src]="getSelectedPortraitImage()"
+                  [alt]="getSelectedPortraitName()">
                 </ion-img>
               </ion-thumbnail>
               <ion-button
@@ -104,9 +104,13 @@
                 slot="end"
                 type="button"
                 (click)="openPortraitSelector()"
+                [disabled]="!characterForm.get('gender')?.value"
                 aria-label="Choose character portrait">
                 <ion-icon name="image-outline"></ion-icon>
               </ion-button>
+              <div slot="end" *ngIf="!characterForm.get('gender')?.value" class="portrait-hint">
+                <small>Select gender first</small>
+              </div>
             </ion-item>
 
             <ion-button
