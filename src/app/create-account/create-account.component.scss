@@ -138,11 +138,24 @@ ion-list {
 /* Field container - simplified to match create-character form */
 ion-item {
   --background: transparent;
-  --border-color: #e6c265;
+  --border-color: #888888;
   --border-width: 1px;
   --border-radius: 6px;
   margin-bottom: 1rem;
   --inner-border-width: 0;
+  border: 1px solid #888888 !important;
+  border-radius: 6px;
+}
+
+/* Ensure borders are visible with more specific selectors */
+.login-card ion-item {
+  border: 1px solid #888888 !important;
+  border-radius: 6px;
+}
+
+.login-card ion-item:focus-within {
+  border: 2px solid #f5d97e !important;
+  border-radius: 6px;
 }
 
 /* Field label */
@@ -192,11 +205,19 @@ ion-textarea textarea:focus {
 ion-item:focus-within {
   --border-color: #f5d97e;
   --border-width: 2px;
+  border: 2px solid #f5d97e !important;
 }
 
 ion-button:focus {
   outline: 2px solid white;
   outline-offset: 2px;
+}
+
+/* Show/hide password button focus styling */
+ion-button[fill="clear"]:focus {
+  outline: 2px solid white;
+  outline-offset: 2px;
+  border-radius: 4px;
 }
 
 .error-message {

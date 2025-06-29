@@ -54,6 +54,9 @@ export class LoginComponent implements AfterViewInit, OnDestroy {
   }
 
   async ngAfterViewInit(): Promise<void> {
+    // Temporarily disable reCAPTCHA initialization
+    // TODO: Re-enable once proper invisible reCAPTCHA v2 is configured
+    /*
     await this.waitForRecaptcha();
 
     if (this.recaptchaWidgetId === null) {
@@ -66,6 +69,10 @@ export class LoginComponent implements AfterViewInit, OnDestroy {
       });
     }
 
+    this.recaptchaReady = true;
+    */
+
+    // For now, just mark as ready without reCAPTCHA
     this.recaptchaReady = true;
   }
 
