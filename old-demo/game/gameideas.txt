@@ -1,0 +1,87 @@
+cave objects 
+jsangular timed events and bars and notifications
+you can gather/harvest at nodes, or hire someone else while you adventure...
+craft same
+cook ?
+make recipes you can add extra ingredients to like soup...every extra ingrediant adds boost
+
+rewrite inventory again... collapsible motif one page
+
+update security with die() catch statements redirects after headers to end php scripts
+evil bunny chance 
+
+finished keep pocket and trade pocket... may need to update armor listings still
+
+fix rarity to number to order correctly in inventory and calculate value
+ ore rune gem
+ patterns
+ mining
+ glowing itemnames
+ 
+colorcode rarity to glowing
+1 common - none
+2 uncommon - blue
+3 rare - gold
+4 ultra-rare - green
+5 legendary - teal
+6 relic - purple
+
+ gethering: plants/fruits/produce/mining
+ 
+ mining ore, gems, runes
+ 
+ logging: building a shop/home???
+ 
+ add rune artifacts
+ 
+ char attack (enemy checks)
+ char endturn (speed checks and counter checks)
+ enemy counterattack (char checks)
+ enemy end turn (speed and counters checked) 
+ enemyendround for enemy turn again
+ end round  counters checked
+ log and display turn end
+ end fight
+ 
+ skip powers for now skill related ones
+ 
+ update deathcount - chardead
+ 
+ //add backstab chance according to skill/weapon equipped
+//$rand=mt_rand(1,100);
+//$rand=$rand*.01;
+//$sbackstab=$rand*$sbackstab;
+//$sbackstab=round($sbackstab);
+//$chance=mt_rand(1,100);
+//if ($sbackstab>$chance) {
+//$counter=$counter."<span class=\"green\">";
+//$counter=$counter."You Backstab ".$enemyname;
+//$counter=$counter." and inflict a Critical Hit of <b>".$damage."!</b></span><br />";
+//}
+
+//$rand=mt_rand(1,100);
+//$rand=$rand*.01;
+//$sbackstab=$rand*$sbackstab;
+//$sbackstab=round($sbackstab);
+//$chance=mt_rand(1,100);
+//if ($sbackstab>$chance)
+//{
+//$counter="<span class=\"red\">";
+//$counter=$counter.$enemyname;
+//$counter=$counter." attempts to flee and <b>Almost Succeeds!</b></span><br />";
+//$counter=$counter."<span class=\"green\">";
+//$counter=$counter."You Backstab ".$enemyname;
+//$counter=$counter." and inflict a Critical Hit of <b>".$damage."!</b></span><br />";
+//}
+//else {
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 

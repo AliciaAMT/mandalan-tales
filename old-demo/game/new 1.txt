@@ -1,0 +1,13 @@
+cave objects 
+jsangular timed events and bars and notifications
+you can gather/harvest at nodes, or hire someone else while you adventure...
+craft same
+cook ?
+make recipes you can add extra ingredients to like soup...every extra ingrediant adds boost
+
+rewrite inventory again... collapsible motif one page
+
+update security with die() catch statements redirects after headers to end php scripts
+evil bunny chance 
+
+finished keep pocket and trade pocket... may need to update armor listings still

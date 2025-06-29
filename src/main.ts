@@ -8,7 +8,24 @@ import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
 import { provideFirestore, getFirestore } from '@angular/fire/firestore';
 import { provideAuth, getAuth } from '@angular/fire/auth';
 import { environment } from './environments/environment';
+import { addIcons } from 'ionicons';
+import {
+  logOutOutline,
+  homeOutline,
+  personOutline,
+  informationCircleOutline,
+  mailOutline,
+  documentTextOutline
+} from 'ionicons/icons';
 
+addIcons({
+  'log-out-outline': logOutOutline,
+  'home-outline': homeOutline,
+  'person-outline': personOutline,
+  'information-circle-outline': informationCircleOutline,
+  'mail-outline': mailOutline,
+  'document-text-outline': documentTextOutline
+});
 
 
 bootstrapApplication(AppComponent, {

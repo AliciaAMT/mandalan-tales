@@ -1,14 +1,17 @@
 import { AppHeaderComponent } from "../shared/header/app-header.component";
 import { AppFooterComponent } from "../shared/footer/app-footer.component";
 import { FormsModule } from '@angular/forms';
-import { AfterViewInit, Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, ViewChild, ElementRef, inject, OnDestroy } from '@angular/core';
 import { AuthService } from '../services/auth.service';
+import { Firestore, doc, setDoc, serverTimestamp } from '@angular/fire/firestore';
 import { Router, RouterModule } from '@angular/router';
 import { NgIf } from "@angular/common";
 import { STANDALONE_IMPORTS } from '../shared/standalone-imports';
 // import { SkipLinkComponent } from "../shared/skip-link/skip-link.component";
 import { addIcons } from 'ionicons';
 import { eye, eyeOff } from 'ionicons/icons';
+import { sendEmailVerification } from '@angular/fire/auth';
+import { ToastController } from '@ionic/angular';
 
 addIcons({
   'eye': eye,
@@ -26,99 +29,86 @@ declare global {
   templateUrl: './create-account.component.html',
   styleUrls: ['./create-account.component.scss'],
   standalone: true,
-  imports: [AppHeaderComponent, AppFooterComponent, FormsModule, NgIf, STANDALONE_IMPORTS, RouterModule/*, SkipLinkComponent*/],
+  imports: [
+    AppHeaderComponent,
+    AppFooterComponent,
+    RouterModule,
+    FormsModule,
+    NgIf,
+    STANDALONE_IMPORTS
+  ]
 })
-export class CreateAccountComponent implements OnInit, AfterViewInit {
-  email = '';
-  password = '';
+export class CreateAccountComponent implements OnDestroy {
+  private authService: AuthService = inject(AuthService);
+  private router: Router = inject(Router);
+  private toastCtrl: ToastController = inject(ToastController);
+  private firestore: Firestore = inject(Firestore);
+  private timeouts: number[] = [];
+
+  email: string = '';
+  password: string = '';
   error: string | null = null;
-  currentYear: number = new Date().getFullYear();
-  recaptchaSiteKey = '6LfCQmYrAAAAAAW9jUsKIkBm8uAc41MGahUqSbpe';
-  private recaptchaWidgetId: any = null;
-  recaptchaReady = false;
-  showPassword = false;
+  showPassword: boolean = false;
 
-  @ViewChild('submitBtn') submitBtn!: ElementRef<HTMLIonButtonElement>;
+  ngOnDestroy(): void {
+    // Clean up all timeouts to prevent memory leaks
+    this.timeouts.forEach(timeoutId => clearTimeout(timeoutId));
+    this.timeouts = [];
+  }
 
-  togglePasswordVisibility(): void {
+  async createAccount() {
+    this.error = null;
+    try {
+      const cred = await this.authService.register(this.email, this.password);
+
+      await sendEmailVerification(cred.user);
+      await this.createUserInFirestore(cred.user);
+      await this.authService.logout();
+
+      const toast = await this.toastCtrl.create({
+        message: 'Account created! Please check your email and verify before logging in.',
+        duration: 4000,
+        color: 'success',
+        position: 'bottom'
+      });
+
+      // Patch for accessibility
+      toast.role = 'alert';
+      await toast.present();
+
+      const timeoutId = window.setTimeout(() => {
+        const toastEl = document.querySelector('ion-toast');
+        if (toastEl) {
+          toastEl.setAttribute('role', 'alert');
+          toastEl.setAttribute('aria-live', 'assertive');
+        }
+      }, 100); // Allow time for DOM render
+      this.timeouts.push(timeoutId);
+
+      this.router.navigate(['/login']);
+    } catch (err: any) {
+      this.error = err.message || 'An unknown error occurred.';
+    }
+  }
+
+  async createUserInFirestore(user: any) {
+    const userRef = doc(this.firestore, `users/${user.uid}`);
+    await setDoc(userRef, {
+      uid: user.uid,
+      email: user.email,
+      displayName: user.displayName || null,
+      createdAt: serverTimestamp(),
+      role: 'player',
+    }, { merge: true });
+  }
+
+  togglePasswordVisibility() {
     this.showPassword = !this.showPassword;
   }
-  submitFormIfValid(form: any): void {
+
+  submitFormIfValid(form: any) {
     if (form.valid) {
       this.createAccount();
     }
-  }
-
-  constructor(private authService: AuthService, private router: Router) {}
-
-  ngOnInit(): void {}
-
-  async ngAfterViewInit(): Promise<void> {
-    await this.waitForRecaptcha();
-
-    this.recaptchaWidgetId = window.grecaptcha.render('recaptcha-container', {
-      sitekey: this.recaptchaSiteKey,
-      size: 'invisible',
-      callback: (token: string) => this.onRecaptchaSuccess(token)
-    });
-
-    this.recaptchaReady = true;
-  }
-
-  waitForRecaptcha(): Promise<void> {
-    return new Promise(resolve => {
-      const interval = setInterval(() => {
-        if (window.grecaptcha && window.grecaptcha.render) {
-          clearInterval(interval);
-          resolve();
-        }
-      }, 100);
-    });
-  }
-
-  async createAccount(): Promise<void> {
-    this.error = null;
-
-    const activeEl = document.activeElement as HTMLElement;
-    if (activeEl && typeof activeEl.blur === 'function') {
-      activeEl.blur();
-    }
-
-    if (!this.recaptchaReady && window.grecaptcha) {
-      await this.ngAfterViewInit(); // re-render if needed
-    }
-
-    if (this.recaptchaReady) {
-      window.grecaptcha.execute(this.recaptchaWidgetId);
-    } else {
-      this.error = 'reCAPTCHA failed to load. Please refresh and try again.';
-      setTimeout(() => {
-        this.submitBtn?.nativeElement?.focus();
-      }, 100);
-    }
-  }
-
-  onRecaptchaSuccess(token: string): void {
-    this.authService.register(this.email, this.password)
-      .then(() => {
-        alert('Verification email sent. Please check your inbox before logging in.');
-        this.router.navigate(['/login']);
-      })
-      .catch(err => {
-        console.error(err);
-        this.error = err?.message || 'Failed to create account. Please try again.';
-
-        setTimeout(() => {
-          const errorEl = document.getElementById('form-error');
-          if (errorEl) {
-            errorEl.focus();
-          }
-          this.submitBtn?.nativeElement?.focus();
-        }, 100);
-
-        if (window.grecaptcha && this.recaptchaWidgetId !== null) {
-          window.grecaptcha.reset(this.recaptchaWidgetId);
-        }
-      });
   }
 }

@@ -1,0 +1,270 @@
+<?php
+
+$response=strip_tags($_POST["type"]);
+$query=sprintf("select * from flags where username='%s';", mysql_real_escape_string($username));
+$result=mysql_query($query);
+while($row = mysql_fetch_array($result))
+  {
+  if (!$response)
+  {
+  if ($row['marah']==0)
+
+  {
+  include ('php/npcicon.php');
+  echo "marah";
+  include ('php/npcname.php');
+  echo "Marah";
+  include ('php/npcdialogue.php');
+  echo "Hello and welcome to my home. Your father would like some of my recipes, no? First you must bring me 5 apples, then I will teach you how to make applesauce.";
+  include ('php/usericon.php');
+  echo "<table class=\"page\" width=\"100%\"><tr><td class=\"center\" width=\"15%\"><form action=\"../maingraphics.php?";
+echo time();
+
+echo "\" method=\"post\"><input class=\"invisible\" type=\"radio\" name=\"type\" checked=\"checked\" value=\"2\" /><input class=\"small\" type=\"submit\" value=\"Say\" /></form></td><td class=\"left\">Ok, thank you.</td></tr></table>";
+$query=sprintf("update flags set marah=1 where username='%s';", mysql_real_escape_string($username));
+
+  mysql_query ($query);
+
+  include ('php/tableend.php');
+  }
+
+  if ($row['marah']==1)
+
+  {
+  include ('php/npcicon.php');
+  echo "marah";
+  include ('php/npcname.php');
+  echo "Marah";
+  include ('php/npcdialogue.php');
+  echo "So do you have the apples for me yet?";
+  include ('php/usericon.php');
+  include ('php/getapples.php');
+  if ($apples<5)
+  {
+  echo "<table class=\"page\" width=\"100%\"><tr><td class=\"center\" width=\"15%\"><form action=\"../maingraphics.php?";
+echo time();
+
+echo "\" method=\"post\"><input class=\"invisible\" type=\"radio\" name=\"type\" checked=\"checked\" value=\"2\" /><input class=\"small\" type=\"submit\" value=\"Say\" /></form></td><td class=\"left\">Not yet.</td></tr></table>";
+}
+
+
+if ($apples>4)
+{
+  echo "<table class=\"page\" width=\"100%\"><tr><td class=\"center\" width=\"15%\"><form action=\"marah.php?";
+echo time();
+echo "\" method=\"post\"><input class=\"invisible\" type=\"radio\" name=\"type\" checked=\"checked\" value=\"2\" /><input class=\"small\" type=\"submit\" value=\"Say\" /></form></td><td class=\"left\">Yes, here they are.</td></tr></table>";
+
+$query=sprintf("update flags set marah=2 where username='%s';", mysql_real_escape_string($username));
+mysql_query ($query);
+
+$query=sprintf("update inventory set keep=keep-5 where username='%s' and itemname='Apple';", mysql_real_escape_string($username));
+mysql_query ($query);
+}
+  include ('php/tableend.php');
+  }
+
+  
+  if ($row['marah']==2)
+
+  {
+  include ('php/npcicon.php');
+  echo "marah";
+  include ('php/npcname.php');
+  echo "Marah";
+  include ('php/npcdialogue.php');
+  echo "So do you have the applesauce for me yet?";
+  include ('php/usericon.php');
+  include ('php/getapplesauce.php');
+  if ($applesauce<1)
+  {
+  echo "<table class=\"page\" width=\"100%\"><tr><td class=\"center\" width=\"15%\"><form action=\"../maingraphics.php?";
+echo time();
+
+echo "\" method=\"post\"><input class=\"invisible\" type=\"radio\" name=\"type\" checked=\"checked\" value=\"3\" /><input class=\"small\" type=\"submit\" value=\"Say\" /></form></td><td class=\"left\">Not yet.</td></tr></table>";
+}
+
+
+if ($applesauce>0)
+{
+  echo "<table class=\"page\" width=\"100%\"><tr><td class=\"center\" width=\"15%\"><form action=\"marah.php?";
+echo time();
+echo "\" method=\"post\"><input class=\"invisible\" type=\"radio\" name=\"type\" checked=\"checked\" value=\"3\" /><input class=\"small\" type=\"submit\" value=\"Say\" /></form></td><td class=\"left\">Yes, here it is.</td></tr></table>";
+
+$query=sprintf("update flags set marah=3 where username='%s';", mysql_real_escape_string($username));
+mysql_query ($query);
+
+$query=sprintf("update inventory set keep=keep-1 where username='%s' and itemname='Applesauce';", mysql_real_escape_string($username));
+mysql_query ($query);
+}
+  include ('php/tableend.php');
+  }
+
+  
+  if ($row['marah']==3)
+
+  {
+  include ('php/npcicon.php');
+  echo "marah";
+  include ('php/npcname.php');
+  echo "Marah";
+  include ('php/npcdialogue.php');
+  echo "So do you have the fried meat for me yet?";
+  include ('php/usericon.php');
+  include ('php/getfriedmeat.php');
+  if ($friedmeat<1)
+  {
+  echo "<table class=\"page\" width=\"100%\"><tr><td class=\"center\" width=\"15%\"><form action=\"../maingraphics.php?";
+echo time();
+
+echo "\" method=\"post\"><input class=\"invisible\" type=\"radio\" name=\"type\" checked=\"checked\" value=\"3\" /><input class=\"small\" type=\"submit\" value=\"Say\" /></form></td><td class=\"left\">Not yet.</td></tr></table>";
+}
+
+
+if ($friedmeat>0)
+{
+  echo "<table class=\"page\" width=\"100%\"><tr><td class=\"center\" width=\"15%\"><form action=\"marah.php?";
+echo time();
+echo "\" method=\"post\"><input class=\"invisible\" type=\"radio\" name=\"type\" checked=\"checked\" value=\"4\" /><input class=\"small\" type=\"submit\" value=\"Say\" /></form></td><td class=\"left\">Yes, here it is.</td></tr></table>";
+
+$query=sprintf("update flags set marah=4 where username='%s';", mysql_real_escape_string($username));
+mysql_query ($query);
+
+$query=sprintf("update inventory set keep=keep-1 where username='%s' and itemname='Fried Meat';", mysql_real_escape_string($username));
+mysql_query ($query);
+}
+  include ('php/tableend.php');
+  }
+  
+  if ($row['marah']==4)
+
+  {
+  include ('php/npcicon.php');
+  echo "marah";
+  include ('php/npcname.php');
+  echo "Marah";
+  include ('php/npcdialogue.php');
+  echo "So do you have the cesar salad for me yet?";
+  include ('php/usericon.php');
+  include ('php/getcesarsalad.php');
+  if ($cesarsalad<1)
+  {
+  echo "<table class=\"page\" width=\"100%\"><tr><td class=\"center\" width=\"15%\"><form action=\"../maingraphics.php?";
+echo time();
+
+echo "\" method=\"post\"><input class=\"invisible\" type=\"radio\" name=\"type\" checked=\"checked\" value=\"3\" /><input class=\"small\" type=\"submit\" value=\"Say\" /></form></td><td class=\"left\">Not yet.</td></tr></table>";
+}
+
+
+if ($cesarsalad>0)
+{
+  echo "<table class=\"page\" width=\"100%\"><tr><td class=\"center\" width=\"15%\"><form action=\"marah.php?";
+echo time();
+echo "\" method=\"post\"><input class=\"invisible\" type=\"radio\" name=\"type\" checked=\"checked\" value=\"5\" /><input class=\"small\" type=\"submit\" value=\"Say\" /></form></td><td class=\"left\">Yes, here it is.</td></tr></table>";
+
+$query=sprintf("update flags set marah=5 where username='%s';", mysql_real_escape_string($username));
+mysql_query ($query);
+
+$query=sprintf("update inventory set keep=keep-1 where username='%s' and itemname='Cesar Salad';", mysql_real_escape_string($username));
+mysql_query ($query);
+}
+  include ('php/tableend.php');
+  }
+    
+}
+
+
+if ($response==4)
+  {
+  include ('php/npcicon.php');
+  echo "marah";
+  include ('php/npcname.php');
+  echo "Marah";
+  include ('php/npcdialogue.php');
+  echo "Very good! To make cesar salad you need 3 lettuce, 1 vegetable, salt, oil, and vinegar.";
+  include ('php/usericon.php');
+  echo "<table class=\"page\" width=\"100%\"><tr><td class=\"center\" width=\"15%\"><form action=\"../maingraphics.php?";
+echo time();
+
+echo "\" method=\"post\"><input class=\"invisible\" type=\"radio\" name=\"type\" checked=\"checked\" value=\"2\" /><input class=\"small\" type=\"submit\" value=\"Say\" /></form></td><td class=\"left\">Ok, thank you.</td></tr></table>";
+
+$query=sprintf("update cookbook set cesarsalad=1 where username='%s';", mysql_real_escape_string($username));
+  mysql_query ($query);
+  
+  $query=sprintf("update stats set experience=experience+25 where username='%s';", mysql_real_escape_string($username));
+  mysql_query ($query);
+
+  include ('php/tableend.php');
+  }
+
+  if ($response==3)
+  {
+  include ('php/npcicon.php');
+  echo "marah";
+  include ('php/npcname.php');
+  echo "Marah";
+  include ('php/npcdialogue.php');
+  echo "Very good! Now to make fried meat you must have a fire source, a skillet or frying pan, and raw meat. Make me some fried meat and I will show you how to make a cesar salad.";
+  include ('php/usericon.php');
+  echo "<table class=\"page\" width=\"100%\"><tr><td class=\"center\" width=\"15%\"><form action=\"../maingraphics.php?";
+echo time();
+
+echo "\" method=\"post\"><input class=\"invisible\" type=\"radio\" name=\"type\" checked=\"checked\" value=\"2\" /><input class=\"small\" type=\"submit\" value=\"Say\" /></form></td><td class=\"left\">Ok, thank you.</td></tr></table>";
+
+$query=sprintf("update cookbook set friedmeat=1 where username='%s';", mysql_real_escape_string($username));
+  mysql_query ($query);
+  
+  $query=sprintf("update stats set experience=experience+25 where username='%s';", mysql_real_escape_string($username));
+  mysql_query ($query);
+
+  include ('php/tableend.php');
+  }
+  if ($response==2)
+  {
+  include ('php/npcicon.php');
+  echo "marah";
+  include ('php/npcname.php');
+  echo "Marah";
+  include ('php/npcdialogue.php');
+  echo "Very well, to make applesauce you need 3 apples, one cinnamon, and one sugar. Mix them together, no need for a fire this time. Make me some applesauce and I will show you how to make fried meat.";
+  include ('php/usericon.php');
+  echo "<table class=\"page\" width=\"100%\"><tr><td class=\"center\" width=\"15%\"><form action=\"cooking.php?";
+echo time();
+
+echo "\" method=\"post\"><input class=\"invisible\" type=\"radio\" name=\"type\" checked=\"checked\" value=\"2\" /><input class=\"small\" type=\"submit\" value=\"Say\" /></form></td><td class=\"left\">Ok, thank you.</td></tr></table>";
+
+$query=sprintf("update cookbook set applesauce=1 where username='%s';", mysql_real_escape_string($username));
+  mysql_query ($query);
+  
+  $query=sprintf("update stats set experience=experience+25 where username='%s';", mysql_real_escape_string($username));
+  mysql_query ($query);
+
+  include ('php/tableend.php');
+  }
+  if ($response==5)
+  {
+  include ('php/npcicon.php');
+  echo "marah";
+  include ('php/npcname.php');
+  echo "Marah";
+  include ('php/npcdialogue.php');
+  echo "Very well, to make fried eggs you need fire, 3 eggs, one skillet, and salt. Make me some fried eggs and I will show you how to make fried egg sandwich.";
+  include ('php/usericon.php');
+  echo "<table class=\"page\" width=\"100%\"><tr><td class=\"center\" width=\"15%\"><form action=\"cooking.php?";
+echo time();
+
+echo "\" method=\"post\"><input class=\"invisible\" type=\"radio\" name=\"type\" checked=\"checked\" value=\"2\" /><input class=\"small\" type=\"submit\" value=\"Say\" /></form></td><td class=\"left\">Ok, thank you.</td></tr></table>";
+
+$query=sprintf("update cookbook set friedegg=1 where username='%s';", mysql_real_escape_string($username));
+  mysql_query ($query);
+  
+  $query=sprintf("update stats set experience=experience+25 where username='%s';", mysql_real_escape_string($username));
+  mysql_query ($query);
+
+  include ('php/tableend.php');
+  }
+  
+}
+
+
+
+?>

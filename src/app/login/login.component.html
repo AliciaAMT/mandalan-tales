@@ -10,6 +10,12 @@
         <h1 class="sr-only">Login to Mandalan Tales</h1>
         <ion-card-title class="login-card-title">Login</ion-card-title>
       </ion-card-header>
+      <ion-card *ngIf="alreadyLoggedIn()" color="warning">
+        <ion-card-header>You are already logged in</ion-card-header>
+        <ion-card-content>
+          <ion-button expand="block" color="danger" (click)="logout()">Log Out</ion-button>
+        </ion-card-content>
+      </ion-card>
 
       <form (ngSubmit)="login()" #loginForm="ngForm">
         <fieldset>
@@ -73,7 +79,8 @@
         <a routerLink="/create-account">Create an account and begin your journey!</a>
       </div>
     </div>
-    <div id="recaptcha-container" class="g-recaptcha" data-sitekey="your-invisible-site-key" data-size="invisible" data-callback="onRecaptchaSuccess" aria-hidden="true"></div>
+    <!-- Temporarily disabled reCAPTCHA -->
+    <!-- <div id="recaptcha-container" class="g-recaptcha" [attr.data-sitekey]="recaptchaSiteKey" data-size="invisible" data-callback="onRecaptchaSuccess" aria-hidden="true"></div> -->
     <p class="sr-only" id="recaptcha-desc">Invisible reCAPTCHA is used to prevent spam. No action is needed.</p>
 
         <app-app-footer></app-app-footer>

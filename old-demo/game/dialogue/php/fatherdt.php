@@ -1,0 +1,597 @@
+<?php
+
+$response=strip_tags($_POST["type"]);
+$query=sprintf("select * from flags where username='%s';", mysql_real_escape_string($username));
+$result=mysql_query($query);
+while($row = mysql_fetch_array($result))
+  {
+  if (!$response)
+  {
+  if ($row['quest4']==1)
+
+  {
+  include ('php/npcicon.php');
+  echo "male1";
+  include ('php/npcname.php');
+  echo "Father";
+  include ('php/npcdialogue.php');
+  echo "Ah, I see you have found the family crest. It contains very special magic. Only those with great power can unlock it's abilities. Keep it. You will need it.";
+  include ('php/usericon.php');
+  echo "<table class=\"page\" width=\"100%\"><tr><td class=\"center\" width=\"15%\"><form action=\"../maingraphict.php?";
+echo time();
+
+echo "\" method=\"post\"><input class=\"invisible\" type=\"radio\" name=\"type\" checked=\"checked\" value=\"2\" /><input class=\"small\" type=\"submit\" value=\"Say\" /></form></td><td class=\"left\">Ok, thank you.</td></tr></table>";
+$query=sprintf("update flags set quest4=2 where username='%s';", mysql_real_escape_string($username));
+
+  mysql_query ($query);
+
+  include ('php/tableend.php');
+  }
+else
+{
+  if ($row['shepfeed']==1)
+
+  {
+
+  include ('php/npcicon.php');
+
+  echo "male1";
+
+  include ('php/npcname.php');
+
+  echo "Father";
+
+  include ('php/npcdialogue.php');
+
+echo "What? You fed Old Shep? Good! Now if only I could find the key to the cellar, I could send you for more supplies down there. I know there are some nice things down there, but that lock requires a special key.";  
+
+  include ('php/usericon.php');
+
+  echo "<table class=\"page\" width=\"100%\"><tr><td class=\"center\" width=\"15%\"><form action=\"../maingraphict.php?";
+
+echo time();
+
+echo "\" method=\"post\"><input class=\"invisible\" type=\"radio\" name=\"type\" checked=\"checked\" value=\"2\" /><input class=\"small\" type=\"submit\" value=\"Say\" /></form></td><td class=\"left\">I'll keep an eye out for the key.</td></tr>";
+
+echo "</table>";
+
+  include ('php/tableend.php');
+
+  }
+  
+  else
+  {
+  if ($row['shepfeed']==2)
+
+  {
+
+  include ('php/npcicon.php');
+
+echo "male1";
+
+  include ('php/npcname.php');
+
+  echo "Father";
+
+  include ('php/npcdialogue.php');
+
+echo "You found a Bone Key! Yes! This is the key to the cellar. Go down there to get some extra supplies for the road on the way to town. Be careful, No one has been down there for a while and there may be rats and spiders.";  
+
+  include ('php/usericon.php');
+
+  echo "<table class=\"page\" width=\"100%\"><tr><td class=\"center\" width=\"15%\"><form action=\"../maingraphict.php?";
+
+echo time();
+
+echo "\" method=\"post\"><input class=\"invisible\" type=\"radio\" name=\"type\" checked=\"checked\" value=\"2\" /><input class=\"small\" type=\"submit\" value=\"Say\" /></form></td><td class=\"left\">Ok, I'll be carefull.</td></tr>";
+
+echo "</table>";
+
+  include ('php/tableend.php');
+  
+  $query=sprintf("update flags set shepfeed=3 where username='%s';", mysql_real_escape_string($username));
+mysql_query($query);
+  }
+  
+  else
+  {
+  
+  
+  if ($row['quest1']==0)
+  {
+  include ('php/npcicon.php');
+  echo "male1";
+  include ('php/npcname.php');
+  echo "Father";
+  include ('php/npcdialogue.php');
+  echo "My child, Happy Birthday! ";
+  echo "Despite these strange events that have transpired, I have news for you that should make your Birthday very merry indeed. ";
+  echo "The elders in the village have been watching you closely for a few years now. ";
+  echo "It seems that you have caught the attention of Old Solias, the mystic. ";
+  echo "He believes that you have a special gift, and he wants you to come live with him and be his apprentice. ";
+  echo "Isn't that wonderful? You could become a powerful magician like Solias! He could also shed some light on why you seem to be changed...";
+include ('php/usericon.php');
+  echo "<table class=\"page\" width=\"100%\"><tr><td class=\"center\" width=\"15%\"><form action=\"fathert.php?";
+echo time();
+echo "\" method=\"post\"><input class=\"invisible\" type=\"radio\" name=\"type\" checked=\"checked\" value=\"2\" /><input class=\"small\" type=\"submit\" value=\"Say\" /></form></td><td class=\"left\">I will go. I seek answers.</td></tr>";
+  echo "<tr><td class=\"center\" width=\"15%\"><form action=\"fathert.php?";
+
+echo time();
+echo "\" method=\"post\"><input class=\"invisible\" type=\"radio\" name=\"type\" checked=\"checked\" value=\"1\" /><input class=\"small\" type=\"submit\" value=\"Say\" /></form></td><td class=\"left\" width=\"85%\">I don't want to go. This place is strange to me.</td></tr></table>";
+
+  include ('php/tableend.php');
+  }
+  if ($row['quest1']==2)
+
+  {
+  include ('php/npcicon.php');
+  echo "male1";
+  include ('php/npcname.php');
+  echo "Father";
+  include ('php/npcdialogue.php');
+  echo "If you need any help or advice, let me know. I will miss you my child.";
+  include ('php/usericon.php');
+  echo "<table class=\"page\" width=\"100%\"><tr><td class=\"center\" width=\"15%\"><form action=\"fathert.php?";
+echo time();
+
+echo "\" method=\"post\"><input class=\"invisible\" type=\"radio\" name=\"type\" checked=\"checked\" value=\"3\" /><input class=\"small\" type=\"submit\" value=\"Say\" /></form></td><td class=\"left\">What advice can you offer me?</td></tr>";
+
+  echo "<tr><td class=\"center\" width=\"15%\"><form action=\"../maingraphict.php?";
+
+echo time();
+
+echo "\" method=\"post\"><input class=\"small\" type=\"submit\" value=\"Say\" /></form></td><td class=\"left\">Maybe Later</td></tr>";
+
+echo "<tr><td class=\"center\" width=\"15%\"><form action=\"fathert.php?";
+
+echo time();
+
+echo "\" method=\"post\"><input class=\"invisible\" type=\"radio\" name=\"type\" checked=\"checked\" value=\"4\" /><input class=\"small\" type=\"submit\" value=\"Say\" /></form></td><td class=\"left\">I would like to learn more and level up.</td></tr></table>";
+  include ('php/tableend.php');
+  }
+
+  if ($row['quest1']==1)
+
+  {
+  include ('php/npcicon.php');
+  echo "male1";
+  include ('php/npcname.php');
+  echo "Father";
+  include ('php/npcdialogue.php');
+  echo "Did you change your mind about the apprenticeship and meeting with Solias?";
+  include ('php/usericon.php');
+  echo "<table class=\"page\" width=\"100%\"><tr><td class=\"center\" width=\"15%\"><form action=\"fathert.php?";
+echo time();
+
+echo "\" method=\"post\"><input class=\"invisible\" type=\"radio\" name=\"type\" checked=\"checked\" value=\"2\" /><input class=\"small\" type=\"submit\" value=\"Say\" /></form></td><td class=\"left\">Yes, I will go, since that is your wish, Father.</td></tr>";
+  echo "<tr><td class=\"center\" width=\"15%\"><form action=\"../maingraphict.php?";
+echo time();
+
+echo "\" method=\"post\"><input class=\"small\" type=\"submit\" value=\"Say\" /></form></td><td class=\"left\">No, I like it here.</td></tr></table>";
+  include ('php/tableend.php');
+  }
+
+  
+ 
+  }
+  }
+  }
+}
+  if ($response==1)
+  {
+  include ('php/npcicon.php');
+  echo "male1";
+  include ('php/npcname.php');
+  echo "Father";
+  include ('php/npcdialogue.php');
+  echo "I know this must seem strange and scary for you, but this is an opportunity that you cannot pass up. Think about it a while and let me know when you change your mind.";
+  include ('php/usericon.php');
+
+  echo "<table class=\"page\" width=\"30%\"><tr><td class=\"center\"><form action=\"../maingraphict.php?";
+
+echo time();
+
+echo "\" method=\"post\"><input class=\"small\" type=\"submit\" value=\"Ok\" /></form></td></tr></table>";
+
+  include ('php/tableend.php');
+
+$query=sprintf("update flags set quest1=1 where username='%s';", mysql_real_escape_string($username));
+mysql_query($query);
+
+  }
+
+  if ($response==2)
+
+  {
+  include ('php/npcicon.php');
+  echo "male1";
+  include ('php/npcname.php');
+  echo "Father";
+  include ('php/npcdialogue.php');
+  echo "I will miss you, but this is an opportunity that you cannot pass up. Here is the letter from Solias. This will gain you entrance to the House of Elders, where Solias resides and where you are to meet him. The House of Elders is North from here. And don't forget to get some supplies before you leave. The roads are getting more treacherous every day.";
+  include ('php/usericon.php');
+  echo "<table class=\"page\"><tr><td class=\"left\"><h3>Experience Gained: 5</h3></td></tr><tr><td class=\"left\"><h3>Quest Updated: The Apprentice</h3></td></tr><tr><td class=\"left\"><h3>Item Gained: </h3></td></tr><tr><td class=\"center\"><img src=\"../images/letter.png\" /><br />Letter From Solias</td></tr></table>";
+  echo "<table class=\"page\" width=\"30%\"><tr><td class=\"center\"><form action=\"../maingraphict.php?";
+echo time();
+
+echo "\" method=\"post\"><input class=\"small\" type=\"submit\" value=\"Ok\" /></form></td></tr></table>";
+
+  include ('php/tableend.php');
+
+$query=sprintf("update flags set quest1=2 where username='%s';", mysql_real_escape_string($username));
+
+mysql_query($query);
+
+$query=sprintf("update stats set experience=experience+5 where username='%s';", mysql_real_escape_string($username));
+
+mysql_query($query);
+$itemnumber=time();
+$itemname="Solias's Letter"; $itemdescription="This letter is your invitation to the House of Elder's. The guards should let you enter when you show them this letter.";
+$itemtype="Other"; $itemimage="letter"; $itemlevel=1; $itemrarity="Relic";
+$itemvalue=0; $keep=1; $trade=0; $equiplocation="None"; $equip=0;
+$equiplh=0; $equiprh=0; $waterunits=0; $maxwater=0; $locklevel=0;
+$keylock=0;
+$readable=0;
+$consumable=0;
+$equipable=0;
+$combatuse=0;
+$singleuse=0;
+$weapontype="None";
+$armortype="None";
+$acctype="None";
+$othertype="Quest";
+$weaponbase=0;
+$armorbase=0;
+$accbase=0;
+$enhancement1="None";
+$enhancement2="None";
+$enhancement3="None";
+$enchantment1="None";
+$enchantment2="None";
+$enchantment3="None";
+$transmute1="None";
+$transmute2="None";
+$transmute3="None";
+$adjustable=0;
+$legendary=0;
+$relic=0;
+$setitem=0;
+$damage=0;
+$defense=0;
+$penalty=0;
+$lightsource=0;
+$thieving=0;
+$slow=0;
+$curse=0;
+$debility=0;
+$weaken=0;
+$acid=0;
+$acidcount=0;
+$sleep=0;
+$sleepcount=0;
+$disease=0;
+$blindness=0;
+$expbonus=0;
+$invisible=0;
+$fire=0;
+$fireresist=0;
+$ice=0;
+$iceresist=0;
+$lightning=0;
+$lightningresist=0;
+$earth=0;
+$earthresist=0;
+$dark=0;
+$darkresist=0;
+$light=0;
+$lightresist=0;
+$knockback=0;
+$criticalhit=0;
+$backstab=0;
+$doublestrike=0;
+$triplestrike=0;
+$catapult=0;
+$bleed=0;
+$bleedcount=0;
+$physdamage=0;
+$reflectphys=0;
+$reflectfire=0;
+$reflectice=0;
+$reflectair=0;
+$reflectearth=0;
+$reflectlight=0;
+$reflectdark=0;
+$vampiric=0;
+$vampamount=0;
+$manadrain=0;
+$drainamount=0;
+$duality=0;
+$lightness=0;
+$longarm=0;
+$throwing=0;
+$ultimateresist=0;
+$ultimatedamage=0;
+$strength=0;
+$speed=0;
+$accuraccy=0;
+$agilty=0;
+$wisdom=0;
+$life=0;
+$mana=0;
+$ultimateboost=0;
+$liferegen=0;
+$manaregen=0;
+$blocking=0;
+$petrify=0;
+$paralyze=0;
+$stun=0;
+$fear=0;
+$insanity=0;
+$lightfoot=0;
+$revivingjolt=0;
+$refillinglight=0;
+$despair=0;
+$tremors=0;
+$inferno=0;
+$infernocount=0;
+$freezing=0;
+$freezecount=0;
+$magicfind=0;
+$greed=0;
+$luck=0;
+$lockpicking=0;
+$firestarter=0;
+$heroicboost=0;
+$heroiccount=0;
+$silence=0;
+$antique=0;
+$webs=0;
+$entanglement=0;
+$waterbreathe=0;
+$lasso=0;
+$adrenalinerush=0;
+$adrenalinecount=0;
+$distraction=0;
+$immobilizeresist=0;
+$mindresist=0;
+$criticalresist=0;
+$horrifying=0;
+$ultimaterevive=0;
+$swarming=0;
+$revivingjolt=0;
+$dryice=0;
+$coldblood=0;
+$raginginferno=0;
+$smoke=0;
+$levelling=0;
+$piercing=0;
+$sharpened=0;
+$keen=0;
+$devastating=0;
+$crushing=0;
+$special=0;
+$itemrange=0;
+
+$itemspeed=0;
+
+$query = sprintf("insert into inventory values(
+
+'%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s',
+'%s','%s','%s','%s','%s','%s','%s','%s','%s',
+'%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s',
+'%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s',
+'%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s',
+'%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s',
+'%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s',
+'%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s',
+'%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s',
+'%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s',
+'%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s'
+);",
+mysql_real_escape_string($username), mysql_real_escape_string($itemnumber), mysql_real_escape_string($itemname), mysql_real_escape_string($itemdescription),
+mysql_real_escape_string($itemtype), mysql_real_escape_string($itemimage), mysql_real_escape_string($itemlevel), mysql_real_escape_string($itemrarity),
+mysql_real_escape_string($itemvalue), mysql_real_escape_string($keep), mysql_real_escape_string($trade), mysql_real_escape_string($equiplocation),
+mysql_real_escape_string($equip), mysql_real_escape_string($equiplh), mysql_real_escape_string($equiprh), mysql_real_escape_string($waterunits),
+mysql_real_escape_string($maxwater), mysql_real_escape_string($locklevel), mysql_real_escape_string($keylock), mysql_real_escape_string($readable),
+mysql_real_escape_string($consumable), mysql_real_escape_string($equipable), mysql_real_escape_string($combatuse), mysql_real_escape_string($singleuse),
+mysql_real_escape_string($weapontype), mysql_real_escape_string($armortype),
+mysql_real_escape_string($acctype), mysql_real_escape_string($othertype),
+mysql_real_escape_string($weaponbase), mysql_real_escape_string($armorbase),
+mysql_real_escape_string($accbase), mysql_real_escape_string($enhancement1),
+mysql_real_escape_string($enhancement2),
+mysql_real_escape_string($enhancement3),
+mysql_real_escape_string($enchantment1),
+mysql_real_escape_string($enchantment2),
+mysql_real_escape_string($enchantment3),
+mysql_real_escape_string($transmute1),
+mysql_real_escape_string($transmute2),
+mysql_real_escape_string($transmute3),
+mysql_real_escape_string($adjustable),
+mysql_real_escape_string($legendary),
+mysql_real_escape_string($relic),
+mysql_real_escape_string($setitem),
+mysql_real_escape_string($damage),
+mysql_real_escape_string($defense),
+mysql_real_escape_string($penalty),
+mysql_real_escape_string($lightsource),
+mysql_real_escape_string($thieving),
+mysql_real_escape_string($slow),
+mysql_real_escape_string($curse),
+mysql_real_escape_string($debility),
+mysql_real_escape_string($weaken),
+mysql_real_escape_string($acid),
+mysql_real_escape_string($acidcount),
+mysql_real_escape_string($sleep),
+mysql_real_escape_string($sleepcount),
+mysql_real_escape_string($disease),
+mysql_real_escape_string($blindness),
+mysql_real_escape_string($expbonus),
+mysql_real_escape_string($invisible),
+mysql_real_escape_string($fire),
+mysql_real_escape_string($fireresist),
+mysql_real_escape_string($ice),
+mysql_real_escape_string($iceresist),
+mysql_real_escape_string($lightning),
+mysql_real_escape_string($lightningresist),
+mysql_real_escape_string($earth),
+mysql_real_escape_string($earthresist),
+mysql_real_escape_string($dark),
+mysql_real_escape_string($darkresist),
+mysql_real_escape_string($light),
+mysql_real_escape_string($lightresist),
+mysql_real_escape_string($knockback),
+mysql_real_escape_string($criticalhit),
+mysql_real_escape_string($backstab),
+mysql_real_escape_string($doublestrike),
+mysql_real_escape_string($triplestrike),
+mysql_real_escape_string($catapult),
+mysql_real_escape_string($bleed),
+mysql_real_escape_string($bleedcount),
+mysql_real_escape_string($physdamage),
+mysql_real_escape_string($reflectphys),
+mysql_real_escape_string($reflectfire),
+mysql_real_escape_string($reflectice),
+mysql_real_escape_string($reflectair),
+mysql_real_escape_string($reflectearth),
+mysql_real_escape_string($reflectlight),
+mysql_real_escape_string($reflectdark),
+mysql_real_escape_string($vampiric),
+mysql_real_escape_string($vampamount),
+mysql_real_escape_string($manadrain),
+mysql_real_escape_string($drainamount),
+mysql_real_escape_string($duality),
+mysql_real_escape_string($lightness),
+mysql_real_escape_string($longarm),
+mysql_real_escape_string($throwing),
+mysql_real_escape_string($ultimateresist),
+mysql_real_escape_string($ultimatedamage),
+mysql_real_escape_string($strength),
+mysql_real_escape_string($speed),
+mysql_real_escape_string($accuraccy),
+mysql_real_escape_string($agilty),
+mysql_real_escape_string($wisdom),
+mysql_real_escape_string($life),
+mysql_real_escape_string($mana),
+mysql_real_escape_string($ultimateboost),
+mysql_real_escape_string($liferegen),
+mysql_real_escape_string($manaregen),
+mysql_real_escape_string($blocking),
+mysql_real_escape_string($petrify),
+mysql_real_escape_string($paralyze),
+mysql_real_escape_string($stun),
+mysql_real_escape_string($fear),
+mysql_real_escape_string($insanity),
+mysql_real_escape_string($lightfoot),
+mysql_real_escape_string($revivingjolt),
+mysql_real_escape_string($refillinglight),
+mysql_real_escape_string($despair),
+mysql_real_escape_string($tremors),
+mysql_real_escape_string($inferno),
+mysql_real_escape_string($infernocount),
+mysql_real_escape_string($freezing),
+mysql_real_escape_string($freezecount),
+mysql_real_escape_string($magicfind),
+mysql_real_escape_string($greed),
+mysql_real_escape_string($luck),
+mysql_real_escape_string($lockpicking),
+mysql_real_escape_string($firestarter),
+mysql_real_escape_string($heroicboost),
+mysql_real_escape_string($heroiccount),
+mysql_real_escape_string($silence),
+mysql_real_escape_string($antique),
+mysql_real_escape_string($webs),
+mysql_real_escape_string($entanglement),
+mysql_real_escape_string($waterbreathe),
+mysql_real_escape_string($lasso),
+mysql_real_escape_string($adrenalinerush),
+mysql_real_escape_string($adrenalinecount),
+mysql_real_escape_string($distraction),
+mysql_real_escape_string($immobilizeresist),
+mysql_real_escape_string($mindresist),
+mysql_real_escape_string($criticalresist),
+mysql_real_escape_string($horrifying),
+mysql_real_escape_string($ultimaterevive),
+mysql_real_escape_string($swarming),
+mysql_real_escape_string($revivingjolt),
+mysql_real_escape_string($dryice),
+mysql_real_escape_string($coldblood),
+mysql_real_escape_string($raginginferno),
+mysql_real_escape_string($smoke),
+mysql_real_escape_string($levelling),
+mysql_real_escape_string($piercing),
+mysql_real_escape_string($sharpened),
+mysql_real_escape_string($keen),
+mysql_real_escape_string($devastating),
+mysql_real_escape_string($crushing),
+mysql_real_escape_string($itemrange),
+mysql_real_escape_string($itemspeed)
+);
+
+mysql_query($query, $con);
+  }
+
+  if ($response==3)
+
+  {
+
+  include ('php/npcicon.php');
+
+  echo "male1";
+
+  include ('php/npcname.php');
+
+  echo "Father";
+
+  include ('php/npcdialogue.php');
+
+  include ('php/getadvice.php');
+
+  include ('php/usericon.php');
+
+  echo "<table class=\"page\" width=\"100%\"><tr><td class=\"center\" width=\"15%\"><form action=\"fathert.php?";
+echo time();
+
+echo "\" method=\"post\"><input class=\"invisible\" type=\"radio\" name=\"type\" checked=\"checked\" value=\"3\" /><input class=\"small\" type=\"submit\" value=\"Say\" /></form></td><td class=\"left\">Do you have any other advice to offer me?</td></tr>";
+
+  echo "<tr><td class=\"center\" width=\"15%\"><form action=\"../maingraphict.php?";
+
+echo time();
+
+echo "\" method=\"post\"><input class=\"small\" type=\"submit\" value=\"Say\" /></form></td><td class=\"left\">Thank you, Father.</td></tr></table>";
+
+  include ('php/tableend.php');
+
+  }
+if ($response==4)
+
+  {
+
+  include ('php/npcicon.php');
+
+  echo "male1";
+
+  include ('php/npcname.php');
+
+  echo "Father";
+
+  include ('php/npcdialogue.php');
+
+  include ('php/levelup.php');
+
+  include ('php/usericon.php');
+
+  echo "<table class=\"page\" width=\"100%\"><tr><td class=\"center\" width=\"15%\"><form action=\"../maingraphict.php?";
+
+echo time();
+
+echo "\" method=\"post\"><input class=\"small\" type=\"submit\" value=\"Say\" /></form></td><td class=\"left\">Thank you, Father.</td></tr></table>";
+
+  include ('php/tableend.php');
+
+  }
+
+}
+
+
+
+?>

@@ -1,49 +1,66 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject, signal, computed, effect } from '@angular/core';
 import {
   Auth,
+  User,
+  createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signOut,
-  createUserWithEmailAndPassword,
-  sendEmailVerification,
   sendPasswordResetEmail
 } from '@angular/fire/auth';
+import { Firestore, doc, setDoc, serverTimestamp } from '@angular/fire/firestore';
 import { Router } from '@angular/router';
-// import { AngularFireAuth } from '@angular/fire/compat/auth';
+import { onAuthStateChanged } from 'firebase/auth';
 
-const actionCodeSettings = {
-  url: 'http://localhost:8100/login', // ⬅️ CHANGE THIS for production
-  handleCodeInApp: false
-};
-
-@Injectable({ providedIn: 'root' })
+@Injectable({
+  providedIn: 'root',
+})
 export class AuthService {
-  constructor(private auth: Auth, private router: Router) {}
+  private auth: Auth = inject(Auth);
+  private firestore: Firestore = inject(Firestore);
+  private router: Router = inject(Router);
 
-  async login(email: string, password: string): Promise<any> {
-    const cred = await signInWithEmailAndPassword(this.auth, email, password);
+  // Use signals instead of RxJS observables
+  private userSignal = signal<User | null>(null);
+  user = this.userSignal.asReadonly();
+  isLoggedIn = computed(() => !!this.user());
 
-    if (!cred.user.emailVerified) {
-      await signOut(this.auth);
-      throw new Error('Your email address has not been verified.');
-    }
+  constructor() {
+    // Set up auth state listener using signals
+    onAuthStateChanged(this.auth, user => {
+      this.userSignal.set(user);
+    });
+  }
+
+  async register(email: string, password: string) {
+    const cred = await createUserWithEmailAndPassword(this.auth, email, password);
+    const userRef = doc(this.firestore, `users/${cred.user.uid}`);
+
+    await setDoc(userRef, {
+      uid: cred.user.uid,
+      email: cred.user.email,
+      displayName: cred.user.displayName || null,
+      createdAt: serverTimestamp(),
+      role: 'player',
+    });
 
     return cred;
   }
 
-  register(email: string, password: string) {
-    return createUserWithEmailAndPassword(this.auth, email, password).then(cred =>
-      cred.user ? sendEmailVerification(cred.user, actionCodeSettings) : Promise.resolve()
-    );
+  async login(email: string, password: string) {
+    return await signInWithEmailAndPassword(this.auth, email, password);
   }
-  logout() {
+
+  logout(): Promise<void> {
     return signOut(this.auth);
   }
 
-  sendPasswordResetEmail(email: string): Promise<void> {
-    return sendPasswordResetEmail(this.auth, email, actionCodeSettings);
+  // ✅ Password reset method
+  async resetPassword(email: string): Promise<void> {
+    return await sendPasswordResetEmail(this.auth, email);
   }
 
-  get currentUser() {
-    return this.auth.currentUser;
+  // Helper method to get current user synchronously
+  getCurrentUser(): User | null {
+    return this.user();
   }
 }
