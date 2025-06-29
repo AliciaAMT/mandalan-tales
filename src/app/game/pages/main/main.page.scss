@@ -99,21 +99,23 @@
     flex-direction: column;
     justify-content: space-evenly;
     align-items: stretch;
-    padding: 24px 12px;
+    padding: 6px 4px;
     box-sizing: border-box;
-    gap: 0;
+    gap: 8px;
   }
   .player-stats-row.portrait-row {
     justify-content: center;
     align-items: center;
     display: flex;
-    margin-bottom: 10px;
+    margin-bottom: 0;
+    flex: 2 1 0;
   }
   .player-stats-row.name-row {
     justify-content: center;
     align-items: center;
     display: flex;
-    margin-bottom: 18px;
+    margin-bottom: 12px;
+    flex: 0.5 1 0;
   }
   .player-name-title {
     text-align: center;
@@ -123,31 +125,30 @@
     flex: 1 1 0;
     display: flex;
     align-items: center;
-    gap: 18px;
+    gap: 14px;
     min-height: 0;
-    padding: 0 0 0 0;
-    font-size: clamp(1rem, 2vw, 2rem);
+    padding: 4px 0;
+    font-size: clamp(0.9rem, 1.8vw, 1.8rem);
   }
   .stat-icon {
-    width: clamp(32px, 4vw, 56px);
-    height: clamp(32px, 4vw, 56px);
+    width: clamp(28px, 3.5vw, 48px);
+    height: clamp(28px, 3.5vw, 48px);
     max-width: 100%;
     max-height: 100%;
     object-fit: contain;
     border-radius: 6px;
-    background: rgba(255,255,255,0.05);
     flex-shrink: 0;
   }
   .stat-icon.portrait {
-    width: clamp(48px, 6vw, 80px);
-    height: clamp(48px, 6vw, 80px);
+    width: clamp(100px, 15vw, 140px);
+    height: clamp(100px, 15vw, 140px);
     border-radius: 50%;
-    background: rgba(255,255,255,0.10);
   }
   .player-stats-row > div {
-    flex: 1 1 0;
+    flex: 1;
     min-width: 0;
-    word-break: break-word;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 }
 
