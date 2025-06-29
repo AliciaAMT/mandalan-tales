@@ -12,9 +12,11 @@
     <div class="section-content" *ngIf="isPlayerStatsOpen">
       <ng-container *ngIf="currentCharacter; else noChar">
         <div class="player-stats-list">
-          <div class="player-stats-row">
+          <div class="player-stats-row portrait-row">
             <img class="stat-icon portrait" [src]="'assets/portraits/transparent/' + currentCharacter.portrait + '.png'" alt="Portrait" />
-            <div>
+          </div>
+          <div class="player-stats-row name-row">
+            <div class="player-name-title">
               <strong>{{ currentCharacter.name }}</strong>
               <span *ngIf="currentCharacter.title">({{ currentCharacter.title }})</span>
             </div>
