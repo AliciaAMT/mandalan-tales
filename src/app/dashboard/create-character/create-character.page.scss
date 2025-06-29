@@ -182,3 +182,55 @@ fieldset {
   white-space: nowrap;
   border: 0;
 }
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  width: 100%;
+  margin-top: 0.5rem;
+}
+
+.stats-column {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.stats-column ion-item {
+  --padding-start: 0;
+  --padding-end: 0;
+  --inner-padding-end: 0;
+  margin-bottom: 0;
+}
+
+.stat-info {
+  display: flex;
+  align-items: center;
+  color: var(--ion-color-medium);
+  font-size: 0.8rem;
+  min-width: 60px;
+  text-align: right;
+}
+
+.character-info-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+.character-info-grid ion-item {
+  --padding-start: 0;
+  --padding-end: 0;
+  --inner-padding-end: 0;
+  margin-bottom: 0;
+}
+
+/* Two columns on larger screens */
+@media (min-width: 768px) {
+  .character-info-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}

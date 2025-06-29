@@ -11,117 +11,194 @@
         <ion-card-content>
           <fieldset>
             <ion-list lines="none">
-              <ion-item>
-                <ion-label for="nameInput" position="stacked">Character Name</ion-label>
-                <ion-input
-                  id="nameInput"
-                  formControlName="name"
-                  required
-                  aria-label="Character name"
-                  autocomplete="off"
-                  inputmode="text"
-                  placeholder="Enter character name">
-                </ion-input>
-              </ion-item>
-
-              <ion-item>
-                <ion-label for="raceSelect" position="stacked">Race</ion-label>
-                <ion-select
-                  id="raceSelect"
-                  formControlName="race"
-                  interface="popover"
-                  aria-label="Select character race"
-                  placeholder="Choose race">
-                  <ion-select-option *ngFor="let race of races" [value]="race">{{ race }}</ion-select-option>
-                </ion-select>
-              </ion-item>
-
-              <ion-item>
-                <ion-label for="classSelect" position="stacked">Class</ion-label>
-                <ion-select
-                  id="classSelect"
-                  formControlName="class"
-                  interface="popover"
-                  aria-label="Select character class"
-                  placeholder="Choose class">
-                  <ion-select-option *ngFor="let cls of classes" [value]="cls">{{ cls }}</ion-select-option>
-                </ion-select>
-              </ion-item>
-
-              <ion-item>
-                <ion-label for="genderSelect" position="stacked">Gender</ion-label>
-                <ion-select
-                  id="genderSelect"
-                  formControlName="gender"
-                  interface="popover"
-                  aria-label="Select character gender"
-                  placeholder="Choose gender">
-                  <ion-select-option value="male">Male</ion-select-option>
-                  <ion-select-option value="female">Female</ion-select-option>
-                </ion-select>
-              </ion-item>
-            </ion-list>
-
-            <div formGroupName="stats">
-              <h3 class="stats-heading">Character Stats</h3>
-              <p class="stats-description">Distribute {{ totalPoints }} points across your character's attributes.</p>
-
-              <ion-list lines="none">
-                <ion-item *ngFor="let stat of ['strength','agility','wisdom','luck','speed','accuracy']">
-                  <ion-label position="stacked">{{ getStatDisplayName(stat) }}</ion-label>
+              <!-- Character Info Section -->
+              <div class="character-info-grid">
+                <ion-item>
+                  <ion-label position="stacked">Character Name</ion-label>
                   <ion-input
-                    [id]="stat + 'Input'"
-                    type="number"
-                    min="0"
-                    max="12"
-                    [formControlName]="stat"
-                    [attr.aria-label]="getStatDisplayName(stat) + ' value'"
-                    inputmode="numeric"
-                    placeholder="0">
+                    type="text"
+                    formControlName="name"
+                    placeholder="Enter character name"
+                    aria-label="Character name">
                   </ion-input>
                 </ion-item>
-              </ion-list>
-            </div>
 
-            <div class="points-display" role="status" aria-live="polite">
-              <p>Points used: <span [class]="allocatedPoints > totalPoints ? 'points-over' : 'points-ok'">{{ allocatedPoints }}</span> / {{ totalPoints }}</p>
-              <p *ngIf="allocatedPoints > totalPoints" class="error-message" role="alert">
-                You have used too many points. Please reduce some stats.
-              </p>
-            </div>
+                <ion-item>
+                  <ion-label position="stacked">Gender</ion-label>
+                  <ion-select
+                    formControlName="gender"
+                    placeholder="Select gender"
+                    aria-label="Character gender">
+                    <ion-select-option value="male">Male</ion-select-option>
+                    <ion-select-option value="female">Female</ion-select-option>
+                  </ion-select>
+                </ion-item>
 
-            <ion-item button (click)="openPortraitSelector()" class="portrait-selector">
-              <ion-label for="portraitButton">Portrait</ion-label>
-              <ion-thumbnail slot="end" *ngIf="selectedPortrait">
-                <ion-img
-                  [src]="'assets/webp-output/portraits/' + selectedPortrait + '.webp'"
-                  [alt]="'Selected portrait: ' + selectedPortrait">
-                </ion-img>
-              </ion-thumbnail>
+                <ion-item>
+                  <ion-label position="stacked">Race</ion-label>
+                  <ion-select
+                    formControlName="race"
+                    placeholder="Select race"
+                    aria-label="Character race">
+                    <ion-select-option value="human">Human</ion-select-option>
+                    <ion-select-option value="elf">Elf</ion-select-option>
+                    <ion-select-option value="dwarf">Dwarf</ion-select-option>
+                    <ion-select-option value="halfling">Halfling</ion-select-option>
+                  </ion-select>
+                </ion-item>
+
+                <ion-item>
+                  <ion-label position="stacked">Class</ion-label>
+                  <ion-select
+                    formControlName="class"
+                    placeholder="Select class"
+                    aria-label="Character class">
+                    <ion-select-option value="warrior">Warrior</ion-select-option>
+                    <ion-select-option value="mage">Mage</ion-select-option>
+                    <ion-select-option value="thief">Thief</ion-select-option>
+                    <ion-select-option value="healer">Healer</ion-select-option>
+                  </ion-select>
+                </ion-item>
+              </div>
+
+              <div formGroupName="stats">
+                <h3 class="stats-heading">Character Stats</h3>
+                <p class="stats-description">Distribute {{ totalPoints }} points across your character's attributes.</p>
+
+                <ion-item>
+                  <ion-label position="stacked">Character Stats</ion-label>
+                  <div class="stats-grid">
+                    <div class="stats-column">
+                      <ion-item>
+                        <ion-label position="stacked">Strength</ion-label>
+                        <ion-input
+                          type="number"
+                          formControlName="strength"
+                          min="1"
+                          max="20"
+                          aria-label="Strength stat">
+                        </ion-input>
+                        <div slot="end" class="stat-info">
+                          <small>Points: {{ characterForm.get('strength')?.value || 0 }}</small>
+                        </div>
+                      </ion-item>
+
+                      <ion-item>
+                        <ion-label position="stacked">Dexterity</ion-label>
+                        <ion-input
+                          type="number"
+                          formControlName="dexterity"
+                          min="1"
+                          max="20"
+                          aria-label="Dexterity stat">
+                        </ion-input>
+                        <div slot="end" class="stat-info">
+                          <small>Points: {{ characterForm.get('dexterity')?.value || 0 }}</small>
+                        </div>
+                      </ion-item>
+
+                      <ion-item>
+                        <ion-label position="stacked">Constitution</ion-label>
+                        <ion-input
+                          type="number"
+                          formControlName="constitution"
+                          min="1"
+                          max="20"
+                          aria-label="Constitution stat">
+                        </ion-input>
+                        <div slot="end" class="stat-info">
+                          <small>Points: {{ characterForm.get('constitution')?.value || 0 }}</small>
+                        </div>
+                      </ion-item>
+                    </div>
+
+                    <div class="stats-column">
+                      <ion-item>
+                        <ion-label position="stacked">Intelligence</ion-label>
+                        <ion-input
+                          type="number"
+                          formControlName="intelligence"
+                          min="1"
+                          max="20"
+                          aria-label="Intelligence stat">
+                        </ion-input>
+                        <div slot="end" class="stat-info">
+                          <small>Points: {{ characterForm.get('intelligence')?.value || 0 }}</small>
+                        </div>
+                      </ion-item>
+
+                      <ion-item>
+                        <ion-label position="stacked">Wisdom</ion-label>
+                        <ion-input
+                          type="number"
+                          formControlName="wisdom"
+                          min="1"
+                          max="20"
+                          aria-label="Wisdom stat">
+                        </ion-input>
+                        <div slot="end" class="stat-info">
+                          <small>Points: {{ characterForm.get('wisdom')?.value || 0 }}</small>
+                        </div>
+                      </ion-item>
+
+                      <ion-item>
+                        <ion-label position="stacked">Charisma</ion-label>
+                        <ion-input
+                          type="number"
+                          formControlName="charisma"
+                          min="1"
+                          max="20"
+                          aria-label="Charisma stat">
+                        </ion-input>
+                        <div slot="end" class="stat-info">
+                          <small>Points: {{ characterForm.get('charisma')?.value || 0 }}</small>
+                        </div>
+                      </ion-item>
+                    </div>
+                  </div>
+                </ion-item>
+              </div>
+
+              <div class="points-display" role="status" aria-live="polite">
+                <p>Points used: <span [class]="allocatedPoints > totalPoints ? 'points-over' : 'points-ok'">{{ allocatedPoints }}</span> / {{ totalPoints }}</p>
+                <p *ngIf="allocatedPoints > totalPoints" class="error-message" role="alert">
+                  You have used too many points. Please reduce some stats.
+                </p>
+              </div>
+
+              <ion-item button (click)="openPortraitSelector()" class="portrait-selector">
+                <ion-label for="portraitButton">Portrait</ion-label>
+                <ion-thumbnail slot="end" *ngIf="selectedPortrait">
+                  <ion-img
+                    [src]="getSelectedPortraitImage()"
+                    [alt]="getSelectedPortraitName()">
+                  </ion-img>
+                </ion-thumbnail>
+                <ion-button
+                  id="portraitButton"
+                  fill="clear"
+                  slot="end"
+                  type="button"
+                  (click)="openPortraitSelector()"
+                  aria-label="Choose character portrait">
+                  <ion-icon name="image-outline"></ion-icon>
+                </ion-button>
+              </ion-item>
+
               <ion-button
-                id="portraitButton"
-                fill="clear"
-                slot="end"
-                type="button"
-                (click)="openPortraitSelector()"
-                aria-label="Choose character portrait">
-                <ion-icon name="image-outline"></ion-icon>
+                expand="block"
+                type="submit"
+                [disabled]="allocatedPoints > totalPoints || !characterForm.valid"
+                aria-label="Create character"
+                aria-describedby="form-error"
+                class="ion-margin-top">
+                Create Character
               </ion-button>
-            </ion-item>
 
-            <ion-button
-              expand="block"
-              type="submit"
-              [disabled]="allocatedPoints > totalPoints || !characterForm.valid"
-              aria-label="Create character"
-              aria-describedby="form-error"
-              class="ion-margin-top">
-              Create Character
-            </ion-button>
-
-            <div class="ion-text-danger error-message" *ngIf="formError" id="form-error" role="alert" aria-live="assertive">
-              {{ formError }}
-            </div>
+              <div class="ion-text-danger error-message" *ngIf="formError" id="form-error" role="alert" aria-live="assertive">
+                {{ formError }}
+              </div>
+            </ion-list>
           </fieldset>
         </ion-card-content>
       </ion-card>
