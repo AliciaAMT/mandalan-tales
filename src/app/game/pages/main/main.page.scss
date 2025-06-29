@@ -70,8 +70,23 @@
 
 @media (max-width: 900px) {
   .main-game-responsive-grid {
-    grid-template-columns: 1fr !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch;
+    grid-template-columns: unset !important;
     grid-template-rows: unset !important;
     grid-template-areas: unset !important;
+    gap: 0;
+    padding: 8px;
+  }
+  .main-section {
+    width: 100% !important;
+    min-width: 0;
+    margin-bottom: 16px;
+    border-radius: 8px;
+    box-sizing: border-box;
+  }
+  .main-section:last-child {
+    margin-bottom: 0;
   }
 }

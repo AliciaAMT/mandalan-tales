@@ -46,11 +46,22 @@ export class MainPage implements OnInit {
   toggleTileActions() { this.isTileActionsOpen = !this.isTileActionsOpen; this.saveState(); }
   toggleMenu() { this.isMenuOpen = !this.isMenuOpen; this.saveState(); }
 
+  get isMobile() {
+    return window.innerWidth <= 900;
+  }
+
   get gridTemplateRows() {
+    if (this.isMobile) {
+      // Stack all sections vertically
+      return 'auto auto auto auto';
+    }
     // If menu is open, bottom row is 1fr, else just header (auto)
     return this.isMenuOpen ? '3fr 1fr' : '1fr auto';
   }
   get gridTemplateColumns() {
+    if (this.isMobile) {
+      return '1fr';
+    }
     // Only include columns for open sections
     const cols = [];
     if (this.isPlayerStatsOpen) cols.push('1fr');
@@ -61,6 +72,9 @@ export class MainPage implements OnInit {
   }
 
   get gridTemplateAreas() {
+    if (this.isMobile) {
+      return 'unset';
+    }
     // Build the top row
     let topRow = [];
     if (this.isPlayerStatsOpen) topRow.push('playerstats');
