@@ -159,8 +159,67 @@
       <button class="collapsible-header" (click)="toggleTileActions()">Tile Actions</button>
       <div class="section-content" *ngIf="isTileActionsOpen">
         <div class="tile-actions-container" *ngIf="currentCharacter; else noTileActions">
-          <!-- NPCs Section -->
-          <div class="action-section" *ngIf="getCurrentNPCs().length > 0">
+          <!-- Mobile: All actions in one grid -->
+          <div class="action-section" *ngIf="isMobile && getAllTileActions().length > 0">
+            <div class="action-grid">
+              <div
+                *ngFor="let action of getAllTileActions()"
+                class="action-item"
+                [ngClass]="{
+                  'npc-item': action.type === 'NPC',
+                  'object-item': action.type === 'Object',
+                  'portal-item': action.type === 'Portal'
+                }"
+                (click)="
+                  action.type === 'NPC' ? interactWithNPC(action) :
+                  action.type === 'Object' ? interactWithObject(action) :
+                  usePortal(action)
+                "
+                (keydown.enter)="
+                  action.type === 'NPC' ? interactWithNPC(action) :
+                  action.type === 'Object' ? interactWithObject(action) :
+                  usePortal(action)
+                "
+                (keydown.space)="
+                  action.type === 'NPC' ? interactWithNPC(action) :
+                  action.type === 'Object' ? interactWithObject(action) :
+                  usePortal(action)
+                "
+                tabindex="0"
+                [attr.aria-label]="
+                  action.type === 'NPC'
+                    ? 'Interact with ' + action.name
+                    : action.type === 'Object'
+                    ? 'Interact with ' + action.name
+                    : 'Use portal to ' + action.destination
+                "
+              >
+                <div class="card-type">{{ action.type }}</div>
+                <div class="card-type-line"></div>
+                <img
+                  [src]="
+                    action.type === 'NPC'
+                      ? 'assets/portraits/' + action.portrait + '.png'
+                      : 'assets/items/' + action.image + '.png'
+                  "
+                  [alt]="action.name"
+                  class="action-image"
+                  (error)="
+                    action.type === 'NPC'
+                      ? onPortraitError($event, action)
+                      : action.type === 'Object'
+                      ? onObjectImageError($event, action)
+                      : onPortalImageError($event, action)
+                  "
+                />
+                <div class="action-name">{{ action.name }}</div>
+                <div class="action-description" *ngIf="action.description">{{ action.description }}</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Desktop: Keep original sections -->
+          <div class="action-section" *ngIf="!isMobile && getCurrentNPCs().length > 0">
             <h4 class="section-title">NPCs</h4>
             <div class="action-grid">
               <div
@@ -184,8 +243,7 @@
             </div>
           </div>
 
-          <!-- Objects Section -->
-          <div class="action-section" *ngIf="getCurrentObjects().length > 0">
+          <div class="action-section" *ngIf="!isMobile && getCurrentObjects().length > 0">
             <h4 class="section-title">Objects</h4>
             <div class="action-grid">
               <div
@@ -209,8 +267,7 @@
             </div>
           </div>
 
-          <!-- Portals Section -->
-          <div class="action-section" *ngIf="getCurrentPortals().length > 0">
+          <div class="action-section" *ngIf="!isMobile && getCurrentPortals().length > 0">
             <h4 class="section-title">Portals</h4>
             <div class="action-grid">
               <div

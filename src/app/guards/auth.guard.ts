@@ -10,6 +10,9 @@ export class AuthGuard implements CanActivate {
   private router = inject(Router);
 
   async canActivate(): Promise<boolean> {
+    // Wait for auth to be initialized before checking login state
+    await this.authService.waitForAuthInit();
+
     // Check if user is logged in using the service's computed signal
     const isLoggedIn = this.authService.isLoggedIn();
 

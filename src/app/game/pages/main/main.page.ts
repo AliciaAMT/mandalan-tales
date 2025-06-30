@@ -912,4 +912,11 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
       console.warn('Error handling portal image error:', error);
     }
   }
+
+  getAllTileActions(): Array<any> {
+    const npcs = this.getCurrentNPCs().map(npc => ({ ...npc, type: 'NPC' }));
+    const objects = this.getCurrentObjects().map(obj => ({ ...obj, type: 'Object' }));
+    const portals = this.getCurrentPortals().map(portal => ({ ...portal, type: 'Portal' }));
+    return [...npcs, ...objects, ...portals];
+  }
 }

@@ -35,6 +35,7 @@ export class AuthService {
         this.ngZone.run(() => {
           this.userSignal.set(user);
           this.authInitializedSignal.set(true);
+          console.log('Auth state changed:', user ? 'User logged in' : 'User logged out');
         });
       });
     });
@@ -82,23 +83,28 @@ export class AuthService {
   async waitForAuthInit(): Promise<void> {
     // If already initialized, return immediately
     if (this.authInitializedSignal()) {
+      console.log('Auth already initialized');
       return;
     }
+
+    console.log('Waiting for auth initialization...');
 
     // Poll for initialization using the existing signal
     return new Promise((resolve) => {
       const checkInterval = setInterval(() => {
         if (this.authInitializedSignal()) {
           clearInterval(checkInterval);
+          console.log('Auth initialization complete');
           resolve();
         }
-      }, 10); // Check every 10ms
+      }, 50); // Check every 50ms (increased from 10ms)
 
-      // Timeout after 5 seconds to prevent infinite waiting
+      // Timeout after 10 seconds to prevent infinite waiting
       setTimeout(() => {
         clearInterval(checkInterval);
+        console.log('Auth initialization timeout - proceeding anyway');
         resolve();
-      }, 5000);
+      }, 10000); // Increased timeout to 10 seconds
     });
   }
 }
