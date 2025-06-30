@@ -337,22 +337,22 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
   togglePlayerStats() {
     this.isPlayerStatsOpen = !this.isPlayerStatsOpen;
     this.saveState();
-    setTimeout(() => this.resizeMapGrid(), 0);
+    requestAnimationFrame(() => this.resizeMapGrid());
   }
   toggleMap() {
     this.isMapOpen = !this.isMapOpen;
     this.saveState();
-    setTimeout(() => this.resizeMapGrid(), 0);
+    requestAnimationFrame(() => this.resizeMapGrid());
   }
   toggleTileActions() {
     this.isTileActionsOpen = !this.isTileActionsOpen;
     this.saveState();
-    setTimeout(() => this.resizeMapGrid(), 0);
+    requestAnimationFrame(() => this.resizeMapGrid());
   }
   toggleMenu() {
     this.isMenuOpen = !this.isMenuOpen;
     this.saveState();
-    setTimeout(() => this.resizeMapGrid(), 0);
+    requestAnimationFrame(() => this.resizeMapGrid());
   }
 
   get isMobile() {
