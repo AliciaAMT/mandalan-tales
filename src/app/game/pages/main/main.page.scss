@@ -1,3 +1,23 @@
+/* Fix Ionic Content issues */
+ion-content {
+  --overflow: auto;
+  height: 100vh !important;
+  min-height: 100vh !important;
+  max-height: 100vh !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  display: block !important;
+  contain: layout style paint;
+}
+
+/* Prevent content dimension errors */
+ion-content::part(scroll) {
+  height: 100% !important;
+  min-height: 100% !important;
+  max-height: 100% !important;
+  overflow: visible !important;
+}
+
 .main-game-responsive-grid {
   display: grid;
   width: 100vw;
@@ -7,6 +27,7 @@
   box-sizing: border-box;
   transition: grid-template-rows 0.3s, grid-template-columns 0.3s, grid-template-areas 0.3s;
   /* grid-template-rows, columns, and areas are set dynamically */
+  contain: layout style;
 }
 
 .main-section {
@@ -520,8 +541,8 @@
 
 .action-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
-  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 16px;
   margin-bottom: 16px;
 }
 
@@ -529,15 +550,17 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 8px;
+  padding: 16px;
   border: 2px solid transparent;
-  border-radius: 8px;
+  border-radius: 12px;
   background: rgba(255, 255, 255, 0.05);
   cursor: pointer;
   transition: all 0.2s ease;
   text-align: center;
-  min-height: 80px;
+  min-height: 120px;
   justify-content: center;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .action-item:hover {
@@ -554,26 +577,27 @@
 }
 
 .action-image {
-  width: 40px;
-  height: 40px;
+  width: 80%;
+  height: auto;
+  aspect-ratio: 1;
   object-fit: contain;
-  margin-bottom: 6px;
-  border-radius: 4px;
+  margin-bottom: 12px;
+  border-radius: 8px;
   background: rgba(0, 0, 0, 0.2);
 }
 
 .action-name {
-  font-size: 0.8rem;
+  font-size: 1rem;
   font-weight: bold;
   color: var(--ion-text-color, #fff);
-  margin-bottom: 2px;
+  margin-bottom: 4px;
   line-height: 1.2;
 }
 
 .action-description {
-  font-size: 0.7rem;
+  font-size: 0.85rem;
   color: var(--ion-text-color, #ccc);
-  line-height: 1.1;
+  line-height: 1.3;
   opacity: 0.8;
 }
 
@@ -587,12 +611,12 @@
 }
 
 .object-item {
-  border-color: rgba(100, 150, 255, 0.3);
+  /* Removed blue border styling */
 }
 
 .object-item:hover {
-  border-color: #6496ff;
-  background: rgba(100, 150, 255, 0.1);
+  border-color: var(--theme-color, #8d6e36);
+  background: rgba(141, 110, 54, 0.1);
 }
 
 .portal-item {
@@ -624,25 +648,26 @@
   }
 
   .action-grid {
-    grid-template-columns: repeat(auto-fit, minmax(70px, 1fr));
-    gap: 8px;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 12px;
   }
 
   .action-item {
-    padding: 6px;
-    min-height: 70px;
+    padding: 12px;
+    min-height: 100px;
   }
 
   .action-image {
-    width: 32px;
-    height: 32px;
+    width: 80%;
+    height: auto;
+    aspect-ratio: 1;
   }
 
   .action-name {
-    font-size: 0.7rem;
+    font-size: 0.9rem;
   }
 
   .action-description {
-    font-size: 0.6rem;
+    font-size: 0.8rem;
   }
 }

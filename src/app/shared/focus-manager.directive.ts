@@ -11,6 +11,7 @@ export class FocusManagerDirective implements OnInit, OnDestroy {
   private originalTabIndex: string | null = null;
   private originalInert: string | null = null;
   private focusedElement: HTMLElement | null = null;
+  private hiddenElements = new Set<HTMLElement>();
 
   constructor(private el: ElementRef, private ngZone: NgZone) {}
 
@@ -49,15 +50,32 @@ export class FocusManagerDirective implements OnInit, OnDestroy {
     this.el.nativeElement.addEventListener('focusin', (event: FocusEvent) => {
       this.focusedElement = event.target as HTMLElement;
     }, true);
+
+    // Proactively check for hidden elements on initialization
+    this.checkForHiddenElements();
   }
 
   ngOnDestroy() {
     if (this.observer) {
       this.observer.disconnect();
     }
+    // Restore all hidden elements
+    this.hiddenElements.forEach(element => {
+      this.handleElementShown(element);
+    });
+    this.hiddenElements.clear();
+  }
+
+  private checkForHiddenElements() {
+    const hiddenElements = this.el.nativeElement.querySelectorAll('[aria-hidden="true"]');
+    hiddenElements.forEach((element: HTMLElement) => {
+      this.handleElementHidden(element);
+    });
   }
 
   private handleElementHidden(element: HTMLElement) {
+    this.hiddenElements.add(element);
+
     // Check if the hidden element contains the currently focused element
     if (this.focusedElement && element.contains(this.focusedElement)) {
       // Move focus to the router outlet or body
@@ -75,6 +93,8 @@ export class FocusManagerDirective implements OnInit, OnDestroy {
   }
 
   private handleElementShown(element: HTMLElement) {
+    this.hiddenElements.delete(element);
+
     // Remove the inert attribute
     if (element.hasAttribute('inert') && !this.originalInert) {
       element.removeAttribute('inert');
@@ -94,6 +114,17 @@ export class FocusManagerDirective implements OnInit, OnDestroy {
       (routerOutlet as HTMLElement).focus();
       return;
     }
+
+    // Try to focus the first visible focusable element
+    const visibleFocusable = document.querySelector(
+      'button:not([aria-hidden="true"]):not([inert]), [href]:not([aria-hidden="true"]):not([inert]), input:not([aria-hidden="true"]):not([inert]), select:not([aria-hidden="true"]):not([inert]), textarea:not([aria-hidden="true"]):not([inert]), [tabindex]:not([tabindex="-1"]):not([aria-hidden="true"]):not([inert])'
+    ) as HTMLElement;
+
+    if (visibleFocusable) {
+      visibleFocusable.focus();
+      return;
+    }
+
     // Fallback: focus the body
     (document.body as HTMLElement).focus();
   }

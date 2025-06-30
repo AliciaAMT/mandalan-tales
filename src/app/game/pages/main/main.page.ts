@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, effect, ViewChild, ElementRef, AfterViewInit, OnDestroy, NgZone } from '@angular/core';
+import { Component, OnInit, inject, effect, ViewChild, ElementRef, AfterViewInit, OnDestroy, NgZone, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CharacterService } from '../../../game/services/character.service';
@@ -60,16 +60,21 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
   authService = inject(AuthService);
 
   mapTiles: MapTile[][] = [];
+  isInitialized = false;
 
   @ViewChild('mapGrid') mapGridRef!: ElementRef<HTMLDivElement>;
 
   private mapParentResizeObserver: ResizeObserver | null = null;
+  private resizeTimeout: any = null;
 
-  constructor(private ngZone: NgZone) {
+  constructor(
+    private ngZone: NgZone,
+    private cdr: ChangeDetectorRef
+  ) {
     // Watch for character changes and regenerate map
     effect(() => {
       const chars = this.characterService.getCharacters();
-      if (chars.length > 0) {
+      if (chars.length > 0 && this.isInitialized) {
         this.generateMap();
       }
     });
@@ -90,23 +95,49 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
 
     // Generate initial map
     this.generateMap();
+    this.isInitialized = true;
   }
 
   ngAfterViewInit() {
-    // Use setTimeout to ensure DOM is fully rendered
+    // Use a longer delay to ensure DOM is fully rendered and Ionic components are initialized
     setTimeout(() => {
-      this.resizeMapGrid();
-    }, 0);
+      this.ngZone.runOutsideAngular(() => {
+        this.resizeMapGrid();
+      });
+    }, 100);
+
+    // Add a second attempt with longer delay for Ionic Content
+    setTimeout(() => {
+      this.ngZone.runOutsideAngular(() => {
+        this.resizeMapGrid();
+      });
+    }, 500);
 
     window.addEventListener('resize', this.onResize);
 
     // Set up ResizeObserver on the map's parent with proper null checks
-    if (this.mapGridRef?.nativeElement?.parentElement) {
-      this.mapParentResizeObserver = new ResizeObserver(() => {
-        this.resizeMapGrid();
+    setTimeout(() => {
+      if (this.mapGridRef?.nativeElement?.parentElement) {
+        this.mapParentResizeObserver = new ResizeObserver(() => {
+          this.ngZone.runOutsideAngular(() => {
+            this.resizeMapGrid();
+          });
+        });
+        this.mapParentResizeObserver.observe(this.mapGridRef.nativeElement.parentElement);
+      }
+    }, 200);
+
+    // Additional attempt to handle Ionic Content initialization
+    setTimeout(() => {
+      this.ngZone.run(() => {
+        this.cdr.detectChanges();
+        setTimeout(() => {
+          this.ngZone.runOutsideAngular(() => {
+            this.resizeMapGrid();
+          });
+        }, 100);
       });
-      this.mapParentResizeObserver.observe(this.mapGridRef.nativeElement.parentElement);
-    }
+    }, 1000);
   }
 
   ngOnDestroy() {
@@ -115,29 +146,58 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
       this.mapParentResizeObserver.disconnect();
       this.mapParentResizeObserver = null;
     }
+    if (this.resizeTimeout) {
+      clearTimeout(this.resizeTimeout);
+    }
   }
 
   onResize = () => {
-    this.ngZone.runOutsideAngular(() => {
-      this.resizeMapGrid();
-    });
+    // Debounce resize events
+    if (this.resizeTimeout) {
+      clearTimeout(this.resizeTimeout);
+    }
+    this.resizeTimeout = setTimeout(() => {
+      this.ngZone.runOutsideAngular(() => {
+        this.resizeMapGrid();
+      });
+    }, 100);
   };
 
   resizeMapGrid() {
-    if (!this.mapGridRef?.nativeElement) return;
+    if (!this.mapGridRef?.nativeElement) {
+      console.warn('Map grid element not found');
+      return;
+    }
 
     const parent = this.mapGridRef.nativeElement.parentElement;
-    if (!parent) return;
+    if (!parent) {
+      console.warn('Map grid parent element not found');
+      return;
+    }
 
     try {
-      const { width, height } = parent.getBoundingClientRect();
+      const rect = parent.getBoundingClientRect();
+      const { width, height } = rect;
+
       if (width > 0 && height > 0) {
         const size = Math.floor(Math.min(width, height));
         this.mapGridRef.nativeElement.style.width = size + 'px';
         this.mapGridRef.nativeElement.style.height = size + 'px';
+      } else {
+        console.warn('Parent element has zero dimensions:', { width, height });
+        // Fallback to a reasonable size
+        this.mapGridRef.nativeElement.style.width = '300px';
+        this.mapGridRef.nativeElement.style.height = '300px';
       }
     } catch (error) {
       console.warn('Error resizing map grid:', error);
+      // Fallback to a reasonable size
+      try {
+        this.mapGridRef.nativeElement.style.width = '300px';
+        this.mapGridRef.nativeElement.style.height = '300px';
+      } catch (fallbackError) {
+        console.error('Failed to set fallback size:', fallbackError);
+      }
     }
   }
 
@@ -329,16 +389,17 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
     if (tile.isPlayer) {
       return 'Your current position';
     }
-    return `Map tile at (${tile.x}, ${tile.y})`;
+    return `Map tile at coordinates (${tile.x}, ${tile.y})`;
   }
 
   onTileImageError(event: any, tile: MapTile) {
-    // Set a fallback image - try yard00.webp first, then a generic fallback
-    if (tile.imageSrc.includes('yard00.webp')) {
-      // If yard00.webp also fails, use a data URL for a simple colored square
-      event.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iIzMzMzMzMyIvPjx0ZXh0IHg9IjUwIiB5PSI1MCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjEyIiBmaWxsPSJ3aGl0ZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkVycm9yPC90ZXh0Pjwvc3ZnPg==';
-    } else {
-      event.target.src = 'assets/webp-output/map-tiles/yard00.webp';
+    try {
+      console.warn(`Failed to load tile image at (${tile.x}, ${tile.y})`);
+      if (event?.target) {
+        event.target.style.display = 'none';
+      }
+    } catch (error) {
+      console.warn('Error handling tile image error:', error);
     }
   }
 
@@ -820,17 +881,35 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
 
   // Error handling for images
   onPortraitError(event: any, npc: NPC) {
-    console.warn(`Failed to load portrait for ${npc.name}`);
-    event.target.style.display = 'none';
+    try {
+      console.warn(`Failed to load portrait for ${npc.name}`);
+      if (event?.target) {
+        event.target.style.display = 'none';
+      }
+    } catch (error) {
+      console.warn('Error handling portrait error:', error);
+    }
   }
 
   onObjectImageError(event: any, object: GameObject) {
-    console.warn(`Failed to load image for ${object.name}`);
-    event.target.style.display = 'none';
+    try {
+      console.warn(`Failed to load image for ${object.name}`);
+      if (event?.target) {
+        event.target.style.display = 'none';
+      }
+    } catch (error) {
+      console.warn('Error handling object image error:', error);
+    }
   }
 
   onPortalImageError(event: any, portal: Portal) {
-    console.warn(`Failed to load image for ${portal.name}`);
-    event.target.style.display = 'none';
+    try {
+      console.warn(`Failed to load image for ${portal.name}`);
+      if (event?.target) {
+        event.target.style.display = 'none';
+      }
+    } catch (error) {
+      console.warn('Error handling portal image error:', error);
+    }
   }
 }
