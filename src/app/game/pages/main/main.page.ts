@@ -592,6 +592,25 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
           description: 'A comfortable rug on the floor.',
           action: 'examine'
         });
+        // TEST ITEMS FOR OVERFLOW
+        objects.push({
+          name: 'Test Overflow Item 1',
+          image: 'rug',
+          description: 'This is test item 1 to check overflow in the tile action box.',
+          action: 'test1'
+        });
+        objects.push({
+          name: 'Test Overflow Item 2',
+          image: 'rug',
+          description: 'This is test item 2 to check overflow in the tile action box.',
+          action: 'test2'
+        });
+        objects.push({
+          name: 'Test Overflow Item 3',
+          image: 'rug',
+          description: 'This is test item 3 to check overflow in the tile action box.',
+          action: 'test3'
+        });
       }
       if (xaxis === 2 && yaxis === 1) {
         objects.push({

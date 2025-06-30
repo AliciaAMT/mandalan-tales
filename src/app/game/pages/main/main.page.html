@@ -250,6 +250,17 @@
                 tabindex="0"
                 [attr.aria-label]="'Interact with ' + npc.name"
               >
+                <button
+                  class="info-btn"
+                  tabindex="0"
+                  type="button"
+                  [attr.aria-label]="'Show info about ' + npc.name"
+                  (click)="$event.stopPropagation(); openInfoModal(npc)"
+                  (keydown.enter)="$event.stopPropagation(); openInfoModal(npc)"
+                  (keydown.space)="$event.stopPropagation(); openInfoModal(npc)"
+                >
+                  <span aria-hidden="true">&#9432;</span>
+                </button>
                 <img
                   [src]="'assets/portraits/' + npc.portrait + '.png'"
                   [alt]="npc.name + ' portrait'"
@@ -257,7 +268,6 @@
                   (error)="onPortraitError($event, npc)"
                 />
                 <div class="action-name">{{ npc.name }}</div>
-                <div class="action-description" *ngIf="npc.description">{{ npc.description }}</div>
               </div>
             </div>
           </div>
@@ -274,6 +284,17 @@
                 tabindex="0"
                 [attr.aria-label]="'Interact with ' + object.name"
               >
+                <button
+                  class="info-btn"
+                  tabindex="0"
+                  type="button"
+                  [attr.aria-label]="'Show info about ' + object.name"
+                  (click)="$event.stopPropagation(); openInfoModal(object)"
+                  (keydown.enter)="$event.stopPropagation(); openInfoModal(object)"
+                  (keydown.space)="$event.stopPropagation(); openInfoModal(object)"
+                >
+                  <span aria-hidden="true">&#9432;</span>
+                </button>
                 <img
                   [src]="'assets/items/' + object.image + '.png'"
                   [alt]="object.name"
@@ -281,7 +302,6 @@
                   (error)="onObjectImageError($event, object)"
                 />
                 <div class="action-name">{{ object.name }}</div>
-                <div class="action-description" *ngIf="object.description">{{ object.description }}</div>
               </div>
             </div>
           </div>
@@ -298,6 +318,17 @@
                 tabindex="0"
                 [attr.aria-label]="'Use portal to ' + portal.destination"
               >
+                <button
+                  class="info-btn"
+                  tabindex="0"
+                  type="button"
+                  [attr.aria-label]="'Show info about ' + portal.name"
+                  (click)="$event.stopPropagation(); openInfoModal(portal)"
+                  (keydown.enter)="$event.stopPropagation(); openInfoModal(portal)"
+                  (keydown.space)="$event.stopPropagation(); openInfoModal(portal)"
+                >
+                  <span aria-hidden="true">&#9432;</span>
+                </button>
                 <img
                   [src]="'assets/items/' + portal.image + '.png'"
                   [alt]="portal.name"
@@ -305,7 +336,6 @@
                   (error)="onPortalImageError($event, portal)"
                 />
                 <div class="action-name">{{ portal.name }}</div>
-                <div class="action-description" *ngIf="portal.description">{{ portal.description }}</div>
               </div>
             </div>
           </div>
@@ -327,6 +357,15 @@
       <div class="section-content" *ngIf="isMenuOpen">
         <span>Menu Placeholder</span>
       </div>
+    </div>
+  </div>
+
+  <!-- Info Modal (global, for both mobile and desktop) -->
+  <div *ngIf="infoModalOpen" class="info-modal-overlay" (click)="closeInfoModal()">
+    <div class="info-modal-content" (click)="$event.stopPropagation()">
+      <h2>{{ infoModalAction?.name }}</h2>
+      <p>{{ infoModalAction?.description }}</p>
+      <button class="close-info-btn" (click)="closeInfoModal()" tabindex="0" aria-label="Close info">Close</button>
     </div>
   </div>
 </ion-content>
