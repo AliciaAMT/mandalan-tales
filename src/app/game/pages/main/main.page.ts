@@ -20,6 +20,28 @@ interface MapTile {
   action?: string;
 }
 
+interface NPC {
+  name: string;
+  portrait: string;
+  description?: string;
+  action: string;
+}
+
+interface GameObject {
+  name: string;
+  image: string;
+  description?: string;
+  action: string;
+}
+
+interface Portal {
+  name: string;
+  image: string;
+  destination: string;
+  description?: string;
+  action: string;
+}
+
 @Component({
   selector: 'app-main',
   templateUrl: './main.page.html',
@@ -305,7 +327,7 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
 
   getTileAltText(tile: MapTile): string {
     if (tile.isPlayer) {
-      return `Player position at (${tile.x}, ${tile.y})`;
+      return 'Your current position';
     }
     return `Map tile at (${tile.x}, ${tile.y})`;
   }
@@ -446,5 +468,369 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
   get currentCharacter(): CharStats | undefined {
     const chars = this.characterService.getCharacters();
     return chars.length > 0 ? chars[0] : undefined;
+  }
+
+  // Tile Actions Methods
+  getCurrentNPCs(): NPC[] {
+    if (!this.currentCharacter) return [];
+
+    const { map, xaxis, yaxis } = this.currentCharacter;
+    const npcs: NPC[] = [];
+
+    // Father in homeup (2,2)
+    if (map === 'homeup' && xaxis === 2 && yaxis === 2) {
+      npcs.push({
+        name: 'Father',
+        portrait: 'father',
+        description: 'Your father, a wise and caring man.',
+        action: 'talk'
+      });
+    }
+
+    // Marah in marah house (1,2) - assuming this is her location
+    if (map === 'marah' && xaxis === 1 && yaxis === 2) {
+      npcs.push({
+        name: 'Marah',
+        portrait: 'marah',
+        description: 'Lady Marah, a mysterious woman.',
+        action: 'talk'
+      });
+    }
+
+    // Random rat in home (2,2) - 30% chance
+    if (map === 'home' && xaxis === 2 && yaxis === 2) {
+      if (Math.random() < 0.3) {
+        npcs.push({
+          name: 'Rat',
+          portrait: 'default', // Will use a fallback image
+          description: 'A small rat scurrying about.',
+          action: 'fight'
+        });
+      }
+    }
+
+    return npcs;
+  }
+
+  getCurrentObjects(): GameObject[] {
+    if (!this.currentCharacter) return [];
+
+    const { map, xaxis, yaxis } = this.currentCharacter;
+    const objects: GameObject[] = [];
+
+    // Homeup objects
+    if (map === 'homeup') {
+      if (xaxis === 2 && yaxis === 2) {
+        objects.push({
+          name: 'Rug',
+          image: 'rug',
+          description: 'A comfortable rug on the floor.',
+          action: 'examine'
+        });
+      }
+      if (xaxis === 2 && yaxis === 1) {
+        objects.push({
+          name: 'Water Barrel',
+          image: 'waterbarrel',
+          description: 'A barrel filled with fresh water.',
+          action: 'drink'
+        });
+      }
+      if (xaxis === 3 && yaxis === 1) {
+        objects.push({
+          name: 'Wardrobe',
+          image: 'wardrobe',
+          description: 'A wooden wardrobe for storing clothes.',
+          action: 'search'
+        });
+      }
+      if (xaxis === 3 && yaxis === 2) {
+        objects.push({
+          name: 'Desk',
+          image: 'desk',
+          description: 'A sturdy wooden desk.',
+          action: 'examine'
+        });
+      }
+      if (xaxis === 1 && yaxis === 2) {
+        objects.push({
+          name: 'Coatrack',
+          image: 'coatrack',
+          description: 'A rack for hanging coats and hats.',
+          action: 'examine'
+        });
+      }
+      if (xaxis === 1 && yaxis === 3) {
+        objects.push({
+          name: 'Bed',
+          image: 'bed',
+          description: 'A comfortable bed for resting.',
+          action: 'sleep'
+        });
+      }
+      if (xaxis === 2 && yaxis === 3) {
+        objects.push({
+          name: 'Chest',
+          image: 'chest',
+          description: 'A wooden chest for storing items.',
+          action: 'search'
+        });
+      }
+      if (xaxis === 3 && yaxis === 3) {
+        objects.push({
+          name: 'Shelf',
+          image: 'shelf',
+          description: 'A shelf with various items.',
+          action: 'examine'
+        });
+      }
+    }
+
+    // Home objects
+    if (map === 'home') {
+      if (xaxis === 1 && yaxis === 1) {
+        objects.push({
+          name: 'Shelf',
+          image: 'shelf1',
+          description: 'A wooden shelf with various items.',
+          action: 'examine'
+        });
+      }
+      if (xaxis === 2 && yaxis === 1) {
+        objects.push({
+          name: 'Rug',
+          image: 'carpet1',
+          description: 'A decorative rug on the floor.',
+          action: 'examine'
+        });
+      }
+      if (xaxis === 3 && yaxis === 1) {
+        objects.push({
+          name: 'Chest',
+          image: 'chest1',
+          description: 'A sturdy wooden chest.',
+          action: 'search'
+        });
+      }
+      if (xaxis === 3 && yaxis === 2) {
+        objects.push({
+          name: 'Fireplace',
+          image: 'fireplace',
+          description: 'A warm fireplace providing heat.',
+          action: 'warm'
+        });
+      }
+      if (xaxis === 2 && yaxis === 2) {
+        objects.push({
+          name: 'Table',
+          image: 'table',
+          description: 'A wooden table for meals.',
+          action: 'examine'
+        });
+      }
+      if (xaxis === 1 && yaxis === 2) {
+        objects.push({
+          name: 'Shelf',
+          image: 'shelf2',
+          description: 'Another wooden shelf.',
+          action: 'examine'
+        });
+      }
+      if (xaxis === 1 && yaxis === 3) {
+        objects.push({
+          name: 'Pantry',
+          image: 'wardrobe',
+          description: 'A pantry for storing food.',
+          action: 'search'
+        });
+      }
+      if (xaxis === 2 && yaxis === 3) {
+        objects.push({
+          name: 'Herb Rack',
+          image: 'herbrack',
+          description: 'A rack for drying herbs.',
+          action: 'examine'
+        });
+      }
+      if (xaxis === 3 && yaxis === 3) {
+        objects.push({
+          name: 'Side Table',
+          image: 'sidetable',
+          description: 'A small side table.',
+          action: 'examine'
+        });
+      }
+    }
+
+    // Yard objects
+    if (map === 'yard') {
+      if (xaxis === 3 && yaxis === 3) {
+        objects.push({
+          name: 'Dog House',
+          image: 'doghouse',
+          description: 'A small house for the family dog.',
+          action: 'examine'
+        });
+      }
+      if (xaxis === 2 && yaxis === 2) {
+        objects.push({
+          name: 'Well',
+          image: 'well',
+          description: 'A deep well for drawing water.',
+          action: 'drink'
+        });
+      }
+      if (xaxis === 1 && yaxis === 2) {
+        objects.push({
+          name: 'Melon Plants',
+          image: 'pumpkinplant',
+          description: 'Growing melon plants in the garden.',
+          action: 'harvest'
+        });
+      }
+      if (xaxis === 3 && yaxis === 2) {
+        objects.push({
+          name: 'Chicken Coop',
+          image: 'chicken',
+          description: 'A coop housing chickens.',
+          action: 'examine'
+        });
+      }
+      if (xaxis === 2 && yaxis === 1) {
+        objects.push({
+          name: 'Garden',
+          image: 'plants',
+          description: 'A small vegetable garden.',
+          action: 'harvest'
+        });
+      }
+      if (xaxis === 3 && yaxis === 1) {
+        objects.push({
+          name: 'Fruit Tree',
+          image: 'fruittree',
+          description: 'A tree bearing delicious fruit.',
+          action: 'harvest'
+        });
+      }
+    }
+
+    return objects;
+  }
+
+  getCurrentPortals(): Portal[] {
+    if (!this.currentCharacter) return [];
+
+    const { map, xaxis, yaxis } = this.currentCharacter;
+    const portals: Portal[] = [];
+
+    // Homeup portals
+    if (map === 'homeup' && xaxis === 1 && yaxis === 1) {
+      portals.push({
+        name: 'Stairs Down',
+        image: 'stairsdown',
+        destination: 'home',
+        description: 'Stairs leading down to the main floor.',
+        action: 'descend'
+      });
+    }
+
+    // Home portals
+    if (map === 'home') {
+      if (xaxis === 1 && yaxis === 1) {
+        portals.push({
+          name: 'Stairs Up',
+          image: 'stairsdown', // Reusing stairs image
+          destination: 'homeup',
+          description: 'Stairs leading up to the bedroom.',
+          action: 'ascend'
+        });
+      }
+      if (xaxis === 3 && yaxis === 3) {
+        portals.push({
+          name: 'Front Door',
+          image: 'door',
+          destination: 'yard',
+          description: 'The front door leading outside.',
+          action: 'exit'
+        });
+      }
+      if (xaxis === 2 && yaxis === 1) {
+        portals.push({
+          name: 'Back Door',
+          image: 'door',
+          destination: 'yard',
+          description: 'The back door leading to the yard.',
+          action: 'exit'
+        });
+      }
+    }
+
+    // Yard portals
+    if (map === 'yard') {
+      if (xaxis === 2 && yaxis === 3) {
+        portals.push({
+          name: 'Back Door',
+          image: 'door',
+          destination: 'home',
+          description: 'The back door leading into the house.',
+          action: 'enter'
+        });
+      }
+      if (xaxis === 1 && yaxis === 3) {
+        portals.push({
+          name: 'Cellar Door',
+          image: 'cellar',
+          destination: 'cellar',
+          description: 'A door leading down to the cellar.',
+          action: 'descend'
+        });
+      }
+      if (xaxis === 1 && yaxis === 1) {
+        portals.push({
+          name: 'Barn Door',
+          image: 'barn',
+          destination: 'barn',
+          description: 'A door leading to the barn.',
+          action: 'enter'
+        });
+      }
+    }
+
+    return portals;
+  }
+
+  // Interaction methods
+  interactWithNPC(npc: NPC) {
+    console.log(`Interacting with ${npc.name}: ${npc.action}`);
+    // TODO: Implement NPC interaction logic
+    alert(`You interact with ${npc.name}. This feature is coming soon!`);
+  }
+
+  interactWithObject(object: GameObject) {
+    console.log(`Interacting with ${object.name}: ${object.action}`);
+    // TODO: Implement object interaction logic
+    alert(`You ${object.action} the ${object.name}. This feature is coming soon!`);
+  }
+
+  usePortal(portal: Portal) {
+    console.log(`Using portal to ${portal.destination}: ${portal.action}`);
+    // TODO: Implement portal logic
+    alert(`You ${portal.action} to ${portal.destination}. This feature is coming soon!`);
+  }
+
+  // Error handling for images
+  onPortraitError(event: any, npc: NPC) {
+    console.warn(`Failed to load portrait for ${npc.name}`);
+    event.target.style.display = 'none';
+  }
+
+  onObjectImageError(event: any, object: GameObject) {
+    console.warn(`Failed to load image for ${object.name}`);
+    event.target.style.display = 'none';
+  }
+
+  onPortalImageError(event: any, portal: Portal) {
+    console.warn(`Failed to load image for ${portal.name}`);
+    event.target.style.display = 'none';
   }
 }

@@ -158,7 +158,90 @@
     <div class="main-section tile-actions" [ngClass]="{'collapsed': !isTileActionsOpen}" [style.grid-area]="tileActionsArea">
       <button class="collapsible-header" (click)="toggleTileActions()">Tile Actions</button>
       <div class="section-content" *ngIf="isTileActionsOpen">
-        <span>Tile Actions Placeholder</span>
+        <div class="tile-actions-container" *ngIf="currentCharacter; else noTileActions">
+          <!-- NPCs Section -->
+          <div class="action-section" *ngIf="getCurrentNPCs().length > 0">
+            <h4 class="section-title">NPCs</h4>
+            <div class="action-grid">
+              <div
+                *ngFor="let npc of getCurrentNPCs()"
+                class="action-item npc-item"
+                (click)="interactWithNPC(npc)"
+                (keydown.enter)="interactWithNPC(npc)"
+                (keydown.space)="interactWithNPC(npc)"
+                tabindex="0"
+                [attr.aria-label]="'Interact with ' + npc.name"
+              >
+                <img
+                  [src]="'assets/portraits/' + npc.portrait + '.png'"
+                  [alt]="npc.name + ' portrait'"
+                  class="action-image"
+                  (error)="onPortraitError($event, npc)"
+                />
+                <div class="action-name">{{ npc.name }}</div>
+                <div class="action-description" *ngIf="npc.description">{{ npc.description }}</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Objects Section -->
+          <div class="action-section" *ngIf="getCurrentObjects().length > 0">
+            <h4 class="section-title">Objects</h4>
+            <div class="action-grid">
+              <div
+                *ngFor="let object of getCurrentObjects()"
+                class="action-item object-item"
+                (click)="interactWithObject(object)"
+                (keydown.enter)="interactWithObject(object)"
+                (keydown.space)="interactWithObject(object)"
+                tabindex="0"
+                [attr.aria-label]="'Interact with ' + object.name"
+              >
+                <img
+                  [src]="'assets/items/' + object.image + '.png'"
+                  [alt]="object.name"
+                  class="action-image"
+                  (error)="onObjectImageError($event, object)"
+                />
+                <div class="action-name">{{ object.name }}</div>
+                <div class="action-description" *ngIf="object.description">{{ object.description }}</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Portals Section -->
+          <div class="action-section" *ngIf="getCurrentPortals().length > 0">
+            <h4 class="section-title">Portals</h4>
+            <div class="action-grid">
+              <div
+                *ngFor="let portal of getCurrentPortals()"
+                class="action-item portal-item"
+                (click)="usePortal(portal)"
+                (keydown.enter)="usePortal(portal)"
+                (keydown.space)="usePortal(portal)"
+                tabindex="0"
+                [attr.aria-label]="'Use portal to ' + portal.destination"
+              >
+                <img
+                  [src]="'assets/items/' + portal.image + '.png'"
+                  [alt]="portal.name"
+                  class="action-image"
+                  (error)="onPortalImageError($event, portal)"
+                />
+                <div class="action-name">{{ portal.name }}</div>
+                <div class="action-description" *ngIf="portal.description">{{ portal.description }}</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- No actions available -->
+          <div class="no-actions" *ngIf="getCurrentNPCs().length === 0 && getCurrentObjects().length === 0 && getCurrentPortals().length === 0">
+            <p>No actions available at this location.</p>
+          </div>
+        </div>
+        <ng-template #noTileActions>
+          <div class="no-tile-actions-message">No character loaded.</div>
+        </ng-template>
       </div>
     </div>
 
