@@ -39,6 +39,8 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
 
   @ViewChild('mapGrid') mapGridRef!: ElementRef<HTMLDivElement>;
 
+  private mapParentResizeObserver: ResizeObserver | null = null;
+
   constructor(private ngZone: NgZone) {
     // Watch for character changes and regenerate map
     effect(() => {
@@ -69,10 +71,22 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
   ngAfterViewInit() {
     this.resizeMapGrid();
     window.addEventListener('resize', this.onResize);
+
+    // Set up ResizeObserver on the map's parent
+    if (this.mapGridRef && this.mapGridRef.nativeElement.parentElement) {
+      this.mapParentResizeObserver = new ResizeObserver(() => {
+        this.resizeMapGrid();
+      });
+      this.mapParentResizeObserver.observe(this.mapGridRef.nativeElement.parentElement);
+    }
   }
 
   ngOnDestroy() {
     window.removeEventListener('resize', this.onResize);
+    if (this.mapParentResizeObserver) {
+      this.mapParentResizeObserver.disconnect();
+      this.mapParentResizeObserver = null;
+    }
   }
 
   onResize = () => {
@@ -334,25 +348,37 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
     }));
   }
 
+  private pollResizeMapGrid(times = 7, interval = 30) {
+    let count = 0;
+    const poll = () => {
+      this.resizeMapGrid();
+      count++;
+      if (count < times) {
+        setTimeout(poll, interval);
+      }
+    };
+    poll();
+  }
+
   togglePlayerStats() {
     this.isPlayerStatsOpen = !this.isPlayerStatsOpen;
     this.saveState();
-    requestAnimationFrame(() => this.resizeMapGrid());
+    this.pollResizeMapGrid();
   }
   toggleMap() {
     this.isMapOpen = !this.isMapOpen;
     this.saveState();
-    requestAnimationFrame(() => this.resizeMapGrid());
+    this.pollResizeMapGrid();
   }
   toggleTileActions() {
     this.isTileActionsOpen = !this.isTileActionsOpen;
     this.saveState();
-    requestAnimationFrame(() => this.resizeMapGrid());
+    this.pollResizeMapGrid();
   }
   toggleMenu() {
     this.isMenuOpen = !this.isMenuOpen;
     this.saveState();
-    requestAnimationFrame(() => this.resizeMapGrid());
+    this.pollResizeMapGrid();
   }
 
   get isMobile() {
