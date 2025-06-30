@@ -6,6 +6,7 @@ import { CharStats } from '../../../game/models/charstats.model';
 import { SettingsService } from '../../../game/services/settings.service';
 import { AuthService } from '../../../services/auth.service';
 import { DEFAULT_THEME_COLOR } from '../../../game/models/settings.model';
+import { IonicModule } from '@ionic/angular';
 
 const STORAGE_KEY = 'mainPageSectionState';
 
@@ -23,7 +24,7 @@ interface MapTile {
   templateUrl: './main.page.html',
   styleUrls: ['./main.page.scss'],
   standalone: true,
-  imports: [CommonModule, FormsModule]
+  imports: [CommonModule, FormsModule, IonicModule]
 })
 export class MainPage implements OnInit, AfterViewInit, OnDestroy {
   isPlayerStatsOpen = true;
