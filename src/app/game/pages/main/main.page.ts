@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, effect, ViewChild, ElementRef, AfterViewInit, OnDestroy, NgZone, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, inject, effect, ViewChild, ElementRef, AfterViewInit, OnDestroy, NgZone, ChangeDetectorRef, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CharacterService } from '../../../game/services/character.service';
@@ -63,6 +63,7 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
   isInitialized = false;
 
   @ViewChild('mapGrid') mapGridRef!: ElementRef<HTMLDivElement>;
+  @ViewChild('closeInfoBtn') closeInfoBtn!: ElementRef<HTMLButtonElement>;
 
   private mapParentResizeObserver: ResizeObserver | null = null;
   private resizeTimeout: any = null;
@@ -70,6 +71,7 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
   // Info modal state for mobile
   infoModalOpen = false;
   infoModalAction: any = null;
+  private lastFocusedElement: HTMLElement | null = null;
 
   constructor(
     private ngZone: NgZone,
@@ -946,10 +948,59 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
   openInfoModal(action: any) {
     this.infoModalAction = action;
     this.infoModalOpen = true;
+    setTimeout(() => {
+      // Save last focused element
+      this.lastFocusedElement = document.activeElement as HTMLElement;
+      // Focus the close button
+      if (this.closeInfoBtn && this.closeInfoBtn.nativeElement) {
+        this.closeInfoBtn.nativeElement.focus();
+      }
+    }, 0);
   }
 
   closeInfoModal() {
     this.infoModalOpen = false;
     this.infoModalAction = null;
+    // Restore focus to last focused element
+    if (this.lastFocusedElement) {
+      setTimeout(() => this.lastFocusedElement?.focus(), 0);
+      this.lastFocusedElement = null;
+    }
+  }
+
+  @HostListener('document:keydown', ['$event'])
+  handleModalKeydown(event: KeyboardEvent) {
+    if (!this.infoModalOpen) return;
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      this.closeInfoModal();
+    }
+    // Focus trap
+    const focusable = this.getModalFocusableElements();
+    if (focusable.length === 0) return;
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    if (event.key === 'Tab') {
+      if (event.shiftKey) {
+        if (document.activeElement === first) {
+          event.preventDefault();
+          last.focus();
+        }
+      } else {
+        if (document.activeElement === last) {
+          event.preventDefault();
+          first.focus();
+        }
+      }
+    }
+  }
+
+  private getModalFocusableElements(): HTMLElement[] {
+    if (!this.infoModalOpen) return [];
+    const modal = document.querySelector('.info-modal-content');
+    if (!modal) return [];
+    return Array.from(modal.querySelectorAll<HTMLElement>(
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+    )).filter(el => !el.hasAttribute('disabled') && !el.getAttribute('aria-hidden'));
   }
 }

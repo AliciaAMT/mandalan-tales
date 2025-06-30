@@ -233,7 +233,7 @@
             <div class="info-modal-content" (click)="$event.stopPropagation()">
               <h2>{{ infoModalAction?.name }}</h2>
               <p>{{ infoModalAction?.description }}</p>
-              <button class="close-info-btn" (click)="closeInfoModal()" tabindex="0" aria-label="Close info">Close</button>
+              <button #closeInfoBtn class="close-info-btn" (click)="closeInfoModal()" tabindex="0" aria-label="Close info">Close</button>
             </div>
           </div>
 
@@ -361,11 +361,19 @@
   </div>
 
   <!-- Info Modal (global, for both mobile and desktop) -->
-  <div *ngIf="infoModalOpen" class="info-modal-overlay" (click)="closeInfoModal()">
+  <div
+    *ngIf="infoModalOpen"
+    class="info-modal-overlay"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="modalTitle"
+    aria-describedby="modalDesc"
+    (click)="closeInfoModal()"
+  >
     <div class="info-modal-content" (click)="$event.stopPropagation()">
-      <h2>{{ infoModalAction?.name }}</h2>
-      <p>{{ infoModalAction?.description }}</p>
-      <button class="close-info-btn" (click)="closeInfoModal()" tabindex="0" aria-label="Close info">Close</button>
+      <h2 id="modalTitle">{{ infoModalAction?.name }}</h2>
+      <p id="modalDesc">{{ infoModalAction?.description }}</p>
+      <button #closeInfoBtn class="close-info-btn" (click)="closeInfoModal()" tabindex="0" aria-label="Close info">Close</button>
     </div>
   </div>
 </ion-content>
