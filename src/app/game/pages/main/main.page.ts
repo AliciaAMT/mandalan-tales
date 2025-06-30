@@ -67,6 +67,10 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
   private mapParentResizeObserver: ResizeObserver | null = null;
   private resizeTimeout: any = null;
 
+  // Info modal state for mobile
+  infoModalOpen = false;
+  infoModalAction: any = null;
+
   constructor(
     private ngZone: NgZone,
     private cdr: ChangeDetectorRef
@@ -918,5 +922,15 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
     const objects = this.getCurrentObjects().map(obj => ({ ...obj, type: 'Object' }));
     const portals = this.getCurrentPortals().map(portal => ({ ...portal, type: 'Portal' }));
     return [...npcs, ...objects, ...portals];
+  }
+
+  openInfoModal(action: any) {
+    this.infoModalAction = action;
+    this.infoModalOpen = true;
+  }
+
+  closeInfoModal() {
+    this.infoModalOpen = false;
+    this.infoModalAction = null;
   }
 }

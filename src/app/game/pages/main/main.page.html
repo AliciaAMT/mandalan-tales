@@ -196,6 +196,17 @@
               >
                 <div class="card-type">{{ action.type }}</div>
                 <div class="card-type-line"></div>
+                <button
+                  class="info-btn"
+                  tabindex="0"
+                  type="button"
+                  [attr.aria-label]="'Show info about ' + action.name"
+                  (click)="$event.stopPropagation(); openInfoModal(action)"
+                  (keydown.enter)="$event.stopPropagation(); openInfoModal(action)"
+                  (keydown.space)="$event.stopPropagation(); openInfoModal(action)"
+                >
+                  <span aria-hidden="true">&#9432;</span>
+                </button>
                 <img
                   [src]="
                     action.type === 'NPC'
@@ -213,10 +224,20 @@
                   "
                 />
                 <div class="action-name">{{ action.name }}</div>
-                <div class="action-description" *ngIf="action.description">{{ action.description }}</div>
               </div>
             </div>
           </div>
+
+          <!-- Info Modal for Mobile -->
+          <ion-modal *ngIf="isMobile && infoModalOpen" [isOpen]="infoModalOpen" (ionModalDidDismiss)="closeInfoModal()">
+            <ng-template>
+              <div class="info-modal-content">
+                <h2>{{ infoModalAction?.name }}</h2>
+                <p>{{ infoModalAction?.description }}</p>
+                <button class="close-info-btn" (click)="closeInfoModal()" tabindex="0" aria-label="Close info">Close</button>
+              </div>
+            </ng-template>
+          </ion-modal>
 
           <!-- Desktop: Keep original sections -->
           <div class="action-section" *ngIf="!isMobile && getCurrentNPCs().length > 0">
