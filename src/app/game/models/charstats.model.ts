@@ -23,6 +23,7 @@ export interface CharStats {
   maxLife: number;
   mana: number;
   maxMana: number;
+  gold: number;
 
   // Core stats
   speed: number;

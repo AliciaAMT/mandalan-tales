@@ -1,5 +1,5 @@
 <app-app-header></app-app-header>
-<ion-content class="ion-padding">
+<ion-content class="ion-padding" appFocusManager>
   <ng-container *ngIf="characters().length > 0; else noCharacters">
     <ion-grid>
       <ion-row>
@@ -76,6 +76,40 @@
     <ion-icon slot="start" name="log-out-outline"></ion-icon>
     Logout
   </ion-button>
+
+  <!-- Theme Settings Section -->
+  <ion-card color="light" class="theme-settings">
+    <ion-card-header>
+      <ion-card-title>Theme Settings</ion-card-title>
+      <ion-card-subtitle>Customize your game interface</ion-card-subtitle>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-item>
+        <ion-label>Theme Color</ion-label>
+        <ion-input
+          type="color"
+          [(ngModel)]="selectedThemeColor"
+          (ionChange)="updateThemeColor()"
+          [value]="selectedThemeColor"
+          class="color-picker">
+        </ion-input>
+      </ion-item>
+
+      <div class="preset-colors">
+        <ion-button
+          *ngFor="let preset of presetColors"
+          [style.--background]="preset.color"
+          [style.--background-hover]="preset.color"
+          [style.--background-activated]="preset.color"
+          fill="solid"
+          size="small"
+          (click)="selectPresetColor(preset.color)"
+          [class.selected]="selectedThemeColor === preset.color">
+          {{ preset.name }}
+        </ion-button>
+      </div>
+    </ion-card-content>
+  </ion-card>
 
   <app-app-footer></app-app-footer>
 </ion-content>

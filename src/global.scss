@@ -35,6 +35,7 @@
 /* @import "@ionic/angular/css/palettes/dark.always.css"; */
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
 @import '@ionic/angular/css/palettes/dark.system.css';
+
 ion-content {
   --background: #000000;
   background: #000000; // fallback for inner divs
@@ -77,4 +78,8 @@ textarea:focus,
 select:focus {
   outline: 2px solid #cccccc !important;
   outline-offset: 2px !important;
+}
+
+:root {
+  --theme-color: #6b4e26;
 }

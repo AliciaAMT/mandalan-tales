@@ -1,8 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { CanActivate, Router } from '@angular/router';
 import { AuthService } from '../services/auth.service';
-import { firstValueFrom } from 'rxjs';
-import { onAuthStateChanged, Auth } from '@angular/fire/auth';
 
 @Injectable({
   providedIn: 'root',
@@ -10,21 +8,19 @@ import { onAuthStateChanged, Auth } from '@angular/fire/auth';
 export class AuthGuard implements CanActivate {
   private authService = inject(AuthService);
   private router = inject(Router);
-  private auth = inject(Auth);
 
   async canActivate(): Promise<boolean> {
-    // Wait for the auth state to be initialized
-    return new Promise((resolve) => {
-      const unsubscribe = onAuthStateChanged(this.auth, (user) => {
-        unsubscribe(); // Unsubscribe after first auth state change
+    // Wait for auth to be initialized before checking login state
+    await this.authService.waitForAuthInit();
 
-        if (user) {
-          resolve(true);
-        } else {
-          this.router.navigate(['/login']);
-          resolve(false);
-        }
-      });
-    });
+    // Check if user is logged in using the service's computed signal
+    const isLoggedIn = this.authService.isLoggedIn();
+
+    if (isLoggedIn) {
+      return true;
+    } else {
+      this.router.navigate(['/login']);
+      return false;
+    }
   }
 }

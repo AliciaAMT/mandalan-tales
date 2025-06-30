@@ -8,7 +8,6 @@ For now I am just establishing a template and structure. This project will requi
 
 ## 1/2/2024 Roadmap
 
-```
  1. **Outside Exploration**
  2. **Outside Combat**
  3. **Outside Quests**
@@ -45,26 +44,11 @@ For now I am just establishing a template and structure. This project will requi
  34. **Outside Hunting**
  35. **Outside Trapping**
  36. **Outside Taming**
- 37. **Outside Riding**
- 38. **Outside Sailing**
- 39. **Outside Flying**
- 40. **Outside Swimming**
- 41. **Outside Climbing**
- 42. **Outside Diving**
- 43. **Outside Stealth**
- 44. **Outside Lockpicking**
- 45. **Outside Pickpocketing**
- 46. **Outside Thieving**
- 47. **Outside Trading**
- 48. **Outside Bartering**
- 49. **Outside Gambling**
- 50. **Outside Fishing**
- 51. **Outside Farming**
- 52. **Outside Woodcutting**
- 53. **Outside Foraging**
- 54. **Outside Hunting**
- 55. **Outside Trapping**
- 56. **Outside Taming**
-```
 
 Testing
+
+## 2025-06-30 – Current Status
+
+- The mobile tile actions UI is now fully optimized. All actions display in a responsive 3-column grid. Info modals and accessibility have been improved.
+- All mobile tile action UI/UX issues are resolved.
+- **Next step:** Optimize the tile actions UI for desktop. Focus on layout, accessibility, and usability.
