@@ -176,12 +176,10 @@
   grid-template-columns: repeat(3, 1fr);
   grid-template-rows: repeat(3, 1fr);
   gap: 4px;
-  /* Use max dimensions to prevent scaling too large while allowing smaller sizes */
-  max-width: min(calc(100vh - 200px), calc(100vw - 200px));
-  max-height: min(calc(100vh - 200px), calc(100vw - 200px));
-  width: 100%;
-  height: 100%;
-  aspect-ratio: 1;
+  /* Calculate square cell size based on available space */
+  --cell-size: min(calc((100vh - 200px) / 3), calc((100vw - 200px) / 3), 100px);
+  width: calc(var(--cell-size) * 3 + 8px); /* 3 cells + 2 gaps */
+  height: calc(var(--cell-size) * 3 + 8px);
   background: rgba(0,0,0,0.2);
   border-radius: 12px;
   min-height: 200px;
@@ -329,8 +327,9 @@
     padding: 8px;
   }
   .map-grid {
-    max-width: min(calc(100vh - 100px), calc(100vw - 100px));
-    max-height: min(calc(100vh - 100px), calc(100vw - 100px));
+    --cell-size: min(calc((100vh - 100px) / 3), calc((100vw - 100px) / 3), 80px);
+    width: calc(var(--cell-size) * 3 + 8px);
+    height: calc(var(--cell-size) * 3 + 8px);
     min-height: 150px;
     min-width: 150px;
   }
