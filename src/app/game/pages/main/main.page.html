@@ -229,15 +229,13 @@
           </div>
 
           <!-- Info Modal for Mobile -->
-          <ion-modal *ngIf="isMobile && infoModalOpen" [isOpen]="infoModalOpen" (ionModalDidDismiss)="closeInfoModal()">
-            <ng-template>
-              <div class="info-modal-content">
-                <h2>{{ infoModalAction?.name }}</h2>
-                <p>{{ infoModalAction?.description }}</p>
-                <button class="close-info-btn" (click)="closeInfoModal()" tabindex="0" aria-label="Close info">Close</button>
-              </div>
-            </ng-template>
-          </ion-modal>
+          <div *ngIf="isMobile && infoModalOpen" class="info-modal-overlay" (click)="closeInfoModal()">
+            <div class="info-modal-content" (click)="$event.stopPropagation()">
+              <h2>{{ infoModalAction?.name }}</h2>
+              <p>{{ infoModalAction?.description }}</p>
+              <button class="close-info-btn" (click)="closeInfoModal()" tabindex="0" aria-label="Close info">Close</button>
+            </div>
+          </div>
 
           <!-- Desktop: Keep original sections -->
           <div class="action-section" *ngIf="!isMobile && getCurrentNPCs().length > 0">
