@@ -10,7 +10,7 @@ export class AuthGuard implements CanActivate {
   private router = inject(Router);
 
   async canActivate(): Promise<boolean> {
-    // Use the auth service's computed signal directly
+    // Check if user is logged in using the service's computed signal
     const isLoggedIn = this.authService.isLoggedIn();
 
     if (isLoggedIn) {

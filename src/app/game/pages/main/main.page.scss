@@ -564,16 +564,18 @@ ion-content::part(scroll) {
 }
 
 .action-item:hover {
-  border-color: var(--theme-color, #8d6e36);
-  background: rgba(141, 110, 54, 0.1);
+  border-color: #fff;
+  background: rgba(255, 255, 255, 0.1);
   transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(255, 255, 255, 0.2);
 }
 
 .action-item:focus {
-  outline: 2px solid var(--theme-color, #8d6e36);
+  outline: 3px solid #fff;
   outline-offset: 2px;
-  border-color: var(--theme-color, #8d6e36);
-  background: rgba(141, 110, 54, 0.1);
+  border-color: #fff;
+  background: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.8), 0 0 30px rgba(255, 255, 255, 0.4);
 }
 
 .action-image {
@@ -602,12 +604,12 @@ ion-content::part(scroll) {
 }
 
 .npc-item {
-  border-color: rgba(255, 215, 0, 0.3);
+  /* Remove default gold border - use same styling as other items */
 }
 
 .npc-item:hover {
-  border-color: #ffd700;
-  background: rgba(255, 215, 0, 0.1);
+  border-color: #fff;
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .object-item {
@@ -615,17 +617,17 @@ ion-content::part(scroll) {
 }
 
 .object-item:hover {
-  border-color: var(--theme-color, #8d6e36);
-  background: rgba(141, 110, 54, 0.1);
+  border-color: #fff;
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .portal-item {
-  border-color: rgba(255, 100, 100, 0.3);
+  /* Remove default red border - use same styling as other items */
 }
 
 .portal-item:hover {
-  border-color: #ff6464;
-  background: rgba(255, 100, 100, 0.1);
+  border-color: #fff;
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .no-actions {

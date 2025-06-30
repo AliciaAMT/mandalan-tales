@@ -22,7 +22,10 @@ export class AuthService {
 
   // Use signals instead of RxJS observables
   private userSignal = signal<User | null>(null);
+  private authInitializedSignal = signal(false);
+
   user = this.userSignal.asReadonly();
+  authInitialized = this.authInitializedSignal.asReadonly();
   isLoggedIn = computed(() => !!this.user());
 
   constructor() {
@@ -31,6 +34,7 @@ export class AuthService {
       onAuthStateChanged(this.auth, user => {
         this.ngZone.run(() => {
           this.userSignal.set(user);
+          this.authInitializedSignal.set(true);
         });
       });
     });
@@ -67,5 +71,34 @@ export class AuthService {
   // Helper method to get current user synchronously
   getCurrentUser(): User | null {
     return this.user();
+  }
+
+  // Helper method to check if auth is initialized
+  isAuthInitialized(): boolean {
+    return this.authInitialized();
+  }
+
+  // Wait for auth to be initialized
+  async waitForAuthInit(): Promise<void> {
+    // If already initialized, return immediately
+    if (this.authInitializedSignal()) {
+      return;
+    }
+
+    // Poll for initialization using the existing signal
+    return new Promise((resolve) => {
+      const checkInterval = setInterval(() => {
+        if (this.authInitializedSignal()) {
+          clearInterval(checkInterval);
+          resolve();
+        }
+      }, 10); // Check every 10ms
+
+      // Timeout after 5 seconds to prevent infinite waiting
+      setTimeout(() => {
+        clearInterval(checkInterval);
+        resolve();
+      }, 5000);
+    });
   }
 }
