@@ -335,6 +335,51 @@ ion-content::part(scroll) {
 }
 
 @media (min-width: 601px) {
+  .main-section.tile-actions {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+  }
+  .section-content {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    padding: 0 0 16px 0;
+    justify-content: flex-start;
+    align-items: center;
+  }
+  .tile-actions-container {
+    height: 100%;
+    max-height: none;
+    overflow-y: auto;
+    width: 100%;
+    max-width: 400px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1 1 auto;
+  }
+  .action-section {
+    height: auto;
+    max-height: none;
+    overflow: visible;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1 1 auto;
+  }
+  .action-grid {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+    width: 100%;
+    max-width: 400px;
+    margin-bottom: 16px;
+    max-height: none;
+    overflow: visible;
+  }
   .action-item {
     padding: 10px;
     min-height: 90px;
@@ -370,32 +415,6 @@ ion-content::part(scroll) {
   }
   .action-item {
     position: relative;
-  }
-  .action-grid {
-    display: grid !important;
-    grid-template-columns: 1fr !important;
-    gap: 12px !important;
-    width: 100%;
-    max-width: 400px;
-    margin-bottom: 16px;
-    max-height: none;
-    overflow: visible;
-  }
-  .action-section {
-    max-height: none;
-    overflow: visible;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-  .tile-actions-container {
-    max-height: 400px;
-    overflow-y: auto;
-    width: 100%;
-    max-width: 400px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
   }
 }
 
