@@ -1,15 +1,15 @@
-import { Injectable, inject, signal, computed, effect } from '@angular/core';
+import { Injectable, inject, signal, computed, effect, NgZone } from '@angular/core';
 import {
   Auth,
   User,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signOut,
-  sendPasswordResetEmail
+  sendPasswordResetEmail,
+  onAuthStateChanged
 } from '@angular/fire/auth';
 import { Firestore, doc, setDoc, serverTimestamp } from '@angular/fire/firestore';
 import { Router } from '@angular/router';
-import { onAuthStateChanged } from 'firebase/auth';
 
 @Injectable({
   providedIn: 'root',
@@ -18,6 +18,7 @@ export class AuthService {
   private auth: Auth = inject(Auth);
   private firestore: Firestore = inject(Firestore);
   private router: Router = inject(Router);
+  private ngZone: NgZone = inject(NgZone);
 
   // Use signals instead of RxJS observables
   private userSignal = signal<User | null>(null);
@@ -25,9 +26,13 @@ export class AuthService {
   isLoggedIn = computed(() => !!this.user());
 
   constructor() {
-    // Set up auth state listener using signals
-    onAuthStateChanged(this.auth, user => {
-      this.userSignal.set(user);
+    // Set up auth state listener using signals within injection context
+    this.ngZone.runOutsideAngular(() => {
+      onAuthStateChanged(this.auth, user => {
+        this.ngZone.run(() => {
+          this.userSignal.set(user);
+        });
+      });
     });
   }
 

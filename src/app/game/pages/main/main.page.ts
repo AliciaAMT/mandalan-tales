@@ -70,11 +70,15 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngAfterViewInit() {
-    this.resizeMapGrid();
+    // Use setTimeout to ensure DOM is fully rendered
+    setTimeout(() => {
+      this.resizeMapGrid();
+    }, 0);
+
     window.addEventListener('resize', this.onResize);
 
-    // Set up ResizeObserver on the map's parent
-    if (this.mapGridRef && this.mapGridRef.nativeElement.parentElement) {
+    // Set up ResizeObserver on the map's parent with proper null checks
+    if (this.mapGridRef?.nativeElement?.parentElement) {
       this.mapParentResizeObserver = new ResizeObserver(() => {
         this.resizeMapGrid();
       });
@@ -97,13 +101,21 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
   };
 
   resizeMapGrid() {
-    if (!this.mapGridRef) return;
+    if (!this.mapGridRef?.nativeElement) return;
+
     const parent = this.mapGridRef.nativeElement.parentElement;
     if (!parent) return;
-    const { width, height } = parent.getBoundingClientRect();
-    const size = Math.floor(Math.min(width, height));
-    this.mapGridRef.nativeElement.style.width = size + 'px';
-    this.mapGridRef.nativeElement.style.height = size + 'px';
+
+    try {
+      const { width, height } = parent.getBoundingClientRect();
+      if (width > 0 && height > 0) {
+        const size = Math.floor(Math.min(width, height));
+        this.mapGridRef.nativeElement.style.width = size + 'px';
+        this.mapGridRef.nativeElement.style.height = size + 'px';
+      }
+    } catch (error) {
+      console.warn('Error resizing map grid:', error);
+    }
   }
 
   generateMap() {
