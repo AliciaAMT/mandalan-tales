@@ -8,7 +8,6 @@ For now I am just establishing a template and structure. This project will requi
 
 ## 1/2/2024 Roadmap
 
-```
  1. **Outside Exploration**
  2. **Outside Combat**
  3. **Outside Quests**
@@ -45,12 +44,11 @@ For now I am just establishing a template and structure. This project will requi
  34. **Outside Hunting**
  35. **Outside Trapping**
  36. **Outside Taming**
-```
 
 Testing
 
 ## 2025-06-30 – Current Status
 
-- Mobile tile actions UI is now fully optimized: all actions display in a single, responsive, accessible 3-column grid, with info modals and improved accessibility.
-- All mobile tile action UI/UX issues are considered resolved.
-- **Next step:** Optimize the tile actions UI for desktop (layout, accessibility, and usability).
+- The mobile tile actions UI is now fully optimized. All actions display in a responsive 3-column grid. Info modals and accessibility have been improved.
+- All mobile tile action UI/UX issues are resolved.
+- **Next step:** Optimize the tile actions UI for desktop. Focus on layout, accessibility, and usability.
