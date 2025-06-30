@@ -151,6 +151,9 @@
     overflow: hidden;
     text-overflow: ellipsis;
   }
+  .main-section.tile-actions {
+    border-top-right-radius: 8px;
+  }
 }
 
 .gold-amount {
@@ -177,7 +180,7 @@
   grid-template-rows: repeat(3, 1fr);
   gap: 4px;
   /* Calculate square cell size based on available space */
-  --cell-size: min(calc((100vh - 200px) / 3), calc((100vw - 200px) / 3), 100px);
+  --cell-size: min(calc((100% - 8px) / 3), calc((100vh - 200px) / 3), 100px);
   width: calc(var(--cell-size) * 3 + 8px); /* 3 cells + 2 gaps */
   height: calc(var(--cell-size) * 3 + 8px);
   background: rgba(0,0,0,0.2);
@@ -327,7 +330,7 @@
     padding: 8px;
   }
   .map-grid {
-    --cell-size: min(calc((100vh - 100px) / 3), calc((100vw - 100px) / 3), 80px);
+    --cell-size: min(calc((100vw - 32px - 8px) / 3), calc((100vh - 100px) / 3), 80px);
     width: calc(var(--cell-size) * 3 + 8px);
     height: calc(var(--cell-size) * 3 + 8px);
     min-height: 150px;
