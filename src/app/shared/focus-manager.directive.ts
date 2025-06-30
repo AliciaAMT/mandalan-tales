@@ -60,8 +60,8 @@ export class FocusManagerDirective implements OnInit, OnDestroy {
   private handleElementHidden(element: HTMLElement) {
     // Check if the hidden element contains the currently focused element
     if (this.focusedElement && element.contains(this.focusedElement)) {
-      // Move focus to a safe element outside the hidden area
-      this.moveFocusToSafeElement();
+      // Move focus to the router outlet or body
+      this.moveFocusToRouterOutletOrBody();
     }
 
     // Use the inert attribute instead of aria-hidden for better accessibility
@@ -87,12 +87,15 @@ export class FocusManagerDirective implements OnInit, OnDestroy {
     this.restoreTabOrder(element);
   }
 
-  private moveFocusToSafeElement() {
-    // Find a safe element to focus (like the body or a skip link)
-    const safeElement = document.querySelector('[data-skip-link], body') as HTMLElement;
-    if (safeElement && safeElement !== this.focusedElement) {
-      safeElement.focus();
+  private moveFocusToRouterOutletOrBody() {
+    // Try to focus the router outlet itself
+    const routerOutlet = document.getElementById('main-content');
+    if (routerOutlet && routerOutlet !== this.focusedElement) {
+      (routerOutlet as HTMLElement).focus();
+      return;
     }
+    // Fallback: focus the body
+    (document.body as HTMLElement).focus();
   }
 
   private removeFromTabOrder(element: HTMLElement) {

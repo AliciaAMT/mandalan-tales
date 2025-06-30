@@ -36,27 +36,6 @@
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
 @import '@ionic/angular/css/palettes/dark.system.css';
 
-/* Skip link for accessibility */
-.skip-link {
-  position: absolute;
-  top: -40px;
-  left: 6px;
-  background: #000000;
-  color: #ffffff;
-  padding: 8px;
-  text-decoration: none;
-  border: 2px solid #cccccc;
-  border-radius: 4px;
-  z-index: 10000;
-  transition: top 0.3s;
-}
-
-.skip-link:focus {
-  top: 6px;
-  outline: 2px solid #cccccc;
-  outline-offset: 2px;
-}
-
 ion-content {
   --background: #000000;
   background: #000000; // fallback for inner divs
