@@ -204,10 +204,17 @@
   cursor: default;
   transition: all 0.2s ease;
   background: rgba(0, 0, 0, 0.1);
+  outline: none; /* Remove default outline */
 }
 
 .map-tile:hover {
   transform: scale(1.05);
+  z-index: 10;
+}
+
+.map-tile:focus {
+  outline: 2px solid var(--theme-color, #8d6e36);
+  outline-offset: 2px;
   z-index: 10;
 }
 
@@ -228,6 +235,13 @@
 .clickable-tile:hover {
   border-color: color-mix(in srgb, var(--theme-color, #8d6e36) 80%, white);
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+.clickable-tile:focus {
+  border-color: color-mix(in srgb, var(--theme-color, #8d6e36) 80%, white);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  outline: 2px solid color-mix(in srgb, var(--theme-color, #8d6e36) 80%, white);
+  outline-offset: 2px;
 }
 
 .player-tile {
@@ -318,5 +332,12 @@
   }
   .map-container {
     min-height: 250px;
+  }
+}
+
+.debug-info {
+  /* Hide from screen readers */
+  &[aria-hidden="true"] {
+    display: none;
   }
 }

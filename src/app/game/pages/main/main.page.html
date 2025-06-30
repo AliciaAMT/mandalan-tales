@@ -62,7 +62,11 @@
               [class.clickable-tile]="tile.isClickable"
               [class.invalid-tile]="tile.imageSrc.includes('yard00.webp') && !tile.isPlayer"
               (click)="onTileClick(tile)"
+              (keydown.enter)="onTileClick(tile)"
+              (keydown.space)="onTileClick(tile)"
               [attr.aria-label]="getTileAriaLabel(tile)"
+              [tabindex]="tile.isClickable ? 0 : -1"
+              role="button"
             >
               <img
                 [src]="tile.imageSrc"
@@ -77,16 +81,25 @@
           </div>
         </div>
 
-        <!-- Debug section -->
-        <div class="debug-info" style="margin-top: 20px; padding: 10px; background: rgba(0,0,0,0.1); border-radius: 8px;">
+        <!-- Debug section - hidden from screen readers and keyboard navigation -->
+        <div class="debug-info"
+             style="margin-top: 20px; padding: 10px; background: rgba(0,0,0,0.1); border-radius: 8px;"
+             tabindex="-1"
+             aria-hidden="true">
           <h4>Debug Info:</h4>
           <p>Map Tiles Count: {{ mapTiles.length }}</p>
           <p *ngIf="mapTiles.length > 0">First Row Tiles: {{ mapTiles[0].length }}</p>
 
-          <!-- Test buttons -->
+          <!-- Test buttons - not keyboard accessible -->
           <div style="margin: 10px 0;">
-            <button (click)="generateTestMap()" style="margin-right: 10px; padding: 5px 10px;">Generate Test Map</button>
-            <button (click)="generateMap()" style="padding: 5px 10px;">Generate Real Map</button>
+            <button (click)="generateTestMap()"
+                    style="margin-right: 10px; padding: 5px 10px;"
+                    tabindex="-1"
+                    aria-hidden="true">Generate Test Map</button>
+            <button (click)="generateMap()"
+                    style="padding: 5px 10px;"
+                    tabindex="-1"
+                    aria-hidden="true">Generate Real Map</button>
           </div>
 
           <div *ngFor="let row of mapTiles; let rowIndex = index">
