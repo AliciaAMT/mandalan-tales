@@ -1,12 +1,12 @@
 // src/app/shared/standalone-imports.ts
-import { IonicModule } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
+import { IonicModule } from '@ionic/angular';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 
 export const STANDALONE_IMPORTS = [
-  IonicModule,
   CommonModule,
+  IonicModule,
   FormsModule,
   RouterModule
 ];

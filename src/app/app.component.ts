@@ -4,11 +4,12 @@ import { AppMenuComponent } from './shared/menu/app-menu/app-menu.component';
 import { Router, NavigationEnd } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { filter } from 'rxjs';
+import { FocusManagerDirective } from './shared/focus-manager.directive';
 
 @Component({
   selector: 'app-root',
   templateUrl: 'app.component.html',
-  imports: [IonApp, IonRouterOutlet, AppMenuComponent],
+  imports: [IonApp, IonRouterOutlet, AppMenuComponent, FocusManagerDirective],
 })
 export class AppComponent implements OnDestroy {
   private router: Router = inject(Router);

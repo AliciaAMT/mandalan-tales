@@ -13,6 +13,7 @@ import { CharacterDetailsModalComponent } from './character-details-modal/charac
 import { SettingsService } from '../game/services/settings.service';
 import { DEFAULT_THEME_COLOR } from '../game/models/settings.model';
 import { FormsModule } from '@angular/forms';
+import { FocusManagerDirective } from '../shared/focus-manager.directive';
 // import { AngularFirestoreModule } from '@angular/fire/compat/firestore';
 
 @Component({
@@ -20,7 +21,7 @@ import { FormsModule } from '@angular/forms';
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss'],
   standalone: true,
-  imports: [AppHeaderComponent, AppFooterComponent, STANDALONE_IMPORTS, CommonModule, RouterModule, FormsModule],
+  imports: [AppHeaderComponent, AppFooterComponent, STANDALONE_IMPORTS, CommonModule, RouterModule, FormsModule, FocusManagerDirective],
 })
 export class DashboardComponent implements OnInit {
   private characterService: CharacterService = inject(CharacterService);

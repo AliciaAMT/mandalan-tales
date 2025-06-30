@@ -1,5 +1,5 @@
 <app-app-header></app-app-header>
-<ion-content class="ion-padding">
+<ion-content class="ion-padding" appFocusManager>
   <ng-container *ngIf="characters().length > 0; else noCharacters">
     <ion-grid>
       <ion-row>
