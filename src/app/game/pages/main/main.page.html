@@ -50,7 +50,7 @@
     <button class="collapsible-header" (click)="toggleMap()">Map</button>
     <div class="section-content" *ngIf="isMapOpen">
       <div class="map-container" *ngIf="currentCharacter; else noMap">
-        <div class="map-grid">
+        <div class="map-grid" #mapGrid>
           <div
             *ngFor="let row of mapTiles; let rowIndex = index"
             class="map-row"

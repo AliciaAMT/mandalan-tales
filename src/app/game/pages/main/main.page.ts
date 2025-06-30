@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, effect } from '@angular/core';
+import { Component, OnInit, inject, effect, ViewChild, ElementRef, AfterViewInit, OnDestroy, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CharacterService } from '../../../game/services/character.service';
@@ -25,7 +25,7 @@ interface MapTile {
   standalone: true,
   imports: [CommonModule, FormsModule]
 })
-export class MainPage implements OnInit {
+export class MainPage implements OnInit, AfterViewInit, OnDestroy {
   isPlayerStatsOpen = true;
   isMapOpen = true;
   isTileActionsOpen = true;
@@ -37,12 +37,9 @@ export class MainPage implements OnInit {
 
   mapTiles: MapTile[][] = [];
 
-  get currentCharacter(): CharStats | undefined {
-    const chars = this.characterService.getCharacters();
-    return chars.length > 0 ? chars[0] : undefined;
-  }
+  @ViewChild('mapGrid') mapGridRef!: ElementRef<HTMLDivElement>;
 
-  constructor() {
+  constructor(private ngZone: NgZone) {
     // Watch for character changes and regenerate map
     effect(() => {
       const chars = this.characterService.getCharacters();
@@ -67,6 +64,31 @@ export class MainPage implements OnInit {
 
     // Generate initial map
     this.generateMap();
+  }
+
+  ngAfterViewInit() {
+    this.resizeMapGrid();
+    window.addEventListener('resize', this.onResize);
+  }
+
+  ngOnDestroy() {
+    window.removeEventListener('resize', this.onResize);
+  }
+
+  onResize = () => {
+    this.ngZone.runOutsideAngular(() => {
+      this.resizeMapGrid();
+    });
+  };
+
+  resizeMapGrid() {
+    if (!this.mapGridRef) return;
+    const parent = this.mapGridRef.nativeElement.parentElement;
+    if (!parent) return;
+    const { width, height } = parent.getBoundingClientRect();
+    const size = Math.floor(Math.min(width, height));
+    this.mapGridRef.nativeElement.style.width = size + 'px';
+    this.mapGridRef.nativeElement.style.height = size + 'px';
   }
 
   generateMap() {
@@ -312,10 +334,26 @@ export class MainPage implements OnInit {
     }));
   }
 
-  togglePlayerStats() { this.isPlayerStatsOpen = !this.isPlayerStatsOpen; this.saveState(); }
-  toggleMap() { this.isMapOpen = !this.isMapOpen; this.saveState(); }
-  toggleTileActions() { this.isTileActionsOpen = !this.isTileActionsOpen; this.saveState(); }
-  toggleMenu() { this.isMenuOpen = !this.isMenuOpen; this.saveState(); }
+  togglePlayerStats() {
+    this.isPlayerStatsOpen = !this.isPlayerStatsOpen;
+    this.saveState();
+    setTimeout(() => this.resizeMapGrid(), 0);
+  }
+  toggleMap() {
+    this.isMapOpen = !this.isMapOpen;
+    this.saveState();
+    setTimeout(() => this.resizeMapGrid(), 0);
+  }
+  toggleTileActions() {
+    this.isTileActionsOpen = !this.isTileActionsOpen;
+    this.saveState();
+    setTimeout(() => this.resizeMapGrid(), 0);
+  }
+  toggleMenu() {
+    this.isMenuOpen = !this.isMenuOpen;
+    this.saveState();
+    setTimeout(() => this.resizeMapGrid(), 0);
+  }
 
   get isMobile() {
     return window.innerWidth <= 900;
@@ -363,5 +401,10 @@ export class MainPage implements OnInit {
   get menuArea() {
     // Always set menu area to 'menu' so it spans all columns
     return 'menu';
+  }
+
+  get currentCharacter(): CharStats | undefined {
+    const chars = this.characterService.getCharacters();
+    return chars.length > 0 ? chars[0] : undefined;
   }
 }
