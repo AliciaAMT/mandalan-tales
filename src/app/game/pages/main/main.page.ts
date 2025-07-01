@@ -8,6 +8,7 @@ import { AuthService } from '../../../services/auth.service';
 import { DEFAULT_THEME_COLOR } from '../../../game/models/settings.model';
 import { IonicModule } from '@ionic/angular';
 import { FocusManagerDirective } from '../../../shared/focus-manager.directive';
+import { BottomIconRowComponent } from './bottom-icon-row.component';
 
 const STORAGE_KEY = 'mainPageSectionState';
 
@@ -47,7 +48,7 @@ interface Portal {
   templateUrl: './main.page.html',
   styleUrls: ['./main.page.scss'],
   standalone: true,
-  imports: [CommonModule, FormsModule, IonicModule, FocusManagerDirective]
+  imports: [CommonModule, FormsModule, IonicModule, FocusManagerDirective, BottomIconRowComponent]
 })
 export class MainPage implements OnInit, AfterViewInit, OnDestroy {
   isPlayerStatsOpen = true;

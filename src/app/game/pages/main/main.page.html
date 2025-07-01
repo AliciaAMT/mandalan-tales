@@ -355,7 +355,7 @@
     <div class="main-section menu" [ngClass]="{'collapsed': !isMenuOpen}" [style.grid-area]="menuArea">
       <button class="collapsible-header" (click)="toggleMenu()">Menu</button>
       <div class="section-content" *ngIf="isMenuOpen">
-        <span>Menu Placeholder</span>
+        <app-bottom-icon-row />
       </div>
     </div>
   </div>
