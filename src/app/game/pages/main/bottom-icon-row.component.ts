@@ -19,6 +19,7 @@ import { CommonModule } from '@angular/common';
 })
 export class BottomIconRowComponent {
   menuItems = [
+    { label: 'Dashboard', icon: 'assets/items/settings.png', action: 'dashboard' },
     { label: 'Statistics', icon: 'assets/items/stats.webp', action: 'stats' },
     { label: 'Inventory', icon: 'assets/items/inventory.webp', action: 'inventory' },
     { label: 'Spellbook', icon: 'assets/items/spellbook.webp', action: 'spellbook' },
