@@ -1,10 +1,11 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router, RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-bottom-icon-row',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterModule],
   template: `
     <div class="bottom-icon-row">
       <div class="icon-item" *ngFor="let item of menuItems">
@@ -18,6 +19,8 @@ import { CommonModule } from '@angular/common';
   styleUrls: ['./bottom-icon-row.component.scss']
 })
 export class BottomIconRowComponent {
+  constructor(private router: Router) {}
+
   menuItems = [
     { label: 'Dashboard', icon: 'assets/items/settings.png', action: 'dashboard' },
     { label: 'Statistics', icon: 'assets/items/stats.webp', action: 'stats' },
@@ -29,7 +32,11 @@ export class BottomIconRowComponent {
   ];
 
   onMenuClick(item: any) {
-    // Placeholder for future logic
-    alert(`Clicked: ${item.label}`);
+    if (item.action === 'dashboard') {
+      this.router.navigate(['/dashboard']);
+    } else {
+      // Placeholder for future logic
+      alert(`Clicked: ${item.label}`);
+    }
   }
 }
