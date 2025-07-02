@@ -1,4 +1,4 @@
-import { Injectable, inject, signal, computed, effect, NgZone } from '@angular/core';
+import { Injectable, inject, signal, computed, effect, NgZone, runInInjectionContext, Injector } from '@angular/core';
 import {
   Auth,
   User,
@@ -19,6 +19,7 @@ export class AuthService {
   private firestore: Firestore = inject(Firestore);
   private router: Router = inject(Router);
   private ngZone: NgZone = inject(NgZone);
+  private injector = inject(Injector);
 
   // Use signals instead of RxJS observables
   private userSignal = signal<User | null>(null);
@@ -43,17 +44,21 @@ export class AuthService {
 
   async register(email: string, password: string) {
     const cred = await createUserWithEmailAndPassword(this.auth, email, password);
-    const userRef = doc(this.firestore, `users/${cred.user.uid}`);
 
-    await setDoc(userRef, {
-      uid: cred.user.uid,
-      email: cred.user.email,
-      displayName: cred.user.displayName || null,
-      createdAt: serverTimestamp(),
-      role: 'player',
+    return runInInjectionContext(this.injector, async () => {
+      const firestore = inject(Firestore);
+      const userRef = doc(firestore, `users/${cred.user.uid}`);
+
+      await setDoc(userRef, {
+        uid: cred.user.uid,
+        email: cred.user.email,
+        displayName: cred.user.displayName || null,
+        createdAt: serverTimestamp(),
+        role: 'player',
+      });
+
+      return cred;
     });
-
-    return cred;
   }
 
   async login(email: string, password: string) {

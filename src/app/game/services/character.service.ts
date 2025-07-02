@@ -1,5 +1,5 @@
 import { Injectable, inject, signal, computed, Signal, effect, runInInjectionContext, Injector } from '@angular/core';
-import { Firestore, collection, collectionData, query, where, addDoc, doc, updateDoc, deleteDoc, writeBatch } from '@angular/fire/firestore';
+import { Firestore, collection, collectionData, query, where, addDoc, doc, updateDoc, deleteDoc, writeBatch, getDocs } from '@angular/fire/firestore';
 import { CharStats } from '../models/charstats.model';
 import { Inventory, DEFAULT_INVENTORY } from '../models/inventory.model';
 import { Skills, DEFAULT_SKILLS } from '../models/skills.model';
@@ -49,7 +49,7 @@ export class CharacterService {
     });
   }
 
-  // Computed values for filtered characters
+    // Computed values for filtered characters
   getCharacters(): CharStats[] {
     return this.characters();
   }
@@ -59,15 +59,23 @@ export class CharacterService {
     return this.characters().find((char: CharStats) => char.id === id);
   }
 
+  // Helper method to get current character (first character for now)
+  getCurrentCharacter(): CharStats | undefined {
+    const characters = this.characters();
+    return characters.length > 0 ? characters[0] : undefined;
+  }
+
   // Method to check if character name already exists
   async isCharacterNameTaken(characterName: string): Promise<boolean> {
-    const currentUser = this.authService.getCurrentUser();
-    if (!currentUser) {
-      throw new Error('User not authenticated');
-    }
+    return runInInjectionContext(this.injector, async () => {
+      const currentUser = this.authService.getCurrentUser();
+      if (!currentUser) {
+        throw new Error('User not authenticated');
+      }
 
-    const characters = this.characters();
-    return characters.some(char => char.name.toLowerCase() === characterName.toLowerCase());
+      const characters = this.characters();
+      return characters.some(char => char.name.toLowerCase() === characterName.toLowerCase());
+    });
   }
 
   // Method to create a new character with all associated data
@@ -223,5 +231,52 @@ export class CharacterService {
   refreshCharacters(): void {
     // The signal will automatically update when the underlying observable changes
     // This method can be used to trigger a manual refresh if needed
+  }
+
+  // Method to get character flags
+  async getCharacterFlags(characterName: string): Promise<Flags | null> {
+    return runInInjectionContext(this.injector, async () => {
+      const firestore = inject(Firestore);
+      const flagsQuery = query(
+        collection(firestore, 'flags'),
+        where('charname', '==', characterName)
+      );
+      const flagsSnapshot = await getDocs(flagsQuery);
+
+      if (flagsSnapshot.empty) {
+        return null;
+      }
+
+      return flagsSnapshot.docs[0].data() as Flags;
+    });
+  }
+
+  // Method to update character flags
+  async updateCharacterFlags(characterName: string, updates: Partial<Flags>): Promise<void> {
+    return runInInjectionContext(this.injector, async () => {
+      const firestore = inject(Firestore);
+      const flagsQuery = query(
+        collection(firestore, 'flags'),
+        where('charname', '==', characterName)
+      );
+      const flagsSnapshot = await getDocs(flagsQuery);
+
+      if (flagsSnapshot.empty) {
+        throw new Error(`Flags not found for character: ${characterName}`);
+      }
+
+      const flagsDoc = flagsSnapshot.docs[0];
+      await updateDoc(doc(firestore, 'flags', flagsDoc.id), {
+        ...updates,
+        updatedAt: Date.now()
+      });
+    });
+  }
+
+  // Method to set a specific flag
+  async setCharacterFlag(characterName: string, flagKey: keyof Flags, value: any): Promise<void> {
+    const update: Partial<Flags> = {};
+    update[flagKey] = value;
+    await this.updateCharacterFlags(characterName, update);
   }
 }

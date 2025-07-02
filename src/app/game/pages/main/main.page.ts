@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, effect, ViewChild, ElementRef, AfterViewInit, OnDestroy, NgZone, ChangeDetectorRef, HostListener } from '@angular/core';
+import { Component, OnInit, inject, effect, ViewChild, ElementRef, AfterViewInit, OnDestroy, NgZone, ChangeDetectorRef, HostListener, Injector, runInInjectionContext } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CharacterService } from '../../../game/services/character.service';
@@ -9,6 +9,8 @@ import { DEFAULT_THEME_COLOR } from '../../../game/models/settings.model';
 import { IonicModule } from '@ionic/angular';
 import { FocusManagerDirective } from '../../../shared/focus-manager.directive';
 import { BottomIconRowComponent } from './bottom-icon-row.component';
+import { DialogueModalComponent } from '../../components/dialogue-modal/dialogue-modal.component';
+import { DialogueService } from '../../services/dialogue.service';
 
 const STORAGE_KEY = 'mainPageSectionState';
 
@@ -48,7 +50,7 @@ interface Portal {
   templateUrl: './main.page.html',
   styleUrls: ['./main.page.scss'],
   standalone: true,
-  imports: [CommonModule, FormsModule, IonicModule, FocusManagerDirective, BottomIconRowComponent]
+  imports: [CommonModule, FormsModule, IonicModule, FocusManagerDirective, BottomIconRowComponent, DialogueModalComponent]
 })
 export class MainPage implements OnInit, AfterViewInit, OnDestroy {
   isPlayerStatsOpen = true;
@@ -59,6 +61,8 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
   characterService = inject(CharacterService);
   settingsService = inject(SettingsService);
   authService = inject(AuthService);
+  dialogueService = inject(DialogueService);
+  private injector = inject(Injector);
 
   mapTiles: MapTile[][] = [];
   isInitialized = false;
@@ -552,7 +556,9 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
 
   // Tile Actions Methods
   getCurrentNPCs(): NPC[] {
-    if (!this.currentCharacter) return [];
+    if (!this.currentCharacter) {
+      return [];
+    }
 
     const { map, xaxis, yaxis } = this.currentCharacter;
     const npcs: NPC[] = [];
@@ -564,6 +570,16 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
         portrait: 'father',
         description: 'Your father, a wise and caring man.',
         action: 'talk'
+      });
+    }
+
+    // Old Shep in yard (3,3) - based on old demo
+    if (map === 'yard' && xaxis === 3 && yaxis === 3) {
+      npcs.push({
+        name: 'Old Shep',
+        portrait: 'default', // Will use fallback image
+        description: 'The family dog, looking hungry.',
+        action: 'feed'
       });
     }
 
@@ -822,6 +838,8 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
     const { map, xaxis, yaxis } = this.currentCharacter;
     const portals: Portal[] = [];
 
+
+
     // Homeup portals
     if (map === 'homeup' && xaxis === 1 && yaxis === 1) {
       portals.push({
@@ -898,11 +916,43 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
     return portals;
   }
 
-  // Interaction methods
-  interactWithNPC(npc: NPC) {
+    // Interaction methods
+  async interactWithNPC(npc: NPC) {
     console.log(`Interacting with ${npc.name}: ${npc.action}`);
-    // TODO: Implement NPC interaction logic
-    alert(`You interact with ${npc.name}. This feature is coming soon!`);
+
+    return runInInjectionContext(this.injector, async () => {
+      // Map NPC names to dialogue IDs
+      const npcDialogueMap: Record<string, string> = {
+        'Father': 'father',
+        'Marah': 'marah'
+      };
+
+      const dialogueId = npcDialogueMap[npc.name];
+      if (dialogueId) {
+        console.log('Starting dialogue for', npc.name);
+        await this.dialogueService.startDialogue(dialogueId);
+      } else {
+        // Fallback for NPCs without dialogue
+        alert(`You interact with ${npc.name}. This feature is coming soon!`);
+      }
+    });
+  }
+
+  // Debug method to check NPC visibility
+  debugNPCs() {
+    const npcs = this.getCurrentNPCs();
+    const isMobile = this.isMobile;
+    console.log('Debug NPCs:', {
+      npcs,
+      isMobile,
+      shouldShow: !isMobile && npcs.length > 0,
+      character: this.currentCharacter ? {
+        name: this.currentCharacter.name,
+        map: this.currentCharacter.map,
+        xaxis: this.currentCharacter.xaxis,
+        yaxis: this.currentCharacter.yaxis
+      } : null
+    });
   }
 
   interactWithObject(object: GameObject) {
@@ -959,6 +1009,7 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
   }
 
   openInfoModal(action: any) {
+    console.log('Opening info modal for:', action);
     this.infoModalAction = action;
     this.infoModalOpen = true;
     setTimeout(() => {

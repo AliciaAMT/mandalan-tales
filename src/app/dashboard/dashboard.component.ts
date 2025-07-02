@@ -8,7 +8,7 @@ import { CommonModule } from '@angular/common';
 import { User } from '@angular/fire/auth';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../services/auth.service';
-import { ModalController } from '@ionic/angular/standalone';
+import { ModalController, AlertController } from '@ionic/angular/standalone';
 import { CharacterDetailsModalComponent } from './character-details-modal/character-details-modal.component';
 import { SettingsService } from '../game/services/settings.service';
 import { DEFAULT_THEME_COLOR } from '../game/models/settings.model';
@@ -29,6 +29,7 @@ export class DashboardComponent implements OnInit {
   private router: Router = inject(Router);
   private modalCtrl: ModalController = inject(ModalController);
   private settingsService: SettingsService = inject(SettingsService);
+  private alertCtrl: AlertController = inject(AlertController);
 
   // Expose the character service signal directly
   characters = this.characterService.characters;
@@ -122,16 +123,21 @@ export class DashboardComponent implements OnInit {
     await modal.present();
 
     const { data } = await modal.onWillDismiss();
+    console.log('Modal dismissed with data:', data);
     if (data && data.deleted) {
       // If character was deleted, clear selection if it was the selected character
       if (this.selectedCharacterId === character.id) {
         this.selectedCharacterId = null;
       }
-
-      // Log warning if deletion was incomplete
-      if (data.warning) {
-        console.warn('Character deletion completed with warnings - some associated data may still exist');
-      }
+      // Show success alert at dashboard level
+      const successAlert = await this.alertCtrl.create({
+        header: 'Character Deleted',
+        message: `"${character.name}" and all associated data have been permanently removed.`,
+        buttons: ['OK'],
+        keyboardClose: true
+      });
+      await successAlert.present();
+      await successAlert.onDidDismiss();
     }
   }
 
