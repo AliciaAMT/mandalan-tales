@@ -106,45 +106,37 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngAfterViewInit() {
-    // Use a longer delay to ensure DOM is fully rendered and Ionic components are initialized
-    setTimeout(() => {
-      this.ngZone.runOutsideAngular(() => {
-        this.resizeMapGrid();
-      });
-    }, 100);
-
-    // Add a second attempt with longer delay for Ionic Content
-    setTimeout(() => {
-      this.ngZone.runOutsideAngular(() => {
-        this.resizeMapGrid();
-      });
-    }, 500);
+    // Single attempt with proper null checking
+    this.initializeMapGrid();
 
     window.addEventListener('resize', this.onResize);
+  }
+
+  private initializeMapGrid() {
+    // Check if element exists before proceeding
+    if (!this.mapGridRef?.nativeElement) {
+      // If element doesn't exist yet, try again after a short delay
+    setTimeout(() => {
+        this.initializeMapGrid();
+    }, 100);
+      return;
+    }
+
+    // Element exists, proceed with initialization
+      this.ngZone.runOutsideAngular(() => {
+        this.resizeMapGrid();
+      });
 
     // Set up ResizeObserver on the map's parent with proper null checks
-    setTimeout(() => {
-      if (this.mapGridRef?.nativeElement?.parentElement) {
+    const parentElement = this.mapGridRef.nativeElement.parentElement;
+    if (parentElement) {
         this.mapParentResizeObserver = new ResizeObserver(() => {
           this.ngZone.runOutsideAngular(() => {
             this.resizeMapGrid();
           });
         });
-        this.mapParentResizeObserver.observe(this.mapGridRef.nativeElement.parentElement);
+      this.mapParentResizeObserver.observe(parentElement);
       }
-    }, 200);
-
-    // Additional attempt to handle Ionic Content initialization
-    setTimeout(() => {
-      this.ngZone.run(() => {
-        this.cdr.detectChanges();
-        setTimeout(() => {
-          this.ngZone.runOutsideAngular(() => {
-            this.resizeMapGrid();
-          });
-        }, 100);
-      });
-    }, 1000);
   }
 
   ngOnDestroy() {
@@ -164,21 +156,24 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
       clearTimeout(this.resizeTimeout);
     }
     this.resizeTimeout = setTimeout(() => {
+      // Only resize if the component is still active and element exists
+      if (this.mapGridRef?.nativeElement) {
       this.ngZone.runOutsideAngular(() => {
         this.resizeMapGrid();
       });
+      }
     }, 100);
   };
 
   resizeMapGrid() {
     if (!this.mapGridRef?.nativeElement) {
-      console.warn('Map grid element not found');
+      // Don't log warning for normal initialization timing
       return;
     }
 
     const parent = this.mapGridRef.nativeElement.parentElement;
     if (!parent) {
-      console.warn('Map grid parent element not found');
+      // Don't log warning for normal initialization timing
       return;
     }
 
@@ -191,19 +186,27 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
         this.mapGridRef.nativeElement.style.width = size + 'px';
         this.mapGridRef.nativeElement.style.height = size + 'px';
       } else {
+        // Only log warning if dimensions are consistently zero after initialization
+        if (this.isInitialized) {
         console.warn('Parent element has zero dimensions:', { width, height });
+        }
         // Fallback to a reasonable size
         this.mapGridRef.nativeElement.style.width = '300px';
         this.mapGridRef.nativeElement.style.height = '300px';
       }
     } catch (error) {
+      // Only log error if it's not a normal initialization timing issue
+      if (this.isInitialized) {
       console.warn('Error resizing map grid:', error);
+      }
       // Fallback to a reasonable size
       try {
         this.mapGridRef.nativeElement.style.width = '300px';
         this.mapGridRef.nativeElement.style.height = '300px';
       } catch (fallbackError) {
+        if (this.isInitialized) {
         console.error('Failed to set fallback size:', fallbackError);
+        }
       }
     }
   }
@@ -453,12 +456,17 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private pollResizeMapGrid(times = 7, interval = 30) {
+    // Clear any existing polling
+    if (this.resizeTimeout) {
+      clearTimeout(this.resizeTimeout);
+    }
+
     let count = 0;
     const poll = () => {
       this.resizeMapGrid();
       count++;
       if (count < times) {
-        setTimeout(poll, interval);
+        this.resizeTimeout = setTimeout(poll, interval);
       }
     };
     poll();
@@ -467,22 +475,26 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
   togglePlayerStats() {
     this.isPlayerStatsOpen = !this.isPlayerStatsOpen;
     this.saveState();
-    this.pollResizeMapGrid();
+    // Use a single resize call instead of polling
+    setTimeout(() => this.resizeMapGrid(), 100);
   }
   toggleMap() {
     this.isMapOpen = !this.isMapOpen;
     this.saveState();
-    this.pollResizeMapGrid();
+    // Use a single resize call instead of polling
+    setTimeout(() => this.resizeMapGrid(), 100);
   }
   toggleTileActions() {
     this.isTileActionsOpen = !this.isTileActionsOpen;
     this.saveState();
-    this.pollResizeMapGrid();
+    // Use a single resize call instead of polling
+    setTimeout(() => this.resizeMapGrid(), 100);
   }
   toggleMenu() {
     this.isMenuOpen = !this.isMenuOpen;
     this.saveState();
-    this.pollResizeMapGrid();
+    // Use a single resize call instead of polling
+    setTimeout(() => this.resizeMapGrid(), 100);
   }
 
   get isMobile() {

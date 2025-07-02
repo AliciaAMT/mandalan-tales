@@ -79,7 +79,7 @@ export class AuthService {
     return this.authInitialized();
   }
 
-  // Wait for auth to be initialized
+      // Wait for auth to be initialized
   async waitForAuthInit(): Promise<void> {
     // If already initialized, return immediately
     if (this.authInitializedSignal()) {
@@ -89,22 +89,31 @@ export class AuthService {
 
     console.log('Waiting for auth initialization...');
 
-    // Poll for initialization using the existing signal
+    // Use polling with a reasonable interval
     return new Promise((resolve) => {
-      const checkInterval = setInterval(() => {
+      let timeoutId: number;
+      let intervalId: number;
+
+      const cleanup = () => {
+        if (intervalId) clearInterval(intervalId);
+        if (timeoutId) clearTimeout(timeoutId);
+      };
+
+      // Check every 100ms for initialization
+      intervalId = setInterval(() => {
         if (this.authInitializedSignal()) {
-          clearInterval(checkInterval);
+          cleanup();
           console.log('Auth initialization complete');
           resolve();
         }
-      }, 50); // Check every 50ms (increased from 10ms)
+      }, 100);
 
-      // Timeout after 10 seconds to prevent infinite waiting
-      setTimeout(() => {
-        clearInterval(checkInterval);
+      // Fallback timeout in case auth doesn't initialize
+      timeoutId = setTimeout(() => {
+        cleanup();
         console.log('Auth initialization timeout - proceeding anyway');
         resolve();
-      }, 10000); // Increased timeout to 10 seconds
+      }, 5000); // 5 second timeout
     });
   }
 }
