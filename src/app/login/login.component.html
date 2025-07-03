@@ -5,71 +5,67 @@
   <ion-content>
     <main id="main-content" role="main">
     <div style="position: relative; z-index: 999; background: #121212; padding: 1rem;">
-    <ion-card class="login-card">
+    <ion-card *ngIf="authService.authInitialized() && !authService.user()" class="login-card">
       <ion-card-header>
         <h1 class="sr-only">Login to Mandalan Tales</h1>
         <ion-card-title class="login-card-title">Login</ion-card-title>
       </ion-card-header>
-      <ion-card *ngIf="alreadyLoggedIn()" color="warning">
-        <ion-card-header>You are already logged in</ion-card-header>
-        <ion-card-content>
-          <ion-button expand="block" color="danger" (click)="logout()">Log Out</ion-button>
-        </ion-card-content>
-      </ion-card>
-
       <form (ngSubmit)="login()" #loginForm="ngForm">
         <fieldset>
-        <ion-list lines="none">
-          <ion-item>
-            <ion-label for="emailInput" position="stacked">Email</ion-label>
-            <ion-input id="emailInput" aria-label="email" type="email" name="email" [(ngModel)]="email" required autocomplete="email" inputmode="email"></ion-input>
-          </ion-item>
-
-          <ion-item>
-            <ion-label for="passwordInput" position="stacked">Password</ion-label>
-            <ion-input
-              [(ngModel)]="password"
-              [ngModelOptions]="{ updateOn: 'change' }"
-              id="passwordInput"
-              [type]="showPassword ? 'text' : 'password'"
-              name="password"
-              required
-              autocomplete="current-password"
-            ></ion-input>
-            <ion-button
-              fill="clear"
-              slot="end"
-              type="button"
-              (click)="togglePasswordVisibility()"
-              [attr.aria-pressed]="showPassword"
-              [attr.aria-label]="showPassword ? 'Hide password' : 'Show password'"
-            >
-              <ion-icon [name]="showPassword ? 'eye-off' : 'eye'"></ion-icon>
-            </ion-button>
-          </ion-item>
-
-        </ion-list>
-
-        <ion-button
-        type="submit"
-        aria-label="Login"
-        aria-describedby="form-error"
-        color="primary"
-        class="ion-margin-top"
-        id="login-button"
-        [attr.aria-disabled]="!loginForm.form.valid ? 'true' : null"
-        [attr.disabled]="!loginForm.form.valid ? true : null"
-        expand="block"
-        [disabled]="!loginForm.form.valid"
-      >
-          Login
-        </ion-button>
-        <div class="ion-text-danger error-message" *ngIf="error" id="form-error" role="alert" aria-live="assertive" tabindex="-1">
-          {{ error }}
-        </div>
-
-      </fieldset>
+          <ion-list lines="none">
+            <ion-item>
+              <ion-label for="emailInput" position="stacked">Email</ion-label>
+              <ion-input id="emailInput" aria-label="email" type="email" name="email" [(ngModel)]="email" required autocomplete="email" inputmode="email"></ion-input>
+            </ion-item>
+            <ion-item>
+              <ion-label for="passwordInput" position="stacked">Password</ion-label>
+              <ion-input
+                [(ngModel)]="password"
+                [ngModelOptions]="{ updateOn: 'change' }"
+                id="passwordInput"
+                [type]="showPassword ? 'text' : 'password'"
+                name="password"
+                required
+                autocomplete="current-password"
+              ></ion-input>
+              <ion-button
+                fill="clear"
+                slot="end"
+                type="button"
+                (click)="togglePasswordVisibility()"
+                [attr.aria-pressed]="showPassword"
+                [attr.aria-label]="showPassword ? 'Hide password' : 'Show password'"
+              >
+                <ion-icon [name]="showPassword ? 'eye-off' : 'eye'"></ion-icon>
+              </ion-button>
+            </ion-item>
+          </ion-list>
+          <ion-button
+            type="submit"
+            aria-label="Login"
+            aria-describedby="form-error"
+            color="primary"
+            class="ion-margin-top"
+            id="login-button"
+            [attr.aria-disabled]="!loginForm.form.valid ? 'true' : null"
+            [attr.disabled]="!loginForm.form.valid ? true : null"
+            expand="block"
+            [disabled]="!loginForm.form.valid"
+          >
+            Login
+          </ion-button>
+          <div class="ion-text-danger error-message" *ngIf="error" id="form-error" role="alert" aria-live="assertive" tabindex="-1">
+            {{ error }}
+          </div>
+        </fieldset>
       </form>
+    </ion-card>
+
+    <ion-card *ngIf="authService.authInitialized() && authService.user()" color="warning">
+      <ion-card-header>You are already logged in</ion-card-header>
+      <ion-card-content>
+        <ion-button expand="block" color="danger" (click)="logout()">Log Out</ion-button>
+      </ion-card-content>
     </ion-card>
 
     <div class="login-links">

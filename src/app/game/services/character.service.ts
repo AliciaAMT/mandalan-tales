@@ -20,36 +20,33 @@ export class CharacterService {
   private authService: AuthService = inject(AuthService);
   private characterDeletionService: CharacterDeletionService = inject(CharacterDeletionService);
 
-  // Create a signal for the current user
-  private currentUserSignal = signal(this.authService.getCurrentUser()?.uid || '');
-
-  // Use toSignal to convert Firestore observable to signal with user filtering
-  private charactersSignal = toSignal(
+  // Expose characters as a computed signal that only queries Firestore when authenticated
+  private firestoreCharacters = toSignal<CharStats[] | undefined>(
     runInInjectionContext(this.injector, () => {
       const firestore = inject(Firestore);
       return collectionData(
         query(
           collection(firestore, 'charstats'),
-          where('userId', '==', this.currentUserSignal())
+          where('userId', '==', this.authService.user() ? this.authService.user()!.uid : '')
         ),
         { idField: 'id' }
       ) as any;
     }),
-    { initialValue: [] as CharStats[] }
-  ) as Signal<CharStats[]>;
+    { initialValue: undefined }
+  );
 
-  // Expose as readonly signal
-  characters = this.charactersSignal;
+  characters = computed<CharStats[]>(() => {
+    if (!this.authService.authInitialized() || !this.authService.user()) {
+      return [];
+    }
+    return this.firestoreCharacters() ?? [];
+  });
 
   constructor() {
-    // Update user signal when auth state changes
-    effect(() => {
-      const user = this.authService.getCurrentUser();
-      this.currentUserSignal.set(user?.uid || '');
-    });
+    // No need for currentUserSignal or effect here anymore
   }
 
-    // Computed values for filtered characters
+  // Computed values for filtered characters
   getCharacters(): CharStats[] {
     return this.characters();
   }

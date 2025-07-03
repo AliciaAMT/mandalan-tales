@@ -57,6 +57,7 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
   isMapOpen = true;
   isTileActionsOpen = true;
   isMenuOpen = true;
+  isLoading = true;
 
   characterService = inject(CharacterService);
   settingsService = inject(SettingsService);
@@ -78,6 +79,11 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
   infoModalAction: any = null;
   private lastFocusedElement: HTMLElement | null = null;
 
+  currentNPCs: NPC[] = [];
+  currentObjects: GameObject[] = [];
+  currentPortals: Portal[] = [];
+  allTileActions: any[] = [];
+
   constructor(
     private ngZone: NgZone,
     private cdr: ChangeDetectorRef
@@ -93,6 +99,7 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
 
   async ngOnInit() {
     await this.loadUserSettings();
+    console.log('MainPage ngOnInit, currentCharacter:', this.currentCharacter);
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) {
       try {
@@ -107,6 +114,11 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
     // Generate initial map
     this.generateMap();
     this.isInitialized = true;
+    this.ngZone.run(() => {
+      this.isLoading = false;
+      this.cdr.detectChanges();
+      console.log('isLoading set to', this.isLoading);
+    });
   }
 
   ngAfterViewInit() {
@@ -216,6 +228,7 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
   }
 
   generateMap() {
+    console.log('generateMap called, currentCharacter:', this.currentCharacter);
     if (!this.currentCharacter) {
       return;
     }
@@ -251,6 +264,14 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
     }
 
     this.mapTiles = mapTiles;
+    this.currentNPCs = this.getCurrentNPCs();
+    this.currentObjects = this.getCurrentObjects();
+    this.currentPortals = this.getCurrentPortals();
+    this.allTileActions = [
+      ...this.currentNPCs.map(npc => ({ ...npc, type: 'NPC' })),
+      ...this.currentObjects.map(obj => ({ ...obj, type: 'Object' })),
+      ...this.currentPortals.map(portal => ({ ...portal, type: 'Portal' }))
+    ];
   }
 
   // Test method to generate hardcoded tiles

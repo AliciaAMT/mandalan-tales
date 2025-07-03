@@ -6,7 +6,8 @@ import {
   signInWithEmailAndPassword,
   signOut,
   sendPasswordResetEmail,
-  onAuthStateChanged
+  onAuthStateChanged,
+  sendEmailVerification
 } from '@angular/fire/auth';
 import { Firestore, doc, setDoc, serverTimestamp } from '@angular/fire/firestore';
 import { Router } from '@angular/router';
@@ -15,9 +16,6 @@ import { Router } from '@angular/router';
   providedIn: 'root',
 })
 export class AuthService {
-  private auth: Auth = inject(Auth);
-  private firestore: Firestore = inject(Firestore);
-  private router: Router = inject(Router);
   private ngZone: NgZone = inject(NgZone);
   private injector = inject(Injector);
 
@@ -32,7 +30,8 @@ export class AuthService {
   constructor() {
     // Set up auth state listener using signals within injection context
     this.ngZone.runOutsideAngular(() => {
-      onAuthStateChanged(this.auth, user => {
+      const auth = inject(Auth);
+      onAuthStateChanged(auth, user => {
         this.ngZone.run(() => {
           this.userSignal.set(user);
           this.authInitializedSignal.set(true);
@@ -42,36 +41,50 @@ export class AuthService {
     });
   }
 
-  async register(email: string, password: string) {
-    const cred = await createUserWithEmailAndPassword(this.auth, email, password);
-
-    return runInInjectionContext(this.injector, async () => {
+  register(email: string, password: string) {
+    return runInInjectionContext(this.injector, () => {
+      const auth = inject(Auth);
       const firestore = inject(Firestore);
-      const userRef = doc(firestore, `users/${cred.user.uid}`);
-
-      await setDoc(userRef, {
-        uid: cred.user.uid,
-        email: cred.user.email,
-        displayName: cred.user.displayName || null,
-        createdAt: serverTimestamp(),
-        role: 'player',
-      });
-
-      return cred;
+      return (async () => {
+        const cred = await createUserWithEmailAndPassword(auth, email, password);
+        const userRef = doc(firestore, `users/${cred.user.uid}`);
+        await setDoc(userRef, {
+          uid: cred.user.uid,
+          email: cred.user.email,
+          displayName: cred.user.displayName || null,
+          createdAt: serverTimestamp(),
+          role: 'player',
+        });
+        if (cred.user) {
+          await sendEmailVerification(cred.user);
+        }
+        return cred;
+      })();
     });
   }
 
-  async login(email: string, password: string) {
-    return await signInWithEmailAndPassword(this.auth, email, password);
+  login(email: string, password: string) {
+    return runInInjectionContext(this.injector, () => {
+      const auth = inject(Auth);
+      return (async () => {
+        return await signInWithEmailAndPassword(auth, email, password);
+      })();
+    });
   }
 
   logout(): Promise<void> {
-    return signOut(this.auth);
+    return runInInjectionContext(this.injector, () => {
+      const auth = inject(Auth);
+      return signOut(auth);
+    });
   }
 
   // ✅ Password reset method
   async resetPassword(email: string): Promise<void> {
-    return await sendPasswordResetEmail(this.auth, email);
+    return runInInjectionContext(this.injector, () => {
+      const auth = inject(Auth);
+      return sendPasswordResetEmail(auth, email);
+    });
   }
 
   // Helper method to get current user synchronously
@@ -84,27 +97,20 @@ export class AuthService {
     return this.authInitialized();
   }
 
-      // Wait for auth to be initialized
+  // Wait for auth to be initialized
   async waitForAuthInit(): Promise<void> {
-    // If already initialized, return immediately
     if (this.authInitializedSignal()) {
       console.log('Auth already initialized');
       return;
     }
-
     console.log('Waiting for auth initialization...');
-
-    // Use polling with a reasonable interval
     return new Promise((resolve) => {
       let timeoutId: number;
       let intervalId: number;
-
       const cleanup = () => {
         if (intervalId) clearInterval(intervalId);
         if (timeoutId) clearTimeout(timeoutId);
       };
-
-      // Check every 100ms for initialization
       intervalId = setInterval(() => {
         if (this.authInitializedSignal()) {
           cleanup();
@@ -112,13 +118,11 @@ export class AuthService {
           resolve();
         }
       }, 100);
-
-      // Fallback timeout in case auth doesn't initialize
       timeoutId = setTimeout(() => {
         cleanup();
         console.log('Auth initialization timeout - proceeding anyway');
         resolve();
-      }, 5000); // 5 second timeout
+      }, 5000);
     });
   }
 }

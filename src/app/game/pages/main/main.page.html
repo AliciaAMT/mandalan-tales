@@ -119,37 +119,6 @@
               </div>
             </div>
           </div>
-
-          <!-- Debug section - hidden from screen readers and keyboard navigation -->
-          <div class="debug-info"
-               style="margin-top: 20px; padding: 10px; background: rgba(0,0,0,0.1); border-radius: 8px;"
-               tabindex="-1"
-               aria-hidden="true">
-            <h4>Debug Info:</h4>
-            <p>Map Tiles Count: {{ mapTiles.length }}</p>
-            <p *ngIf="mapTiles.length > 0">First Row Tiles: {{ mapTiles[0].length }}</p>
-
-            <!-- Test buttons - not keyboard accessible -->
-            <div style="margin: 10px 0;">
-              <button (click)="generateTestMap()"
-                      style="margin-right: 10px; padding: 5px 10px;"
-                      tabindex="-1"
-                      aria-hidden="true">Generate Test Map</button>
-              <button (click)="generateMap()"
-                      style="padding: 5px 10px;"
-                      tabindex="-1"
-                      aria-hidden="true">Generate Real Map</button>
-            </div>
-
-            <div *ngFor="let row of mapTiles; let rowIndex = index">
-              <p>Row {{ rowIndex }}:</p>
-              <ul>
-                <li *ngFor="let tile of row">
-                  ({{ tile.x }}, {{ tile.y }}) - {{ tile.imageSrc }} - Player: {{ tile.isPlayer }} - Clickable: {{ tile.isClickable }}
-                </li>
-              </ul>
-            </div>
-          </div>
         </div>
         <ng-template #noMap>
           <div class="no-map-message">No character loaded.</div>
@@ -163,10 +132,10 @@
       <div class="section-content" *ngIf="isTileActionsOpen">
         <div class="tile-actions-container" *ngIf="currentCharacter; else noTileActions">
           <!-- Mobile: All actions in one grid -->
-          <div class="action-section" *ngIf="isMobile && getAllTileActions().length > 0">
+          <div class="action-section" *ngIf="isMobile && allTileActions.length > 0">
             <div class="action-grid">
               <div
-                *ngFor="let action of getAllTileActions()"
+                *ngFor="let action of allTileActions"
                 class="action-item"
                 [ngClass]="{
                   'npc-item': action.type === 'NPC',
@@ -241,11 +210,11 @@
           </div>
 
           <!-- Desktop: Keep original sections -->
-          <div class="action-section" *ngIf="!isMobile && getCurrentNPCs().length > 0">
+          <div class="action-section" *ngIf="!isMobile && currentNPCs.length > 0">
             <h4 class="section-title">NPCs</h4>
             <div class="action-grid">
               <div
-                *ngFor="let npc of getCurrentNPCs()"
+                *ngFor="let npc of currentNPCs"
                 class="action-item npc-item"
                 (click)="interactWithNPC(npc)"
                 (keydown.enter)="interactWithNPC(npc)"
@@ -275,11 +244,11 @@
             </div>
           </div>
 
-          <div class="action-section" *ngIf="!isMobile && getCurrentObjects().length > 0">
+          <div class="action-section" *ngIf="!isMobile && currentObjects.length > 0">
             <h4 class="section-title">Objects</h4>
             <div class="action-grid">
               <div
-                *ngFor="let object of getCurrentObjects()"
+                *ngFor="let object of currentObjects"
                 class="action-item object-item"
                 (click)="interactWithObject(object)"
                 (keydown.enter)="interactWithObject(object)"
@@ -309,11 +278,11 @@
             </div>
           </div>
 
-          <div class="action-section" *ngIf="!isMobile && getCurrentPortals().length > 0">
+          <div class="action-section" *ngIf="!isMobile && currentPortals.length > 0">
             <h4 class="section-title">Portals</h4>
             <div class="action-grid">
               <div
-                *ngFor="let portal of getCurrentPortals()"
+                *ngFor="let portal of currentPortals"
                 class="action-item portal-item"
                 (click)="usePortal(portal)"
                 (keydown.enter)="usePortal(portal)"
@@ -344,7 +313,7 @@
           </div>
 
           <!-- No actions available -->
-          <div class="no-actions" *ngIf="getCurrentNPCs().length === 0 && getCurrentObjects().length === 0 && getCurrentPortals().length === 0">
+          <div class="no-actions" *ngIf="currentNPCs.length === 0 && currentObjects.length === 0 && currentPortals.length === 0">
             <p>No actions available at this location.</p>
           </div>
         </div>

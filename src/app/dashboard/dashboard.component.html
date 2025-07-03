@@ -58,7 +58,7 @@
   <ion-button
     expand="block"
     color="success"
-    [disabled]="!selectedCharacterId"
+    [disabled]="!selectedCharacterId || !(user && user.emailVerified)"
     (click)="startGame()"
   >
     Enter Game

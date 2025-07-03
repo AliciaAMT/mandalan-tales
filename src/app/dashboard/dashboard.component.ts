@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, effect } from '@angular/core';
 import { AppHeaderComponent } from "../shared/header/app-header.component";
 import { AppFooterComponent } from "../shared/footer/app-footer.component";
 import { STANDALONE_IMPORTS } from '../shared/standalone-imports';
@@ -52,16 +52,23 @@ export class DashboardComponent implements OnInit {
     { name: 'Black', color: '#000000' }
   ];
 
-  async ngOnInit(): Promise<void> {
-    const user = this.authService.getCurrentUser();
+  constructor() {
+    effect(() => {
+      if (this.authService.authInitialized() && !this.authService.user()) {
+        this.router.navigate(['/login']);
+      } else if (this.authService.authInitialized()) {
+        const user = this.authService.user();
+        if (user && user.emailVerified) {
+          this.user = user;
+          this.loadUserSettings();
+        }
+      }
+      // Do NOT auto-navigate to dashboard here!
+    });
+  }
 
-    if (!user) {
-      this.router.navigate(['/login']);
-      return;
-    }
-
-    this.user = user;
-    await this.loadUserSettings();
+  ngOnInit() {
+    // No effect() here!
   }
 
   async loadUserSettings(): Promise<void> {
@@ -148,9 +155,17 @@ export class DashboardComponent implements OnInit {
   }
 
   startGame(): void {
-    if (this.selectedCharacterId) {
-      // Navigate to game screen
+    const user = this.authService.getCurrentUser();
+    console.log('startGame called. user:', user, 'selectedCharacterId:', this.selectedCharacterId);
+    if (this.selectedCharacterId && user && user.emailVerified) {
+      console.log('Navigating to /game');
       this.router.navigate(['/game']);
+    } else if (!user) {
+      console.log('No user, redirecting to login');
+      this.router.navigate(['/login']);
+    } else if (user && !user.emailVerified) {
+      console.log('User not verified');
+      alert('Please verify your email before entering the game.');
     }
   }
 }

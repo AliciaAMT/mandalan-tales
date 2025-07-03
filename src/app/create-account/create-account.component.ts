@@ -10,7 +10,6 @@ import { STANDALONE_IMPORTS } from '../shared/standalone-imports';
 // import { SkipLinkComponent } from "../shared/skip-link/skip-link.component";
 import { addIcons } from 'ionicons';
 import { eye, eyeOff } from 'ionicons/icons';
-import { sendEmailVerification } from '@angular/fire/auth';
 import { ToastController } from '@ionic/angular';
 
 addIcons({
@@ -42,7 +41,6 @@ export class CreateAccountComponent implements OnDestroy {
   private authService: AuthService = inject(AuthService);
   private router: Router = inject(Router);
   private toastCtrl: ToastController = inject(ToastController);
-  private firestore: Firestore = inject(Firestore);
   private timeouts: number[] = [];
 
   email: string = '';
@@ -59,10 +57,7 @@ export class CreateAccountComponent implements OnDestroy {
   async createAccount() {
     this.error = null;
     try {
-      const cred = await this.authService.register(this.email, this.password);
-
-      await sendEmailVerification(cred.user);
-      await this.createUserInFirestore(cred.user);
+      await this.authService.register(this.email, this.password);
       await this.authService.logout();
 
       const toast = await this.toastCtrl.create({
@@ -71,35 +66,14 @@ export class CreateAccountComponent implements OnDestroy {
         color: 'success',
         position: 'bottom'
       });
-
-      // Patch for accessibility
       toast.role = 'alert';
       await toast.present();
 
-      const timeoutId = window.setTimeout(() => {
-        const toastEl = document.querySelector('ion-toast');
-        if (toastEl) {
-          toastEl.setAttribute('role', 'alert');
-          toastEl.setAttribute('aria-live', 'assertive');
-        }
-      }, 100); // Allow time for DOM render
-      this.timeouts.push(timeoutId);
-
       this.router.navigate(['/login']);
     } catch (err: any) {
+      console.error('Account creation error:', err);
       this.error = err.message || 'An unknown error occurred.';
     }
-  }
-
-  async createUserInFirestore(user: any) {
-    const userRef = doc(this.firestore, `users/${user.uid}`);
-    await setDoc(userRef, {
-      uid: user.uid,
-      email: user.email,
-      displayName: user.displayName || null,
-      createdAt: serverTimestamp(),
-      role: 'player',
-    }, { merge: true });
   }
 
   togglePasswordVisibility() {
