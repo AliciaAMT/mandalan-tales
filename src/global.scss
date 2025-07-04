@@ -82,6 +82,7 @@ select:focus {
 
 :root {
   --theme-color: #6b4e26;
+  --ion-color-primary: var(--theme-color, #6b4e26);
 }
 
 

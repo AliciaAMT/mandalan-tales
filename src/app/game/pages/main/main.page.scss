@@ -44,7 +44,7 @@ ion-content::part(scroll) {
 }
 
 .collapsible-header {
-  background: linear-gradient(90deg, var(--theme-color, #8d6e36) 0%, color-mix(in srgb, var(--theme-color, #8d6e36) 80%, white) 100%);
+  background: linear-gradient(90deg, var(--ion-color-primary) 0%, color-mix(in srgb, var(--ion-color-primary) 80%, white) 100%);
   color: var(--header-text-color, #181200);
   font-weight: bold;
   border: none;
@@ -57,7 +57,7 @@ ion-content::part(scroll) {
 }
 
 .collapsible-header:hover {
-  background: linear-gradient(90deg, color-mix(in srgb, var(--theme-color, #8d6e36) 90%, white) 0%, color-mix(in srgb, var(--theme-color, #8d6e36) 70%, white) 100%);
+  background: linear-gradient(90deg, color-mix(in srgb, var(--ion-color-primary) 90%, white) 0%, color-mix(in srgb, var(--ion-color-primary) 70%, white) 100%);
 }
 
 .collapsible-header:focus {
@@ -217,7 +217,7 @@ ion-content::part(scroll) {
     flex-shrink: 0;
   }
   .stats-col .gold-amount {
-    color: #ffd700;
+    color: var(--ion-color-primary);
     font-weight: bold;
   }
   .stats-col .player-stats-row > div {
@@ -419,7 +419,7 @@ ion-content::part(scroll) {
 }
 
 .gold-amount {
-  color: #ffd700;
+  color: var(--ion-color-primary);
   font-weight: bold;
 }
 
@@ -473,7 +473,7 @@ ion-content::part(scroll) {
 }
 
 .map-tile:focus {
-  outline: 2px solid var(--theme-color, #8d6e36);
+  outline: 2px solid var(--ion-color-primary);
   outline-offset: 2px;
   z-index: 10;
 }
@@ -488,19 +488,19 @@ ion-content::part(scroll) {
 
 .clickable-tile {
   cursor: pointer;
-  border-color: var(--theme-color, #8d6e36);
+  border-color: var(--ion-color-primary);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 .clickable-tile:hover {
-  border-color: color-mix(in srgb, var(--theme-color, #8d6e36) 80%, white);
+  border-color: color-mix(in srgb, var(--ion-color-primary) 80%, white);
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
 }
 
 .clickable-tile:focus {
-  border-color: color-mix(in srgb, var(--theme-color, #8d6e36) 80%, white);
+  border-color: color-mix(in srgb, var(--ion-color-primary) 80%, white);
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
-  outline: 2px solid color-mix(in srgb, var(--theme-color, #8d6e36) 80%, white);
+  outline: 2px solid color-mix(in srgb, var(--ion-color-primary) 80%, white);
   outline-offset: 2px;
 }
 
@@ -513,14 +513,14 @@ ion-content::part(scroll) {
 }
 
 .player-tile:focus {
-  border-color: #ffd700;
+  border-color: var(--ion-color-primary);
   border-width: 3px;
-  box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+  box-shadow: 0 0 20px color-mix(in srgb, var(--ion-color-primary) 80%, white, 0.5);
 }
 
 .player-tile:focus:hover {
-  border-color: #ffed4e;
-  box-shadow: 0 0 30px rgba(255, 215, 0, 0.7);
+  border-color: color-mix(in srgb, var(--ion-color-primary) 90%, white);
+  box-shadow: 0 0 30px color-mix(in srgb, var(--ion-color-primary) 70%, white, 0.7);
 }
 
 .tile-overlay {
@@ -545,14 +545,14 @@ ion-content::part(scroll) {
 }
 
 .player-indicator {
-  color: #ffd700;
+  color: var(--ion-color-primary);
   font-weight: bold;
   font-size: 0.8rem;
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
   background: rgba(0, 0, 0, 0.7);
   padding: 4px 8px;
   border-radius: 4px;
-  border: 1px solid #ffd700;
+  border: 1px solid var(--ion-color-primary);
 }
 
 .invalid-tile {

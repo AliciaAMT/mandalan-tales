@@ -9,8 +9,8 @@
   overflow: hidden;
 
   .modal-header, .modal-title, .modal-message {
-    background: var(--theme-color, #8d6e36);
-    color: var(--theme-color-contrast, #fff);
+    background: var(--ion-color-primary);
+    color: var(--ion-color-primary-contrast, #fff);
     padding: 16px 20px 8px 20px;
     font-weight: bold;
     font-size: 1.1rem;
@@ -18,8 +18,8 @@
   }
 
   .modal-message {
-    background: var(--theme-color, #8d6e36);
-    color: var(--theme-color-contrast, #fff);
+    background: var(--ion-color-primary);
+    color: var(--ion-color-primary-contrast, #fff);
     padding: 8px 20px;
     font-size: 1rem;
     border-bottom: 1px solid rgba(0,0,0,0.08);
@@ -37,8 +37,8 @@
   }
 
   .modal-ok-btn {
-    background: var(--theme-color, #8d6e36);
-    color: var(--theme-color-contrast, #fff);
+    background: var(--ion-color-primary);
+    color: var(--ion-color-primary-contrast, #fff);
     border: none;
     border-radius: 6px;
     font-weight: bold;
@@ -50,9 +50,9 @@
     box-shadow: 0 2px 8px rgba(0,0,0,0.08);
   }
   .modal-ok-btn:focus, .modal-ok-btn:hover {
-    background: color-mix(in srgb, var(--theme-color, #8d6e36) 80%, #000 20%);
-    color: var(--theme-color-contrast, #fff);
-    outline: 2px solid var(--theme-color, #8d6e36);
+    background: color-mix(in srgb, var(--ion-color-primary) 80%, #000 20%);
+    color: var(--ion-color-primary-contrast, #fff);
+    outline: 2px solid var(--ion-color-primary);
   }
 
   .modal-close-btn {
@@ -61,7 +61,7 @@
     right: 8px;
     background: none;
     border: none;
-    color: var(--theme-color-contrast, #fff);
+    color: var(--ion-color-primary-contrast, #fff);
     font-size: 1.5rem;
     cursor: pointer;
     z-index: 2;
@@ -71,6 +71,6 @@
   }
   .modal-close-btn:focus, .modal-close-btn:hover {
     background: rgba(0,0,0,0.08);
-    outline: 2px solid var(--theme-color, #8d6e36);
+    outline: 2px solid var(--ion-color-primary);
   }
 }

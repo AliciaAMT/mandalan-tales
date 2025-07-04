@@ -156,6 +156,16 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
+  ionViewWillEnter() {
+    const themeColor = localStorage.getItem('themeColor') || DEFAULT_THEME_COLOR;
+    document.documentElement.style.setProperty('--theme-color', themeColor);
+    document.documentElement.style.setProperty('--ion-color-primary', themeColor);
+    if (this.getTextColorForTheme) {
+      const textColor = this.getTextColorForTheme(themeColor);
+      document.documentElement.style.setProperty('--header-text-color', textColor);
+    }
+  }
+
   ngAfterViewInit() {
     // Single attempt with proper null checking
     this.initializeMapGrid();

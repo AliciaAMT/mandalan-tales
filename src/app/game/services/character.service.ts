@@ -283,7 +283,7 @@ export class CharacterService {
       if (!flagsSnapshot.empty) {
         const flagsDoc = flagsSnapshot.docs[0];
         const update: any = {};
-        update[flagKey] = value;
+    update[flagKey] = value;
         await updateDoc(flagsDoc.ref, update);
       }
     });
