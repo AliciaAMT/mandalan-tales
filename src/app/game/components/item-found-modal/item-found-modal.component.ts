@@ -40,7 +40,10 @@ export interface FoundItem {
           </div>
         </div>
       </div>
-      <ion-button expand="block" fill="outline" (click)="close()">OK</ion-button>
+      <div *ngIf="actions && actions.length > 0" class="modal-actions">
+        <ion-button *ngFor="let action of actions" expand="block" (click)="selectAction(action.value)">{{ action.label }}</ion-button>
+      </div>
+      <ion-button *ngIf="!actions || actions.length === 0" expand="block" (click)="close()">OK</ion-button>
     </ion-content>
   `,
   styles: [`
@@ -109,6 +112,7 @@ export interface FoundItem {
 export class ItemFoundModalComponent implements OnInit, OnDestroy {
   @Input() items: FoundItem[] = [];
   @Input() eventMessage?: string;
+  @Input() actions: { label: string, value: string }[] = [];
   @Output() closed = new EventEmitter<void>();
 
   private lastFocusedElement: HTMLElement | null = null;
@@ -139,6 +143,11 @@ export class ItemFoundModalComponent implements OnInit, OnDestroy {
     this.closed.emit();
   }
 
+  selectAction(value: string) {
+    this.modalCtrl.dismiss({ action: value });
+    this.closed.emit();
+  }
+
   @HostListener('document:keydown', ['$event'])
   handleKeydown(event: KeyboardEvent) {
     if (event.key === 'Escape') {
@@ -155,15 +164,16 @@ export class ItemFoundModalComponent implements OnInit, OnDestroy {
   }
 
   // Static helper to present the modal
-  static async present(modalCtrl: ModalController, items: FoundItem[], eventMessage?: string) {
+  static async present(modalCtrl: ModalController, items: FoundItem[], eventMessage?: string, actions?: { label: string, value: string }[]): Promise<string | undefined> {
     const modal = await modalCtrl.create({
       component: ItemFoundModalComponent,
-      componentProps: { items, eventMessage },
+      componentProps: { items, eventMessage, actions },
       cssClass: 'item-found-modal',
       backdropDismiss: false,
       keyboardClose: true
     });
     await modal.present();
-    return modal;
+    const result = await modal.onWillDismiss();
+    return result.data?.action;
   }
 }

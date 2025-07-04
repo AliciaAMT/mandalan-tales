@@ -15,6 +15,8 @@ import { DialogueService } from '../../services/dialogue.service';
 import { ReplenishmentService, ReplenishableItem } from '../../services/replenishment.service';
 import { ItemFoundModalComponent, FoundItem } from '../../components/item-found-modal/item-found-modal.component';
 import { ModalController } from '@ionic/angular';
+import { ObjectInteractionService } from '../../services/object-interaction.service';
+import { TileActionService } from '../../services/tile-action.service';
 
 const STORAGE_KEY = 'mainPageSectionState';
 
@@ -70,6 +72,8 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
   inventoryService = inject(InventoryService);
   dialogueService = inject(DialogueService);
   replenishmentService = inject(ReplenishmentService);
+  objectInteractionService = inject(ObjectInteractionService);
+  tileActionService = inject(TileActionService);
   private injector = inject(Injector);
   modalCtrl = inject(ModalController);
 
@@ -1054,7 +1058,11 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
         await this.dialogueService.startDialogue(dialogueId);
       } else {
         // Fallback for NPCs without dialogue
-        alert(`You interact with ${npc.name}. This feature is coming soon!`);
+        await ItemFoundModalComponent.present(
+          this.modalCtrl,
+          [],
+          `You interact with ${npc.name}. This feature is coming soon!`
+        );
       }
     });
   }
@@ -1086,9 +1094,42 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
       case 'water barrel':
         await this.handleWaterBarrel();
         break;
-      case 'fireplace':
-        await this.handleFireplace();
+      case 'fireplace': {
+        const action = await ItemFoundModalComponent.present(
+          this.modalCtrl,
+          [],
+          'You are at the fireplace. What would you like to do?',
+          [
+            { label: 'Light Fire', value: 'light' },
+            { label: 'Rest', value: 'rest' },
+            { label: 'Search Fireplace', value: 'search' },
+            { label: 'Cook', value: 'cook' },
+            { label: 'Cancel', value: 'cancel' }
+          ]
+        );
+        if (action === 'light') {
+          await this.handleFireplace();
+        } else if (action === 'rest') {
+          await ItemFoundModalComponent.present(
+            this.modalCtrl,
+            [],
+            'You rest by the fireplace and feel a bit warmer.'
+          );
+        } else if (action === 'search') {
+          await ItemFoundModalComponent.present(
+            this.modalCtrl,
+            [],
+            'You search the fireplace but find nothing of interest.'
+          );
+        } else if (action === 'cook') {
+          await ItemFoundModalComponent.present(
+            this.modalCtrl,
+            [],
+            'The cookbook and recipe system is coming soon!'
+          );
+        }
         break;
+      }
       case 'well':
         await this.handleWell();
         break;
@@ -1109,27 +1150,67 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
       case 'rug':
         await this.handleRug();
         break;
+      case 'bed': {
+        const { actions, message } = await this.objectInteractionService.getBedInteraction();
+        const action = await ItemFoundModalComponent.present(
+          this.modalCtrl,
+          [],
+          message,
+          actions
+        );
+        if (action && action !== 'cancel') {
+          if (action === 'search' && this.currentCharacter) {
+            const result = await this.tileActionService.handleTileAction(
+              this.currentCharacter.map,
+              this.currentCharacter.xaxis,
+              this.currentCharacter.yaxis,
+              'search',
+              this.currentCharacter.name
+            );
+            await ItemFoundModalComponent.present(this.modalCtrl, result.items || [], result.message);
+          } else {
+            const result = await this.objectInteractionService.handleBedAction(action);
+            if (result.message) {
+              await ItemFoundModalComponent.present(this.modalCtrl, [], result.message);
+            }
+          }
+        }
+        break;
+      }
       case 'desk':
       case 'shelf':
       case 'side table':
       case 'coatrack':
       case 'wardrobe':
       case 'table':
-      case 'bed':
       case 'dog house':
       case 'chicken coop':
-        // These are examine/search objects that don't give items
-        alert(`You ${object.action} the ${object.name}. You find nothing of interest.`);
+        if (this.currentCharacter && (object.action === 'search' || object.action === 'examine')) {
+          const result = await this.tileActionService.handleTileAction(
+            this.currentCharacter.map,
+            this.currentCharacter.xaxis,
+            this.currentCharacter.yaxis,
+            object.action,
+            this.currentCharacter.name
+          );
+          await ItemFoundModalComponent.present(this.modalCtrl, result.items || [], result.message);
+        } else {
+          await ItemFoundModalComponent.present(
+            this.modalCtrl,
+            [],
+            `You ${object.action} the ${object.name}. You find nothing of interest.`
+          );
+        }
         break;
       default:
-        // Default interaction
-        alert(`You ${object.action} the ${object.name}. This feature is coming soon!`);
+        await ItemFoundModalComponent.present(
+          this.modalCtrl,
+          [],
+          `You ${object.action} the ${object.name}. This feature is coming soon!`
+        );
     }
   }
 
-  /**
-   * Handle water barrel interaction
-   */
   private async handleWaterBarrel() {
     console.log('Handling water barrel interaction');
     console.log('Current inventory:', this.inventoryService.inventory);
@@ -1143,16 +1224,21 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
       if (bottleItem) {
         bottleItem.waterunits = Math.min(bottleItem.waterunits + 3, bottleItem.maxwater || 10);
         await this.inventoryService.saveInventory();
-        alert('You fill your bottle with fresh water from the barrel.');
+        await ItemFoundModalComponent.present(
+          this.modalCtrl,
+          [],
+          'You fill your bottle with fresh water from the barrel.'
+        );
       }
     } else {
-      alert('You need a bottle to collect water.');
+      await ItemFoundModalComponent.present(
+        this.modalCtrl,
+        [],
+        'You need a bottle to collect water from the barrel.'
+      );
     }
   }
 
-  /**
-   * Handle fireplace interaction
-   */
   private async handleFireplace() {
     const hasFirewood = this.inventoryService.hasItem('Firewood');
     const hasTinderbox = this.inventoryService.hasItem('Tinderbox');
@@ -1160,17 +1246,26 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
     if (hasFirewood && hasTinderbox) {
       // Start a fire
       await this.inventoryService.removeItem('Firewood', 1);
-      alert('You successfully start a fire in the fireplace. The room is now warm and cozy.');
+      await ItemFoundModalComponent.present(
+        this.modalCtrl,
+        [],
+        'You successfully start a fire in the fireplace. The room is now warm and cozy.'
+      );
     } else if (hasFirewood) {
-      alert('You have firewood but need a tinderbox to start a fire.');
+      await ItemFoundModalComponent.present(
+        this.modalCtrl,
+        [],
+        'You have firewood but need a tinderbox to start a fire.'
+      );
     } else {
-      alert('You need firewood and a tinderbox to start a fire.');
+      await ItemFoundModalComponent.present(
+        this.modalCtrl,
+        [],
+        'You need firewood and a tinderbox to start a fire.'
+      );
     }
   }
 
-  /**
-   * Handle well interaction
-   */
   private async handleWell() {
     const hasBottle = this.inventoryService.hasItem('Bottle');
 
@@ -1180,10 +1275,18 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
       if (bottleItem) {
         bottleItem.waterunits = Math.min(bottleItem.waterunits + 5, bottleItem.maxwater || 10);
         await this.inventoryService.saveInventory();
-        alert('You draw fresh water from the well and fill your bottle.');
+        await ItemFoundModalComponent.present(
+          this.modalCtrl,
+          [],
+          'You draw fresh water from the well and fill your bottle.'
+        );
       }
     } else {
-      alert('You need a bottle to collect water from the well.');
+      await ItemFoundModalComponent.present(
+        this.modalCtrl,
+        [],
+        'You need a bottle to collect water from the well.'
+      );
     }
   }
 
@@ -1485,7 +1588,11 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
     const herbRackState = localStorage.getItem(herbRackKey);
 
     if (herbRackState === 'empty') {
-      alert('The herb rack is mostly empty.');
+      await ItemFoundModalComponent.present(
+        this.modalCtrl,
+        [],
+        'The herb rack is mostly empty.'
+      );
       return;
     }
 
@@ -1539,9 +1646,17 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
     if (itemsFound > 0) {
       // Mark herb rack as empty
       localStorage.setItem(herbRackKey, 'empty');
-      alert(`You found ${itemsFound} herbs on the herb rack!`);
+      await ItemFoundModalComponent.present(
+        this.modalCtrl,
+        [],
+        `You found ${itemsFound} herbs on the herb rack!`
+      );
     } else {
-      alert('Your inventory is full.');
+      await ItemFoundModalComponent.present(
+        this.modalCtrl,
+        [],
+        'Your inventory is full.'
+      );
     }
   }
 
