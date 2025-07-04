@@ -16,23 +16,23 @@ export interface FoundItem {
   template: `
     <ion-header>
       <ion-toolbar>
-        <ion-title>Item Found</ion-title>
+        <ion-title>Game Event</ion-title>
         <ion-buttons slot="end">
-          <ion-button (click)="close()">
+          <ion-button (click)="close()" aria-label="Close dialog">
             <ion-icon name="close-outline"></ion-icon>
           </ion-button>
         </ion-buttons>
       </ion-toolbar>
     </ion-header>
     <ion-content class="ion-padding">
-      <div *ngIf="eventMessage" class="event-message">
-        <ion-icon name="alert-circle-outline" color="warning"></ion-icon>
+      <div *ngIf="eventMessage" class="event-message" role="alert" aria-live="polite">
+        <ion-icon name="alert-circle-outline" color="warning" aria-hidden="true"></ion-icon>
         <span>{{ eventMessage }}</span>
       </div>
-      <div *ngIf="items && items.length > 0">
+      <div *ngIf="items && items.length > 0" role="region" aria-label="Found items">
         <div class="item-list">
           <div *ngFor="let item of items" class="item-row">
-            <img [src]="getItemImage(item)" [alt]="item.name" class="item-image" />
+            <img [src]="getItemImage(item)" [alt]="'Item image: ' + item.name" class="item-image" />
             <div class="item-info">
               <div class="item-name">{{ item.name }}<span *ngIf="item.quantity"> x{{ item.quantity }}</span></div>
               <div class="item-desc" *ngIf="item.description">{{ item.description }}</div>
@@ -40,10 +40,10 @@ export interface FoundItem {
           </div>
         </div>
       </div>
-      <div *ngIf="actions && actions.length > 0" class="modal-actions">
-        <ion-button *ngFor="let action of actions" expand="block" (click)="selectAction(action.value)">{{ action.label }}</ion-button>
+      <div *ngIf="actions && actions.length > 0" class="modal-actions" role="group" aria-label="Available actions">
+        <ion-button *ngFor="let action of actions" expand="block" (click)="selectAction(action.value)" [attr.aria-label]="action.label">{{ action.label }}</ion-button>
       </div>
-      <ion-button *ngIf="!actions || actions.length === 0" expand="block" (click)="close()">OK</ion-button>
+      <ion-button *ngIf="!actions || actions.length === 0" expand="block" (click)="close()" aria-label="Close dialog">OK</ion-button>
     </ion-content>
   `,
   styles: [`

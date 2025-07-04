@@ -90,7 +90,7 @@
       <!-- Map (Center/Second) -->
       <div class="main-section map" role="region" aria-label="Map" [ngClass]="{'collapsed': !isMapOpen}" [style.grid-area]="mapArea">
         <h2 class="collapsible-header" (click)="toggleMap()" tabindex="0" role="button" [attr.aria-expanded]="isMapOpen" aria-controls="map-content">
-          Map
+          {{ getCurrentMapDisplayName() }}
         </h2>
         <div id="map-content" class="section-content" *ngIf="isMapOpen">
           <div class="map-container" *ngIf="currentCharacter; else noMap">

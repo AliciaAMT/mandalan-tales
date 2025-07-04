@@ -963,82 +963,71 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
     const { map, xaxis, yaxis } = this.currentCharacter;
     const portals: Portal[] = [];
 
-
-
-    // Homeup portals
-    if (map === 'homeup' && xaxis === 1 && yaxis === 1) {
+    // Use the portal service to get portals for current location
+    const portalAction = this.tileActionService.getPortalAction(map, xaxis, yaxis);
+    if (portalAction) {
       portals.push({
-        name: 'Stairs Down',
-        image: 'stairsdown',
-        destination: 'home',
-        description: 'Stairs leading down to the main floor.',
-        action: 'descend'
+        name: portalAction.portal.name,
+        image: portalAction.portal.image,
+        destination: this.tileActionService.getMapDisplayName(portalAction.portal.targetMap),
+        description: portalAction.portal.description,
+        action: this.getPortalActionText(portalAction.portal.name)
       });
     }
 
-    // Home portals
-    if (map === 'home') {
-      if (xaxis === 1 && yaxis === 1) {
-        portals.push({
-          name: 'Stairs Up',
-          image: 'stairsdown', // Reusing stairs image
-          destination: 'homeup',
-          description: 'Stairs leading up to the bedroom.',
-          action: 'ascend'
-        });
-      }
-      if (xaxis === 3 && yaxis === 3) {
-        portals.push({
-          name: 'Front Door',
-          image: 'door',
-          destination: 'yard',
-          description: 'The front door leading outside.',
-          action: 'exit'
-        });
-      }
-      if (xaxis === 2 && yaxis === 1) {
-        portals.push({
-          name: 'Back Door',
-          image: 'door',
-          destination: 'yard',
-          description: 'The back door leading to the yard.',
-          action: 'exit'
-        });
-      }
-    }
-
-    // Yard portals
-    if (map === 'yard') {
-      if (xaxis === 2 && yaxis === 3) {
-        portals.push({
-          name: 'Back Door',
-          image: 'door',
-          destination: 'home',
-          description: 'The back door leading into the house.',
-          action: 'enter'
-        });
-      }
-      if (xaxis === 1 && yaxis === 3) {
-        portals.push({
-          name: 'Cellar Door',
-          image: 'cellar',
-          destination: 'cellar',
-          description: 'A door leading down to the cellar.',
-          action: 'descend'
-        });
-      }
-      if (xaxis === 1 && yaxis === 1) {
-        portals.push({
-          name: 'Barn Door',
-          image: 'barn',
-          destination: 'barn',
-          description: 'A door leading to the barn.',
-          action: 'enter'
-        });
-      }
-    }
-
     return portals;
+  }
+
+  private getPortalActionText(portalName: string): string {
+    const actionMap: Record<string, string> = {
+      'Stairs Down': 'descend',
+      'Stairs Up': 'ascend',
+      'Front Door': 'exit',
+      'Back Door': 'exit',
+      'Cellar Door': 'descend',
+      'Barn Door': 'enter',
+      'Ladder Out of Cellar': 'climb',
+      'Father\'s House': 'enter',
+      'Gate to Ishandar': 'enter',
+      'Lady Marah\'s House': 'enter',
+      'Cave Entrance': 'enter',
+      'Gate to Ishandar Forest': 'exit',
+      'Cave Exit': 'exit'
+    };
+    return actionMap[portalName] || 'use';
+  }
+
+  /**
+   * Get the current map's display name
+   */
+  getCurrentMapDisplayName(): string {
+    if (!this.currentCharacter) return 'Unknown Location';
+    return this.tileActionService.getMapDisplayName(this.currentCharacter.map);
+  }
+
+  /**
+   * Announce message to screen readers
+   */
+  private announceToScreenReader(message: string): void {
+    // Create a live region for screen reader announcements
+    const announcement = document.createElement('div');
+    announcement.setAttribute('aria-live', 'polite');
+    announcement.setAttribute('aria-atomic', 'true');
+    announcement.style.position = 'absolute';
+    announcement.style.left = '-10000px';
+    announcement.style.width = '1px';
+    announcement.style.height = '1px';
+    announcement.style.overflow = 'hidden';
+    announcement.textContent = message;
+
+    document.body.appendChild(announcement);
+
+    // Remove the announcement element after a short delay
+    setTimeout(() => {
+      if (document.body.contains(announcement)) {
+        document.body.removeChild(announcement);
+      }
+    }, 1000);
   }
 
     // Interaction methods
@@ -1715,10 +1704,76 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  usePortal(portal: Portal) {
+  async usePortal(portal: Portal) {
     console.log(`Using portal to ${portal.destination}: ${portal.action}`);
-    // TODO: Implement portal logic
-    alert(`You ${portal.action} to ${portal.destination}. This feature is coming soon!`);
+
+    if (!this.currentCharacter) {
+      console.error('No current character found');
+      return;
+    }
+
+    // Get the portal action from the service
+    const portalAction = this.tileActionService.getPortalAction(
+      this.currentCharacter.map,
+      this.currentCharacter.xaxis,
+      this.currentCharacter.yaxis
+    );
+
+    if (!portalAction) {
+      console.error('No portal action found for current location');
+      return;
+    }
+
+    // Check portal requirements first
+    const requirements = await this.tileActionService.checkPortalRequirements(
+      portalAction.portal,
+      this.currentCharacter.name
+    );
+
+    if (!requirements.canUse) {
+      await ItemFoundModalComponent.present(
+        this.modalCtrl,
+        [],
+        requirements.message || 'You cannot use this portal.'
+      );
+      return;
+    }
+
+    // Show confirmation dialog
+    const confirmed = await ItemFoundModalComponent.present(
+      this.modalCtrl,
+      [],
+      portalAction.portal.confirmationMessage,
+      [
+        { label: 'Yes', value: 'yes' },
+        { label: 'No', value: 'no' }
+      ]
+    );
+
+    if (confirmed === 'yes') {
+      // Use the portal
+      const result = await this.tileActionService.handlePortalAction(
+        portalAction.portal,
+        this.currentCharacter.name
+      );
+
+      if (result.success) {
+        // Announce to screen readers
+        this.announceToScreenReader(result.message);
+        await ItemFoundModalComponent.present(
+          this.modalCtrl,
+          [],
+          result.message
+        );
+        // The map will be regenerated automatically due to the effect watching character changes
+      } else {
+        await ItemFoundModalComponent.present(
+          this.modalCtrl,
+          [],
+          result.message
+        );
+      }
+    }
   }
 
   // Error handling for images

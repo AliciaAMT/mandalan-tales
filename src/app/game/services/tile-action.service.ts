@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { CharacterService } from './character.service';
 import { InventoryService } from './inventory.service';
+import { PortalService } from './portal.service';
 
 export interface TileAction {
   map: string;
@@ -31,6 +32,7 @@ export interface TileAction {
 export class TileActionService {
   private characterService = inject(CharacterService);
   private inventoryService = inject(InventoryService);
+  private portalService = inject(PortalService);
 
   // Define all tile actions organized by map and coordinates
   private tileActions: TileAction[] = [
@@ -334,5 +336,40 @@ export class TileActionService {
     }
 
     return { message: tileAction?.message || 'You search but find nothing.' };
+  }
+
+  /**
+   * Check if there's a portal at the given coordinates
+   */
+  hasPortal(map: string, x: number, y: number): boolean {
+    return this.portalService.hasPortal(map, x, y);
+  }
+
+  /**
+   * Get portal action for the given coordinates
+   */
+  getPortalAction(map: string, x: number, y: number) {
+    return this.portalService.getPortalAction(map, x, y);
+  }
+
+  /**
+   * Handle portal action
+   */
+  async handlePortalAction(portal: any, characterName: string): Promise<{ success: boolean; message: string }> {
+    return await this.portalService.usePortal(portal, characterName);
+  }
+
+  /**
+   * Check portal requirements
+   */
+  async checkPortalRequirements(portal: any, characterName: string): Promise<{ canUse: boolean; message?: string }> {
+    return await this.portalService.checkPortalRequirements(portal, characterName);
+  }
+
+  /**
+   * Get user-friendly name for a map
+   */
+  getMapDisplayName(map: string): string {
+    return this.portalService.getMapDisplayName(map);
   }
 }
