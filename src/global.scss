@@ -85,4 +85,25 @@ select:focus {
   --ion-color-primary: var(--theme-color, #6b4e26);
 }
 
+/* Ensure alert buttons have proper contrast */
+ion-alert {
+  --background: var(--ion-background-color, #ffffff);
+  --color: var(--ion-text-color, #000000);
+}
+
+ion-alert .alert-button {
+  color: var(--ion-color-primary-contrast, #ffffff) !important;
+  background: var(--ion-color-primary, #3880ff) !important;
+}
+
+ion-alert .alert-button.alert-button-role-cancel {
+  color: var(--ion-color-medium, #92949c) !important;
+  background: transparent !important;
+}
+
+ion-alert .alert-button.alert-button-role-destructive {
+  color: var(--ion-color-danger-contrast, #ffffff) !important;
+  background: var(--ion-color-danger, #eb445a) !important;
+}
+
 

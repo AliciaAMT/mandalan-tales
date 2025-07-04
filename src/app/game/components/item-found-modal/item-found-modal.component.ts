@@ -15,7 +15,7 @@ export interface FoundItem {
   selector: 'app-item-found-modal',
   template: `
     <ion-header>
-      <ion-toolbar color="primary">
+      <ion-toolbar>
         <ion-title>Item Found</ion-title>
         <ion-buttons slot="end">
           <ion-button (click)="close()">
@@ -40,7 +40,7 @@ export interface FoundItem {
           </div>
         </div>
       </div>
-      <ion-button expand="block" (click)="close()">OK</ion-button>
+      <ion-button expand="block" fill="outline" (click)="close()">OK</ion-button>
     </ion-content>
   `,
   styles: [`
@@ -80,9 +80,9 @@ export interface FoundItem {
     .event-message {
       display: flex;
       align-items: center;
-      background: #fffbe6;
-      color: #b8860b;
-      border: 1px solid #ffe58f;
+      background: var(--ion-color-light, #f4f4f4);
+      color: var(--ion-text-color, #000000);
+      border: 1px solid var(--ion-color-medium, #92949c);
       border-radius: 6px;
       padding: 0.75em 1em;
       margin-bottom: 1em;
@@ -91,6 +91,16 @@ export interface FoundItem {
     .event-message ion-icon {
       margin-right: 0.5em;
       font-size: 1.3em;
+    }
+
+    ion-button {
+      --background: var(--ion-color-medium, #92949c);
+      --color: var(--ion-color-medium-contrast, #ffffff);
+      --border-color: var(--ion-color-medium, #92949c);
+    }
+
+    ion-button:hover {
+      --background: var(--ion-color-medium-shade, #7a7d85);
     }
   `],
   standalone: true,
