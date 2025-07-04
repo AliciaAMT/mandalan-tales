@@ -543,6 +543,26 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
     // Use a single resize call instead of polling
     setTimeout(() => this.resizeMapGrid(), 100);
   }
+
+  @HostListener('document:keydown', ['$event'])
+  handleHeaderKeydown(event: KeyboardEvent) {
+    // Handle Enter and Space for collapsible headers
+    if (event.target instanceof HTMLElement && event.target.classList.contains('collapsible-header')) {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        const header = event.target as HTMLElement;
+        if (header.textContent?.includes('Player Stats')) {
+          this.togglePlayerStats();
+        } else if (header.textContent?.includes('Map')) {
+          this.toggleMap();
+        } else if (header.textContent?.includes('Tile Actions')) {
+          this.toggleTileActions();
+        } else if (header.textContent?.includes('Menu')) {
+          this.toggleMenu();
+        }
+      }
+    }
+  }
   toggleMap() {
     this.isMapOpen = !this.isMapOpen;
     this.saveState();

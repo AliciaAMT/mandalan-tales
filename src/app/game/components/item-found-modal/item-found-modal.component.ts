@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, OnDestroy, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonicModule, ModalController } from '@ionic/angular';
 import { addIcons } from 'ionicons';
@@ -106,18 +106,45 @@ export interface FoundItem {
   standalone: true,
   imports: [CommonModule, IonicModule]
 })
-export class ItemFoundModalComponent {
+export class ItemFoundModalComponent implements OnInit, OnDestroy {
   @Input() items: FoundItem[] = [];
   @Input() eventMessage?: string;
   @Output() closed = new EventEmitter<void>();
+
+  private lastFocusedElement: HTMLElement | null = null;
 
   constructor(private modalCtrl: ModalController) {
     addIcons({ closeOutline, alertCircleOutline });
   }
 
+  ngOnInit() {
+    // Save the currently focused element
+    this.lastFocusedElement = document.activeElement as HTMLElement;
+  }
+
+  ngOnDestroy() {
+    // Restore focus when component is destroyed
+    if (this.lastFocusedElement) {
+      // Use a longer timeout to ensure the directive has finished its work
+      setTimeout(() => {
+        if (this.lastFocusedElement && document.contains(this.lastFocusedElement)) {
+          this.lastFocusedElement.focus();
+        }
+      }, 100);
+    }
+  }
+
   close() {
     this.modalCtrl.dismiss();
     this.closed.emit();
+  }
+
+  @HostListener('document:keydown', ['$event'])
+  handleKeydown(event: KeyboardEvent) {
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      this.close();
+    }
   }
 
   getItemImage(item: FoundItem): string {
