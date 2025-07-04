@@ -28,11 +28,20 @@ export interface TileAction {
   alreadyFoundMessage?: string;
 }
 
+export interface TileActionResult {
+  message: string;
+  items?: any[];
+  success: boolean;
+}
+
 @Injectable({ providedIn: 'root' })
 export class TileActionService {
   private characterService = inject(CharacterService);
   private inventoryService = inject(InventoryService);
   private portalService = inject(PortalService);
+
+  // Optimized lookup structure: Map -> Coordinates -> Action -> TileAction
+  private tileActionLookup: Map<string, Map<string, Map<string, TileAction>>> = new Map();
 
   // Define all tile actions organized by map and coordinates
   private tileActions: TileAction[] = [
@@ -232,41 +241,161 @@ export class TileActionService {
     }
   ];
 
-  /**
-   * Get tile action for a specific map and coordinates
-   */
-  getTileAction(map: string, x: number, y: number, action: string): TileAction | null {
-    return this.tileActions.find(ta =>
-      ta.map === map &&
-      ta.x === x &&
-      ta.y === y &&
-      ta.action === action
-    ) || null;
+  constructor() {
+    this.buildTileActionLookup();
   }
 
   /**
-   * Handle tile action and return result
+   * Build optimized lookup structure for fast tile action retrieval
    */
-  async handleTileAction(map: string, x: number, y: number, action: string, characterName?: string): Promise<{ message: string, items?: any[] }> {
+  private buildTileActionLookup(): void {
+    for (const tileAction of this.tileActions) {
+      const mapKey = tileAction.map;
+      const coordKey = `${tileAction.x},${tileAction.y}`;
+      const actionKey = tileAction.action;
+
+      // Initialize map if it doesn't exist
+      if (!this.tileActionLookup.has(mapKey)) {
+        this.tileActionLookup.set(mapKey, new Map());
+      }
+
+      // Initialize coordinates if they don't exist
+      const mapActions = this.tileActionLookup.get(mapKey)!;
+      if (!mapActions.has(coordKey)) {
+        mapActions.set(coordKey, new Map());
+      }
+
+      // Add the tile action
+      const coordActions = mapActions.get(coordKey)!;
+      coordActions.set(actionKey, tileAction);
+    }
+  }
+
+  /**
+   * Main method to handle tile actions that may yield items
+   */
+  async handleTileAction(
+    map: string,
+    x: number,
+    y: number,
+    action: string,
+    characterName?: string
+  ): Promise<TileActionResult> {
     const tileAction = this.getTileAction(map, x, y, action);
 
     if (!tileAction) {
-      return { message: `You ${action} but find nothing of interest.` };
+      return {
+        message: `You ${action} but find nothing of interest.`,
+        success: false
+      };
     }
 
     if (!characterName) {
-      return { message: tileAction.message };
+      return {
+        message: tileAction.message,
+        success: true
+      };
     }
 
     // Check if already found
-    if (tileAction.flagKey) {
-      const flags = await this.characterService.getCharacterFlags(characterName);
-      if (flags?.[tileAction.flagKey as keyof typeof flags] === 1) {
-        return { message: tileAction.alreadyFoundMessage || 'You search but find nothing.' };
-      }
+    if (await this.isItemAlreadyFound(tileAction, characterName)) {
+      return {
+        message: tileAction.alreadyFoundMessage || 'You search but find nothing.',
+        success: false
+      };
     }
 
-    // Award items
+    // Give items to player
+    const foundItems = await this.giveItemsToPlayer(tileAction, characterName);
+
+    if (foundItems.length === 0) {
+      return {
+        message: 'You find items but your inventory is full.',
+        success: false
+      };
+    }
+
+    // Set flags to prevent finding items again
+    await this.setItemFlags(tileAction, characterName);
+
+    return {
+      message: tileAction.message,
+      items: foundItems,
+      success: true
+    };
+  }
+
+  /**
+   * Get tile action for a specific map and coordinates using optimized lookup
+   */
+  getTileAction(map: string, x: number, y: number, action: string): TileAction | null {
+    // Fallback for invalid map
+    if (!map || !x || !y || !action) {
+      console.warn('Invalid parameters for getTileAction:', { map, x, y, action });
+      return null;
+    }
+
+    const mapActions = this.tileActionLookup.get(map);
+    if (!mapActions) {
+      return null;
+    }
+
+    const coordKey = `${x},${y}`;
+    const coordActions = mapActions.get(coordKey);
+    if (!coordActions) {
+      return null;
+    }
+
+    return coordActions.get(action) || null;
+  }
+
+  /**
+   * Get all tile actions for a specific map (useful for debugging or bulk operations)
+   */
+  getTileActionsForMap(map: string): TileAction[] {
+    const mapActions = this.tileActionLookup.get(map);
+    if (!mapActions) {
+      return [];
+    }
+
+    const actions: TileAction[] = [];
+    for (const coordActions of mapActions.values()) {
+      for (const tileAction of coordActions.values()) {
+        actions.push(tileAction);
+      }
+    }
+    return actions;
+  }
+
+  /**
+   * Check if there are any tile actions for a specific map and coordinates
+   */
+  hasTileActions(map: string, x: number, y: number): boolean {
+    const mapActions = this.tileActionLookup.get(map);
+    if (!mapActions) {
+      return false;
+    }
+
+    const coordKey = `${x},${y}`;
+    return mapActions.has(coordKey);
+  }
+
+  /**
+   * Check if the item has already been found by checking flags
+   */
+  private async isItemAlreadyFound(tileAction: TileAction, characterName: string): Promise<boolean> {
+    if (!tileAction.flagKey) {
+      return false;
+    }
+
+    const flags = await this.characterService.getCharacterFlags(characterName);
+    return !!flags && !!flags[tileAction.flagKey as keyof typeof flags];
+  }
+
+  /**
+   * Give items to the player and return the list of found items
+   */
+  private async giveItemsToPlayer(tileAction: TileAction, characterName: string): Promise<any[]> {
     const foundItems: any[] = [];
 
     if (tileAction.items && tileAction.items.length > 0) {
@@ -313,29 +442,29 @@ export class TileActionService {
       }
     }
 
-    if (foundItems.length > 0) {
-      // Update flag
-      if (tileAction.flagKey) {
-        await this.characterService.setCharacterFlag(characterName, tileAction.flagKey as any, 1);
-      }
+    return foundItems;
+  }
 
-      // Update quest flag
-      if (tileAction.questFlagKey && tileAction.questFlagValue) {
-        const flags = await this.characterService.getCharacterFlags(characterName);
-        if (flags?.[tileAction.questFlagKey as keyof typeof flags] === 0) {
-          await this.characterService.setCharacterFlag(characterName, tileAction.questFlagKey as any, tileAction.questFlagValue);
-        }
-      }
-
-      return {
-        message: tileAction.message,
-        items: foundItems
-      };
-    } else {
-      return { message: `You find items but your inventory is full.` };
+  /**
+   * Set flags to prevent finding items again and update quest progress
+   */
+  private async setItemFlags(tileAction: TileAction, characterName: string): Promise<void> {
+    // Set the main flag to prevent finding the item again
+    if (tileAction.flagKey) {
+      await this.characterService.setCharacterFlag(characterName, tileAction.flagKey as any, 1);
     }
 
-    return { message: tileAction?.message || 'You search but find nothing.' };
+    // Update quest flag if this action advances a quest
+    if (tileAction.questFlagKey && tileAction.questFlagValue) {
+      const flags = await this.characterService.getCharacterFlags(characterName);
+      if (flags?.[tileAction.questFlagKey as keyof typeof flags] === 0) {
+        await this.characterService.setCharacterFlag(
+          characterName,
+          tileAction.questFlagKey as any,
+          tileAction.questFlagValue
+        );
+      }
+    }
   }
 
   /**

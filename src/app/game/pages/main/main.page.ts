@@ -15,7 +15,7 @@ import { DialogueService } from '../../services/dialogue.service';
 import { ReplenishmentService, ReplenishableItem } from '../../services/replenishment.service';
 import { ItemFoundModalComponent, FoundItem } from '../../components/item-found-modal/item-found-modal.component';
 import { ModalController } from '@ionic/angular';
-import { ObjectInteractionService } from '../../services/object-interaction.service';
+// import { ObjectInteractionService } from '../../services/object-interaction.service';
 import { TileActionService } from '../../services/tile-action.service';
 
 const STORAGE_KEY = 'mainPageSectionState';
@@ -72,7 +72,7 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
   inventoryService = inject(InventoryService);
   dialogueService = inject(DialogueService);
   replenishmentService = inject(ReplenishmentService);
-  objectInteractionService = inject(ObjectInteractionService);
+  // objectInteractionService = inject(ObjectInteractionService);
   tileActionService = inject(TileActionService);
   private injector = inject(Injector);
   modalCtrl = inject(ModalController);
@@ -95,8 +95,34 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
   currentObjects: GameObject[] = [];
   currentPortals: Portal[] = [];
 
+  // Track last character position to prevent infinite loops
+  private lastCharacterX: number = 0;
+  private lastCharacterY: number = 0;
+
+  // Cache for allTileActions to prevent infinite loops
+  private _allTileActionsCache: any[] = [];
+  private _allTileActionsCacheTimestamp: number = 0;
+  private _lastCacheUpdate: number = 0;
+
+  // Cache for getCurrentObjects to prevent infinite loops
+  private _lastObjectPosition: string = '';
+  private _cachedObjects: GameObject[] = [];
+
+  // Cache for getCurrentNPCs to prevent infinite loops
+  private _lastNPCPosition: string = '';
+  private _cachedNPCs: NPC[] = [];
+
+  // Cache for getCurrentPortals to prevent infinite loops
+  private _lastPortalPosition: string = '';
+  private _cachedPortals: Portal[] = [];
+
   get allTileActions(): any[] {
-    return this.getAllTileActions();
+    // Cache the result to prevent infinite loops
+    if (!this._allTileActionsCache || this._allTileActionsCacheTimestamp !== this._lastCacheUpdate) {
+      this._allTileActionsCache = this.getAllTileActions();
+      this._allTileActionsCacheTimestamp = this._lastCacheUpdate;
+    }
+    return this._allTileActionsCache;
   }
 
   constructor(
@@ -107,9 +133,15 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
     effect(() => {
       const chars = this.characterService.getCharacters();
       if (chars.length > 0 && this.isInitialized) {
-        this.generateMap();
-        // Reset replenishment flag when character changes
-        this.resetReplenishmentInitialization();
+        // Only regenerate map if character actually changed
+        const currentChar = this.currentCharacter;
+        if (currentChar && (currentChar.xaxis !== this.lastCharacterX || currentChar.yaxis !== this.lastCharacterY)) {
+          this.generateMap();
+          this.lastCharacterX = currentChar.xaxis;
+          this.lastCharacterY = currentChar.yaxis;
+          // Reset replenishment flag when character changes
+          this.resetReplenishmentInitialization();
+        }
       }
     });
   }
@@ -322,6 +354,14 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
     this.currentNPCs = this.getCurrentNPCs();
     this.currentObjects = this.getCurrentObjects();
     this.currentPortals = this.getCurrentPortals();
+
+    // Update cache timestamp to invalidate cached tile actions
+    this._lastCacheUpdate = Date.now();
+
+    // Clear position-based caches when map is regenerated
+    this._lastObjectPosition = '';
+    this._lastNPCPosition = '';
+    this._lastPortalPosition = '';
   }
 
   // Test method to generate hardcoded tiles
@@ -619,7 +659,7 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
 
   get gridTemplateAreas() {
     if (this.isMobile) {
-      return 'unset';
+      return '"playerstats" "map" "tileactions" "menu"';
     }
     // Build the top row
     let topRow = [];
@@ -632,9 +672,9 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
     return `\"${topRow.join(' ')}\" \"${menuRow}\"`;
   }
 
-  get playerStatsArea() { return this.isPlayerStatsOpen ? 'playerstats' : ''; }
-  get mapArea() { return this.isMapOpen ? 'map' : ''; }
-  get tileActionsArea() { return this.isTileActionsOpen ? 'tileactions' : ''; }
+  get playerStatsArea() { return this.isPlayerStatsOpen ? 'playerstats' : 'unset'; }
+  get mapArea() { return this.isMapOpen ? 'map' : 'unset'; }
+  get tileActionsArea() { return this.isTileActionsOpen ? 'tileactions' : 'unset'; }
   get menuArea() {
     // Always set menu area to 'menu' so it spans all columns
     return 'menu';
@@ -652,6 +692,13 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
     }
 
     const { map, xaxis, yaxis } = this.currentCharacter;
+
+    // Prevent excessive calls with caching
+    const positionKey = `${map}-${xaxis}-${yaxis}`;
+    if (this._lastNPCPosition === positionKey) {
+      return this._cachedNPCs || [];
+    }
+
     const npcs: NPC[] = [];
 
     // Father in homeup (2,2)
@@ -696,6 +743,10 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
       }
     }
 
+    // Update cache
+    this._lastNPCPosition = positionKey;
+    this._cachedNPCs = npcs;
+
     return npcs;
   }
 
@@ -703,8 +754,21 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
     if (!this.currentCharacter) return [];
 
     const { map, xaxis, yaxis } = this.currentCharacter;
+
+    // Prevent excessive logging and calls
+    const positionKey = `${map}-${xaxis}-${yaxis}`;
+    if (this._lastObjectPosition === positionKey) {
+      return this._cachedObjects || [];
+    }
+
     console.log(`Getting objects for position: ${map} (${xaxis}, ${yaxis})`);
     const objects: GameObject[] = [];
+
+    // Fallback for unknown maps
+    if (!map) {
+      console.warn('No map available for current character');
+      return [];
+    }
 
     // Homeup objects
     if (map === 'homeup') {
@@ -944,6 +1008,11 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
     }
 
     console.log('Returning objects:', objects);
+
+    // Update cache
+    this._lastObjectPosition = positionKey;
+    this._cachedObjects = objects;
+
     return objects;
   }
 
@@ -967,6 +1036,13 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
     if (!this.currentCharacter) return [];
 
     const { map, xaxis, yaxis } = this.currentCharacter;
+
+    // Prevent excessive calls with caching
+    const positionKey = `${map}-${xaxis}-${yaxis}`;
+    if (this._lastPortalPosition === positionKey) {
+      return this._cachedPortals || [];
+    }
+
     const portals: Portal[] = [];
 
     // Use the portal service to get portals for current location
@@ -980,6 +1056,10 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
         action: this.getPortalActionText(portalAction.portal.name)
       });
     }
+
+    // Update cache
+    this._lastPortalPosition = positionKey;
+    this._cachedPortals = portals;
 
     return portals;
   }
@@ -1146,7 +1226,13 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
         await this.handleRug();
         break;
       case 'bed': {
-        const { actions, message } = await this.objectInteractionService.getBedInteraction();
+        // const { actions, message } = await this.objectInteractionService.getBedInteraction();
+    const actions = [
+      { label: 'Sleep', value: 'sleep' },
+      { label: 'Search', value: 'search' },
+      { label: 'Cancel', value: 'cancel' }
+    ];
+    const message = 'You see a simple bed. What would you like to do?';
         const action = await ItemFoundModalComponent.present(
           this.modalCtrl,
           [],
@@ -1164,7 +1250,13 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
             );
             await ItemFoundModalComponent.present(this.modalCtrl, result.items || [], result.message);
           } else {
-            const result = await this.objectInteractionService.handleBedAction(action);
+            // const result = await this.objectInteractionService.handleBedAction(action);
+        let result = { message: '' };
+        if (action === 'sleep') {
+          result = { message: 'You rest on the bed and feel a bit better.' };
+        } else if (action === 'search') {
+          result = { message: 'You search the bed but find nothing of interest.' };
+        }
             if (result.message) {
               await ItemFoundModalComponent.present(this.modalCtrl, [], result.message);
             }

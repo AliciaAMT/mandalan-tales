@@ -102,13 +102,20 @@ ion-content::part(scroll) {
     overflow-x: hidden !important;
     display: block !important;
   }
+
   .main-game-responsive-grid {
     height: auto !important;
     min-height: 0 !important;
     max-height: none !important;
     overflow: visible !important;
-    display: block !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 16px !important;
+    grid-template-areas: none !important;
+    grid-template-columns: none !important;
+    grid-template-rows: none !important;
   }
+
   .main-section,
   .section-content,
   .map-container {
@@ -117,16 +124,33 @@ ion-content::part(scroll) {
     max-height: none !important;
     flex: unset !important;
     display: block !important;
+    width: 100% !important;
   }
+
   .main-section {
     width: 100% !important;
     min-width: 0;
     margin-bottom: 16px;
     border-radius: 8px;
     box-sizing: border-box;
+    display: block !important;
   }
+
   .main-section:last-child {
     margin-bottom: 0;
+  }
+
+  /* Force mobile layout for all sections - override any grid-area */
+  .player-stats,
+  .map,
+  .tile-actions,
+  .menu {
+    grid-area: unset !important;
+    width: 100% !important;
+    display: block !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
   }
   .player-stats-list {
     display: flex;
