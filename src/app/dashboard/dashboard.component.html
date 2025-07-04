@@ -38,6 +38,15 @@
                   [attr.aria-label]="'View details for ' + char.name + ' character'">
                   <ion-icon slot="icon-only" name="information-circle-outline"></ion-icon>
                 </ion-button>
+                <ion-button
+                  fill="clear"
+                  size="small"
+                  (click)="resetTestData(char); $event.stopPropagation()"
+                  color="warning"
+                  class="reset-button"
+                  [attr.aria-label]="'Reset ' + char.name + ' to brand new state'">
+                  <ion-icon slot="icon-only" name="refresh-circle-outline"></ion-icon>
+                </ion-button>
               </div>
             </div>
           </ion-card>

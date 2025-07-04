@@ -272,8 +272,63 @@ export class CharacterService {
 
   // Method to set a specific flag
   async setCharacterFlag(characterName: string, flagKey: keyof Flags, value: any): Promise<void> {
-    const update: Partial<Flags> = {};
-    update[flagKey] = value;
-    await this.updateCharacterFlags(characterName, update);
+    return runInInjectionContext(this.injector, async () => {
+      const firestore = inject(Firestore);
+      const flagsQuery = query(
+        collection(firestore, 'flags'),
+        where('charname', '==', characterName)
+      );
+      const flagsSnapshot = await getDocs(flagsQuery);
+
+      if (!flagsSnapshot.empty) {
+        const flagsDoc = flagsSnapshot.docs[0];
+        const update: any = {};
+        update[flagKey] = value;
+        await updateDoc(flagsDoc.ref, update);
+      }
+    });
+  }
+
+  // Method to clear all inventory items for a character
+  async clearCharacterInventory(characterId: string): Promise<void> {
+    return runInInjectionContext(this.injector, async () => {
+      const firestore = inject(Firestore);
+      const character = this.getCharacterById(characterId);
+      if (!character) {
+        throw new Error('Character not found');
+      }
+
+      // Delete all inventory items for this character
+      const inventoryQuery = query(
+        collection(firestore, 'inventory'),
+        where('charname', '==', character.name)
+      );
+      const inventorySnapshot = await getDocs(inventoryQuery);
+
+      const batch = writeBatch(firestore);
+      inventorySnapshot.docs.forEach(doc => {
+        batch.delete(doc.ref);
+      });
+
+      await batch.commit();
+      console.log(`Cleared ${inventorySnapshot.docs.length} inventory items for character: ${character.name}`);
+    });
+  }
+
+  // Method to clear replenishment data for a character
+  async clearCharacterReplenishment(characterName: string): Promise<void> {
+    return runInInjectionContext(this.injector, async () => {
+      const firestore = inject(Firestore);
+
+      // Delete replenishment data for this character
+      const replenishmentRef = doc(firestore, 'replenishableItems', characterName);
+      try {
+        await deleteDoc(replenishmentRef);
+        console.log(`Cleared replenishment data for character: ${characterName}`);
+      } catch (error) {
+        // Document might not exist, which is fine
+        console.log(`No replenishment data found for character: ${characterName}`);
+      }
+    });
   }
 }

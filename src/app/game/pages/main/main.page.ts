@@ -5,12 +5,16 @@ import { CharacterService } from '../../../game/services/character.service';
 import { CharStats } from '../../../game/models/charstats.model';
 import { SettingsService } from '../../../game/services/settings.service';
 import { AuthService } from '../../../services/auth.service';
+import { InventoryService } from '../../../game/services/inventory.service';
 import { DEFAULT_THEME_COLOR } from '../../../game/models/settings.model';
 import { IonicModule } from '@ionic/angular';
 import { FocusManagerDirective } from '../../../shared/focus-manager.directive';
 import { BottomIconRowComponent } from './bottom-icon-row.component';
 import { DialogueModalComponent } from '../../components/dialogue-modal/dialogue-modal.component';
 import { DialogueService } from '../../services/dialogue.service';
+import { ReplenishmentService, ReplenishableItem } from '../../services/replenishment.service';
+import { ItemFoundModalComponent, FoundItem } from '../../components/item-found-modal/item-found-modal.component';
+import { ModalController } from '@ionic/angular';
 
 const STORAGE_KEY = 'mainPageSectionState';
 
@@ -50,7 +54,7 @@ interface Portal {
   templateUrl: './main.page.html',
   styleUrls: ['./main.page.scss'],
   standalone: true,
-  imports: [CommonModule, FormsModule, IonicModule, FocusManagerDirective, BottomIconRowComponent, DialogueModalComponent]
+  imports: [CommonModule, FormsModule, IonicModule, FocusManagerDirective, BottomIconRowComponent, DialogueModalComponent, ItemFoundModalComponent]
 })
 export class MainPage implements OnInit, AfterViewInit, OnDestroy {
   isPlayerStatsOpen = true;
@@ -58,12 +62,16 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
   isTileActionsOpen = true;
   isMenuOpen = true;
   isLoading = true;
+  private replenishmentInitialized = false;
 
   characterService = inject(CharacterService);
   settingsService = inject(SettingsService);
   authService = inject(AuthService);
+  inventoryService = inject(InventoryService);
   dialogueService = inject(DialogueService);
+  replenishmentService = inject(ReplenishmentService);
   private injector = inject(Injector);
+  modalCtrl = inject(ModalController);
 
   mapTiles: MapTile[][] = [];
   isInitialized = false;
@@ -82,7 +90,10 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
   currentNPCs: NPC[] = [];
   currentObjects: GameObject[] = [];
   currentPortals: Portal[] = [];
-  allTileActions: any[] = [];
+
+  get allTileActions(): any[] {
+    return this.getAllTileActions();
+  }
 
   constructor(
     private ngZone: NgZone,
@@ -93,11 +104,25 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
       const chars = this.characterService.getCharacters();
       if (chars.length > 0 && this.isInitialized) {
         this.generateMap();
+        // Reset replenishment flag when character changes
+        this.resetReplenishmentInitialization();
       }
     });
   }
 
+  private resetReplenishmentInitialization() {
+    // Reset the flag so replenishment can be initialized for new characters
+    this.replenishmentInitialized = false;
+  }
+
   async ngOnInit() {
+    // Set theme color from localStorage or default
+    const themeColor = localStorage.getItem('themeColor') || DEFAULT_THEME_COLOR;
+    document.documentElement.style.setProperty('--theme-color', themeColor);
+    if (this.getTextColorForTheme) {
+      const textColor = this.getTextColorForTheme(themeColor);
+      document.documentElement.style.setProperty('--header-text-color', textColor);
+    }
     await this.loadUserSettings();
     console.log('MainPage ngOnInit, currentCharacter:', this.currentCharacter);
     const saved = localStorage.getItem(STORAGE_KEY);
@@ -109,6 +134,16 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
         if (typeof state.isTileActionsOpen === 'boolean') this.isTileActionsOpen = state.isTileActionsOpen;
         if (typeof state.isMenuOpen === 'boolean') this.isMenuOpen = state.isMenuOpen;
       } catch {}
+    }
+
+        // Load inventory for current character
+    await this.inventoryService.loadInventory();
+    console.log('Current inventory:', this.inventoryService.inventory);
+
+    // Initialize replenishable items for current character
+    if (this.currentCharacter && !this.replenishmentInitialized) {
+      await this.replenishmentService.initializeReplenishableItems(this.currentCharacter.name);
+      this.replenishmentInitialized = true;
     }
 
     // Generate initial map
@@ -267,11 +302,6 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
     this.currentNPCs = this.getCurrentNPCs();
     this.currentObjects = this.getCurrentObjects();
     this.currentPortals = this.getCurrentPortals();
-    this.allTileActions = [
-      ...this.currentNPCs.map(npc => ({ ...npc, type: 'NPC' })),
-      ...this.currentObjects.map(obj => ({ ...obj, type: 'Object' })),
-      ...this.currentPortals.map(portal => ({ ...portal, type: 'Portal' }))
-    ];
   }
 
   // Test method to generate hardcoded tiles
@@ -633,6 +663,7 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
     if (!this.currentCharacter) return [];
 
     const { map, xaxis, yaxis } = this.currentCharacter;
+    console.log(`Getting objects for position: ${map} (${xaxis}, ${yaxis})`);
     const objects: GameObject[] = [];
 
     // Homeup objects
@@ -850,7 +881,46 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
       }
     }
 
+    // Add replenishable items from the service
+    if (this.currentCharacter) {
+      const replenishableItems = this.replenishmentService.getReplenishableItems(
+        this.currentCharacter.map,
+        this.currentCharacter.xaxis,
+        this.currentCharacter.yaxis
+      );
+
+      replenishableItems.forEach(item => {
+        const statusText = item.currentQuantity > 0
+          ? ` (${item.currentQuantity} available)`
+          : ' (depleted)';
+
+        objects.push({
+          name: item.name,
+          image: this.getReplenishableItemImage(item),
+          description: `${item.name}${statusText}`,
+          action: 'harvest'
+        });
+      });
+    }
+
+    console.log('Returning objects:', objects);
     return objects;
+  }
+
+  /**
+   * Get the appropriate image for a replenishable item
+   */
+  private getReplenishableItemImage(item: ReplenishableItem): string {
+    switch (item.type) {
+      case 'fruit':
+        return 'fruittree';
+      case 'herb':
+        return 'herbrack';
+      case 'resource':
+        return 'plants';
+      default:
+        return 'plants';
+    }
   }
 
   getCurrentPortals(): Portal[] {
@@ -976,10 +1046,528 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-  interactWithObject(object: GameObject) {
+  async interactWithObject(object: GameObject) {
     console.log(`Interacting with ${object.name}: ${object.action}`);
-    // TODO: Implement object interaction logic
-    alert(`You ${object.action} the ${object.name}. This feature is coming soon!`);
+    console.log('Object details:', object);
+    console.log('Current inventory:', this.inventoryService.inventory);
+
+    // Handle different object types based on the old PHP demo
+    switch (object.name.toLowerCase()) {
+      case 'water barrel':
+        await this.handleWaterBarrel();
+        break;
+      case 'fireplace':
+        await this.handleFireplace();
+        break;
+      case 'well':
+        await this.handleWell();
+        break;
+      case 'melon plants':
+      case 'garden':
+      case 'fruit tree':
+        await this.handleHarvest(object.name);
+        break;
+      case 'chest':
+        await this.handleChest();
+        break;
+      case 'pantry':
+        await this.handlePantry();
+        break;
+      case 'herb rack':
+        await this.handleHerbRack();
+        break;
+      case 'rug':
+        await this.handleRug();
+        break;
+      case 'desk':
+      case 'shelf':
+      case 'side table':
+      case 'coatrack':
+      case 'wardrobe':
+      case 'table':
+      case 'bed':
+      case 'dog house':
+      case 'chicken coop':
+        // These are examine/search objects that don't give items
+        alert(`You ${object.action} the ${object.name}. You find nothing of interest.`);
+        break;
+      default:
+        // Default interaction
+        alert(`You ${object.action} the ${object.name}. This feature is coming soon!`);
+    }
+  }
+
+  /**
+   * Handle water barrel interaction
+   */
+  private async handleWaterBarrel() {
+    console.log('Handling water barrel interaction');
+    console.log('Current inventory:', this.inventoryService.inventory);
+
+    const hasBottle = this.inventoryService.hasItem('Bottle');
+    console.log('Has bottle:', hasBottle);
+
+    if (hasBottle) {
+      // Add water to bottle
+      const bottleItem = this.inventoryService.inventory.find(i => i.itemname === 'Bottle');
+      if (bottleItem) {
+        bottleItem.waterunits = Math.min(bottleItem.waterunits + 3, bottleItem.maxwater || 10);
+        await this.inventoryService.saveInventory();
+        alert('You fill your bottle with fresh water from the barrel.');
+      }
+    } else {
+      alert('You need a bottle to collect water.');
+    }
+  }
+
+  /**
+   * Handle fireplace interaction
+   */
+  private async handleFireplace() {
+    const hasFirewood = this.inventoryService.hasItem('Firewood');
+    const hasTinderbox = this.inventoryService.hasItem('Tinderbox');
+
+    if (hasFirewood && hasTinderbox) {
+      // Start a fire
+      await this.inventoryService.removeItem('Firewood', 1);
+      alert('You successfully start a fire in the fireplace. The room is now warm and cozy.');
+    } else if (hasFirewood) {
+      alert('You have firewood but need a tinderbox to start a fire.');
+    } else {
+      alert('You need firewood and a tinderbox to start a fire.');
+    }
+  }
+
+  /**
+   * Handle well interaction
+   */
+  private async handleWell() {
+    const hasBottle = this.inventoryService.hasItem('Bottle');
+
+    if (hasBottle) {
+      // Add water to bottle
+      const bottleItem = this.inventoryService.inventory.find(i => i.itemname === 'Bottle');
+      if (bottleItem) {
+        bottleItem.waterunits = Math.min(bottleItem.waterunits + 5, bottleItem.maxwater || 10);
+        await this.inventoryService.saveInventory();
+        alert('You draw fresh water from the well and fill your bottle.');
+      }
+    } else {
+      alert('You need a bottle to collect water from the well.');
+    }
+  }
+
+  /**
+   * Handle harvesting from plants/trees
+   */
+  private async handleHarvest(plantName: string) {
+    if (!this.currentCharacter) return;
+
+    // Check for replenishable items at current location
+    const replenishableItems = this.replenishmentService.getReplenishableItems(
+      this.currentCharacter.map,
+      this.currentCharacter.xaxis,
+      this.currentCharacter.yaxis
+    );
+
+    // Find matching replenishable item by name
+    const matchingItem = replenishableItems.find(item =>
+      item.name.toLowerCase().includes(plantName.toLowerCase()) ||
+      plantName.toLowerCase().includes(item.name.toLowerCase())
+    );
+
+    if (matchingItem && matchingItem.currentQuantity > 0) {
+      // Harvest from replenishable source
+      const harvestedItem = await this.replenishmentService.harvestItem(
+        this.currentCharacter.name,
+        matchingItem.id
+      );
+
+      if (harvestedItem) {
+        const item = this.inventoryService.createBasicItem(
+          harvestedItem.itemData.name,
+          harvestedItem.itemData.description,
+          harvestedItem.itemData.type,
+          harvestedItem.itemData.image,
+          harvestedItem.itemData.quantity,
+          harvestedItem.itemData.options || {}
+        );
+
+        const success = await this.inventoryService.addItem(item);
+        if (success) {
+          const foundItems: FoundItem[] = [{
+            name: harvestedItem.itemData.name,
+            description: harvestedItem.itemData.description,
+            image: harvestedItem.itemData.image,
+            quantity: harvestedItem.itemData.quantity
+          }];
+          const remainingText = harvestedItem.currentQuantity > 0
+            ? `(${harvestedItem.currentQuantity} remaining)`
+            : '(depleted)';
+          await ItemFoundModalComponent.present(
+            this.modalCtrl,
+            foundItems,
+            `You harvest a ${harvestedItem.itemData.name.toLowerCase()} from the ${matchingItem.name.toLowerCase()}. ${remainingText}`
+          );
+        } else {
+          await ItemFoundModalComponent.present(
+            this.modalCtrl,
+            [],
+            'Your inventory is full.'
+          );
+        }
+      }
+    } else {
+      // Fallback to old static harvest logic for non-replenishable items
+      const harvestResults: { [key: string]: any } = {
+        'melon plants': { name: 'Melon', type: 'Food', image: 'melon', description: 'A juicy melon from the garden.' },
+        'garden': { name: 'Vegetable', type: 'Food', image: 'vegetable', description: 'Fresh vegetables from the garden.' }
+      };
+
+      const result = harvestResults[plantName.toLowerCase()];
+      if (result) {
+        const item = this.inventoryService.createBasicItem(
+          result.name,
+          result.description,
+          result.type,
+          result.image,
+          1,
+          { consumable: 1 }
+        );
+
+        const success = await this.inventoryService.addItem(item);
+        if (success) {
+          const foundItems: FoundItem[] = [{
+            name: result.name,
+            description: result.description,
+            image: result.image,
+            quantity: 1
+          }];
+          await ItemFoundModalComponent.present(
+            this.modalCtrl,
+            foundItems,
+            `You harvest a ${result.name.toLowerCase()} from the ${plantName.toLowerCase()}.`
+          );
+        } else {
+          await ItemFoundModalComponent.present(
+            this.modalCtrl,
+            [],
+            'Your inventory is full.'
+          );
+        }
+      }
+    }
+  }
+
+  /**
+   * Handle chest interaction
+   */
+  private async handleChest() {
+    console.log('Handling chest interaction');
+    console.log('Current inventory:', this.inventoryService.inventory);
+
+    // Check if items are already in this chest (using character position as identifier)
+    const chestKey = `chest_${this.currentCharacter?.name}_${this.currentCharacter?.map}_${this.currentCharacter?.xaxis}_${this.currentCharacter?.yaxis}`;
+    const chestState = localStorage.getItem(chestKey);
+
+    if (chestState === 'empty') {
+      await ItemFoundModalComponent.present(
+        this.modalCtrl,
+        [],
+        'The chest is empty.'
+      );
+      return;
+    }
+
+    // Items that should be in this chest
+    const chestItems = [
+      {
+        name: 'Firewood',
+        description: 'With firewood and flint you can start a fire in the proper area such as a fireplace or campsite.',
+        type: 'Other',
+        image: 'firewood',
+        quantity: 3
+      },
+      {
+        name: 'Tinderbox',
+        description: 'This tinderbox contains items to start a fire including flint and tinder.',
+        type: 'Other',
+        image: 'tinderbox',
+        quantity: 1
+      },
+      {
+        name: 'Key',
+        description: 'A rusty old key that might unlock something.',
+        type: 'Other',
+        image: 'key',
+        quantity: 1,
+        options: { othertype: 'Tool' }
+      },
+      {
+        name: 'Leather Armor',
+        description: 'Light leather armor that provides basic protection.',
+        type: 'Armor',
+        image: 'leatherarmor',
+        quantity: 1,
+        options: { equipable: 1, armortype: 'Light', defense: 2 }
+      }
+    ];
+
+    // Add all items to inventory
+    const foundItems: FoundItem[] = [];
+    for (const itemData of chestItems) {
+      const item = this.inventoryService.createBasicItem(
+        itemData.name,
+        itemData.description,
+        itemData.type,
+        itemData.image,
+        itemData.quantity,
+        itemData.options || {}
+      );
+
+      const success = await this.inventoryService.addItem(item);
+      if (success) {
+        foundItems.push({
+          name: itemData.name,
+          description: itemData.description,
+          image: itemData.image,
+          quantity: itemData.quantity
+        });
+        console.log(`Added ${itemData.name} to inventory`);
+      }
+    }
+
+    if (foundItems.length > 0) {
+      // Mark chest as empty
+      localStorage.setItem(chestKey, 'empty');
+      await ItemFoundModalComponent.present(
+        this.modalCtrl,
+        foundItems,
+        `You found ${foundItems.length} items in the chest!`
+      );
+    } else {
+      await ItemFoundModalComponent.present(
+        this.modalCtrl,
+        [],
+        'Your inventory is full.'
+      );
+    }
+  }
+
+  /**
+   * Handle pantry interaction
+   */
+    private async handlePantry() {
+    console.log('Handling pantry interaction');
+    console.log('Current inventory:', this.inventoryService.inventory);
+
+    // Check if items are already collected from this pantry
+    const pantryKey = `pantry_${this.currentCharacter?.name}_${this.currentCharacter?.map}_${this.currentCharacter?.xaxis}_${this.currentCharacter?.yaxis}`;
+    const pantryState = localStorage.getItem(pantryKey);
+
+    if (pantryState === 'empty') {
+      await ItemFoundModalComponent.present(
+        this.modalCtrl,
+        [],
+        'The pantry is mostly empty.'
+      );
+      return;
+    }
+
+    // Items that should be in this pantry
+    const pantryItems = [
+      {
+        name: 'Bread',
+        description: 'Fresh bread from the pantry.',
+        type: 'Food',
+        image: 'bread',
+        quantity: 1,
+        options: { consumable: 1 }
+      },
+      {
+        name: 'Cheese',
+        description: 'A piece of cheese from the pantry.',
+        type: 'Food',
+        image: 'cheese',
+        quantity: 1,
+        options: { consumable: 1 }
+      },
+      {
+        name: 'Apple',
+        description: 'A fresh apple from the pantry.',
+        type: 'Food',
+        image: 'apple',
+        quantity: 1,
+        options: { consumable: 1 }
+      }
+    ];
+
+    // Add all items to inventory
+    const foundItems: FoundItem[] = [];
+    for (const itemData of pantryItems) {
+      const item = this.inventoryService.createBasicItem(
+        itemData.name,
+        itemData.description,
+        itemData.type,
+        itemData.image,
+        itemData.quantity,
+        itemData.options || {}
+      );
+
+      const success = await this.inventoryService.addItem(item);
+      if (success) {
+        foundItems.push({
+          name: itemData.name,
+          description: itemData.description,
+          image: itemData.image,
+          quantity: itemData.quantity
+        });
+        console.log(`Added ${itemData.name} to inventory`);
+      }
+    }
+
+    if (foundItems.length > 0) {
+      // Mark pantry as empty
+      localStorage.setItem(pantryKey, 'empty');
+      await ItemFoundModalComponent.present(
+        this.modalCtrl,
+        foundItems,
+        `You found ${foundItems.length} food items in the pantry!`
+      );
+    } else {
+      await ItemFoundModalComponent.present(
+        this.modalCtrl,
+        [],
+        'Your inventory is full.'
+      );
+    }
+  }
+
+  /**
+   * Handle herb rack interaction
+   */
+    private async handleHerbRack() {
+    console.log('Handling herb rack interaction');
+    console.log('Current inventory:', this.inventoryService.inventory);
+
+    // Check if items are already collected from this herb rack
+    const herbRackKey = `herbrack_${this.currentCharacter?.name}_${this.currentCharacter?.map}_${this.currentCharacter?.xaxis}_${this.currentCharacter?.yaxis}`;
+    const herbRackState = localStorage.getItem(herbRackKey);
+
+    if (herbRackState === 'empty') {
+      alert('The herb rack is mostly empty.');
+      return;
+    }
+
+    // Items that should be on this herb rack
+    const herbRackItems = [
+      {
+        name: 'Aloe',
+        description: 'Aloe vera plant, useful for healing.',
+        type: 'Other',
+        image: 'aloe',
+        quantity: 1,
+        options: { othertype: 'Herb' }
+      },
+      {
+        name: 'Cinnamon',
+        description: 'Ground cinnamon spice.',
+        type: 'Other',
+        image: 'cinnamon',
+        quantity: 1,
+        options: { othertype: 'Spice' }
+      },
+      {
+        name: 'Thyme',
+        description: 'Fresh thyme herb.',
+        type: 'Other',
+        image: 'thyme',
+        quantity: 1,
+        options: { othertype: 'Herb' }
+      }
+    ];
+
+    // Add all items to inventory
+    let itemsFound = 0;
+    for (const itemData of herbRackItems) {
+      const item = this.inventoryService.createBasicItem(
+        itemData.name,
+        itemData.description,
+        itemData.type,
+        itemData.image,
+        itemData.quantity,
+        itemData.options || {}
+      );
+
+      const success = await this.inventoryService.addItem(item);
+      if (success) {
+        itemsFound++;
+        console.log(`Added ${itemData.name} to inventory`);
+      }
+    }
+
+    if (itemsFound > 0) {
+      // Mark herb rack as empty
+      localStorage.setItem(herbRackKey, 'empty');
+      alert(`You found ${itemsFound} herbs on the herb rack!`);
+    } else {
+      alert('Your inventory is full.');
+    }
+  }
+
+  /**
+   * Handle rug interaction
+   */
+  private async handleRug() {
+    console.log('Handling rug interaction');
+    console.log('Current inventory:', this.inventoryService.inventory);
+
+    // Check if the rug has already been interacted with
+    const rugKey = `rug_${this.currentCharacter?.name}_${this.currentCharacter?.map}_${this.currentCharacter?.xaxis}_${this.currentCharacter?.yaxis}`;
+    const rugState = localStorage.getItem(rugKey);
+
+    if (rugState === 'empty') {
+      await ItemFoundModalComponent.present(
+        this.modalCtrl,
+        [],
+        'The rug has already been examined.'
+      );
+      return;
+    }
+
+    // Add a hidden key item to the inventory (using old demo item name)
+    const keyItem = this.inventoryService.createBasicItem(
+      'Small Rusty Key',
+      'A small rusty key that might unlock something.',
+      'Other',
+      'smallrustykey',
+      1,
+      { othertype: 'Tool' }
+    );
+
+    const success = await this.inventoryService.addItem(keyItem);
+    if (success) {
+      const foundItems: FoundItem[] = [{
+        name: 'Small Rusty Key',
+        description: 'A small rusty key that might unlock something.',
+        image: 'smallrustykey',
+        quantity: 1
+      }];
+      await ItemFoundModalComponent.present(
+        this.modalCtrl,
+        foundItems,
+        'You find a small rusty key under the rug!'
+      );
+      // Mark rug as empty to prevent re-interaction
+      localStorage.setItem(rugKey, 'empty');
+      console.log('Rug flag set to empty:', rugKey);
+    } else {
+      await ItemFoundModalComponent.present(
+        this.modalCtrl,
+        [],
+        'Your inventory is full. Cannot add key.'
+      );
+    }
   }
 
   usePortal(portal: Portal) {
@@ -1087,5 +1675,33 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
     return Array.from(modal.querySelectorAll<HTMLElement>(
       'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
     )).filter(el => !el.hasAttribute('disabled') && !el.getAttribute('aria-hidden'));
+  }
+
+  /**
+   * Reset test data - useful for testing
+   * Call this from browser console: window.mainPage.resetTestData()
+   */
+  resetTestData() {
+    console.log('Resetting test data...');
+
+    // Clear all game-related localStorage flags
+    const keysToRemove = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && (key.includes('rug_') || key.includes('chest_') || key.includes('pantry_') || key.includes('herbrack_'))) {
+        keysToRemove.push(key);
+      }
+    }
+
+    keysToRemove.forEach(key => {
+      localStorage.removeItem(key);
+      console.log(`Removed: ${key}`);
+    });
+
+    console.log('Test data reset complete!');
+    console.log('Create a new character or reload the page for fresh testing.');
+
+    // Make it available globally for console access
+    (window as any).mainPage = this;
   }
 }

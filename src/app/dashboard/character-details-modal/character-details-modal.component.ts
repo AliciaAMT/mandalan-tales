@@ -367,7 +367,7 @@ export class CharacterDetailsModalComponent {
         }
       ],
       keyboardClose: true,
-      backdropDismiss: true
+      backdropDismiss: false
     });
 
     await alert.present();
@@ -422,7 +422,8 @@ export class CharacterDetailsModalComponent {
         header: 'Deletion Failed',
         message: `Failed to delete character: ${error}. Please try again or contact support.`,
         buttons: ['OK'],
-        keyboardClose: true
+        keyboardClose: true,
+        backdropDismiss: false
       });
       await errorAlert.present();
       await errorAlert.onDidDismiss();

@@ -7,6 +7,7 @@ import { AppHeaderComponent } from 'src/app/shared/header/app-header.component';
 import { AppFooterComponent } from 'src/app/shared/footer/app-footer.component';
 import { RACE_BONUSES, CLASS_BONUSES, getRaceBonus, getClassBonus } from 'src/app/game/config/character-config';
 import { CharacterService } from 'src/app/game/services/character.service';
+import { InventoryService } from 'src/app/game/services/inventory.service';
 import { CharStats } from 'src/app/game/models/charstats.model';
 
 @Component({
@@ -22,6 +23,7 @@ export class CreateCharacterPage {
   private modalCtrl: ModalController = inject(ModalController);
   private router: Router = inject(Router);
   private characterService: CharacterService = inject(CharacterService);
+  private inventoryService: InventoryService = inject(InventoryService);
 
   characterForm: FormGroup;
   formError: string | null = null;
@@ -293,6 +295,9 @@ export class CreateCharacterPage {
 
         // Save character to Firebase
         await this.characterService.createCharacter(characterData);
+
+        // Initialize inventory for the new character
+        await this.inventoryService.initializeForNewCharacter(characterData.name);
 
         // Navigate to dashboard
         this.router.navigate(['/dashboard']);

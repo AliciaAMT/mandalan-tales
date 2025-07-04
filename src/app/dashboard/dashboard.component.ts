@@ -14,6 +14,8 @@ import { SettingsService } from '../game/services/settings.service';
 import { DEFAULT_THEME_COLOR } from '../game/models/settings.model';
 import { FormsModule } from '@angular/forms';
 import { FocusManagerDirective } from '../shared/focus-manager.directive';
+import { addIcons } from 'ionicons';
+import { refreshCircleOutline } from 'ionicons/icons';
 // import { AngularFirestoreModule } from '@angular/fire/compat/firestore';
 
 @Component({
@@ -53,6 +55,9 @@ export class DashboardComponent implements OnInit {
   ];
 
   constructor() {
+    // Register the refresh-circle-outline icon
+    addIcons({ refreshCircleOutline });
+
     effect(() => {
       if (this.authService.authInitialized() && !this.authService.user()) {
         this.router.navigate(['/login']);
@@ -76,6 +81,12 @@ export class DashboardComponent implements OnInit {
       const settings = await this.settingsService.getUserSettings(this.user.uid);
       if (settings) {
         this.selectedThemeColor = settings.themeColor;
+        // Set the CSS variable immediately
+        document.documentElement.style.setProperty('--theme-color', this.selectedThemeColor);
+        localStorage.setItem('themeColor', this.selectedThemeColor);
+        // Also set the text color for contrast
+        const textColor = this.getTextColorForTheme(this.selectedThemeColor);
+        document.documentElement.style.setProperty('--header-text-color', textColor);
       }
     }
   }
@@ -86,6 +97,7 @@ export class DashboardComponent implements OnInit {
         await this.settingsService.updateThemeColor(this.user.uid, this.selectedThemeColor);
         // Update CSS custom properties for immediate effect
         document.documentElement.style.setProperty('--theme-color', this.selectedThemeColor);
+        localStorage.setItem('themeColor', this.selectedThemeColor);
 
         // Set text color based on theme brightness
         const textColor = this.getTextColorForTheme(this.selectedThemeColor);
@@ -141,6 +153,7 @@ export class DashboardComponent implements OnInit {
         header: 'Character Deleted',
         message: `"${character.name}" and all associated data have been permanently removed.`,
         buttons: ['OK'],
+        backdropDismiss: false,
         keyboardClose: true
       });
       await successAlert.present();
@@ -166,6 +179,95 @@ export class DashboardComponent implements OnInit {
     } else if (user && !user.emailVerified) {
       console.log('User not verified');
       alert('Please verify your email before entering the game.');
+    }
+  }
+
+  async resetTestData(character: CharStats): Promise<void> {
+    const alert = await this.alertCtrl.create({
+      header: 'Reset Character',
+      message: `This will completely reset "${character.name}" to a brand new state. This will delete ALL inventory items, clear ALL game progress, and reset ALL flags. This action cannot be undone.`,
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel'
+        },
+        {
+          text: 'Reset Character',
+          role: 'destructive',
+          handler: () => {
+            this.performCharacterReset(character);
+          }
+        }
+      ],
+      backdropDismiss: false,
+      keyboardClose: true
+    });
+
+    await alert.present();
+  }
+
+  private async performCharacterReset(character: CharStats): Promise<void> {
+    console.log('Performing complete reset for character:', character.name);
+
+    try {
+      // 1. Clear all localStorage flags for this character
+      const keysToRemove = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.includes(`_${character.name}_`)) {
+          keysToRemove.push(key);
+        }
+      }
+
+      keysToRemove.forEach(key => {
+        localStorage.removeItem(key);
+        console.log(`Removed localStorage key: ${key}`);
+      });
+
+      // 2. Clear inventory for this character from Firestore
+      if (character.id) {
+        try {
+          await this.characterService.clearCharacterInventory(character.id);
+          console.log('Cleared inventory from Firestore');
+        } catch (error) {
+          console.error('Error clearing inventory:', error);
+        }
+      }
+
+      // 3. Clear replenishment data for this character from Firestore
+      try {
+        await this.characterService.clearCharacterReplenishment(character.name);
+        console.log('Cleared replenishment data from Firestore');
+      } catch (error) {
+        console.error('Error clearing replenishment data:', error);
+      }
+
+      // 4. Reset character stats to default (optional - uncomment if you want this)
+      // await this.characterService.resetCharacterStats(character.id);
+
+      console.log('Complete character reset finished for:', character.name);
+
+      // Show success message
+      const successAlert = await this.alertCtrl.create({
+        header: 'Character Reset Complete',
+        message: `"${character.name}" has been completely reset to a brand new state. All inventory, progress, and flags have been cleared.`,
+        buttons: ['OK'],
+        backdropDismiss: false,
+        keyboardClose: true
+      });
+      await successAlert.present();
+
+    } catch (error) {
+      console.error('Error during character reset:', error);
+
+      const errorAlert = await this.alertCtrl.create({
+        header: 'Reset Error',
+        message: 'There was an error during the reset. Some data may not have been cleared completely.',
+        buttons: ['OK'],
+        backdropDismiss: false,
+        keyboardClose: true
+      });
+      await errorAlert.present();
     }
   }
 }

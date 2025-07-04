@@ -162,7 +162,9 @@ export class LoginComponent implements AfterViewInit, OnDestroy {
             this.resendVerificationEmail(user);
           }
         }
-      ]
+      ],
+      backdropDismiss: false,
+      keyboardClose: true
     });
 
     await alert.present();
