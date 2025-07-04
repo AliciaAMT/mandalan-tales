@@ -10,6 +10,10 @@ import { DialogueOption } from '../../models/dialogue.model';
   standalone: true,
   imports: [CommonModule, IonicModule],
   template: `
+    <!--
+      NPC section uses green border/accent and white font for name.
+      Player section uses blue border/accent (Ionic default) and white font.
+    -->
     <div class="dialogue-overlay" *ngIf="isDialogueOpen()" (click)="closeDialogue()">
       <div class="dialogue-modal" (click)="$event.stopPropagation()">
         <!-- NPC Section -->

@@ -35,7 +35,7 @@
   padding: 16px;
   background: rgba(255, 255, 255, 0.05);
   border-radius: 12px;
-  border-left: 4px solid var(--theme-color, #8d6e36);
+  border-left: 4px solid #2ecc40;
 }
 
 .npc-portrait {
@@ -44,7 +44,7 @@
   height: 80px;
   border-radius: 50%;
   overflow: hidden;
-  border: 3px solid var(--theme-color, #8d6e36);
+  border: 3px solid #2ecc40;
   background: rgba(0, 0, 0, 0.3);
 }
 
@@ -61,7 +61,7 @@
 
 .npc-name {
   margin: 0 0 8px 0;
-  color: var(--theme-color, #8d6e36);
+  color: #fff;
   font-size: 1.4rem;
   font-weight: bold;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
