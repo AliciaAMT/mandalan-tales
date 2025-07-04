@@ -28,7 +28,7 @@ declare global {
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
   standalone: true,
-  imports: [AppHeaderComponent, AppFooterComponent, FormsModule, NgIf, STANDALONE_IMPORTS, RouterModule/*, SkipLinkComponent*/],
+  imports: [AppHeaderComponent, AppFooterComponent, FormsModule, NgIf, STANDALONE_IMPORTS, RouterModule],
 })
 export class LoginComponent implements AfterViewInit, OnDestroy {
   public authService: AuthService = inject(AuthService);

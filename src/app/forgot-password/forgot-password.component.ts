@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { AuthService } from '../services/auth.service';
+// import { SkipLinkComponent } from '../shared/skip-link/skip-link.component';
 
 @Component({
   selector: 'app-forgot-password',

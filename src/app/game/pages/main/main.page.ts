@@ -56,7 +56,7 @@ interface Portal {
   templateUrl: './main.page.html',
   styleUrls: ['./main.page.scss'],
   standalone: true,
-  imports: [CommonModule, FormsModule, IonicModule, FocusManagerDirective, BottomIconRowComponent, DialogueModalComponent, ItemFoundModalComponent]
+  imports: [CommonModule, FormsModule, IonicModule, FocusManagerDirective, BottomIconRowComponent, DialogueModalComponent]
 })
 export class MainPage implements OnInit, AfterViewInit, OnDestroy {
   isPlayerStatsOpen = true;
@@ -120,6 +120,22 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
   }
 
   async ngOnInit() {
+    console.log('MainPage ngOnInit');
+
+    // Load saved state
+    const savedState = localStorage.getItem(STORAGE_KEY);
+    if (savedState) {
+      try {
+        const state = JSON.parse(savedState);
+        this.isPlayerStatsOpen = state.isPlayerStatsOpen ?? true;
+        this.isMapOpen = state.isMapOpen ?? true;
+        this.isTileActionsOpen = state.isTileActionsOpen ?? true;
+        this.isMenuOpen = state.isMenuOpen ?? true;
+      } catch (error) {
+        console.warn('Failed to load saved state:', error);
+      }
+    }
+
     // Set theme color from localStorage or default
     const themeColor = localStorage.getItem('themeColor') || DEFAULT_THEME_COLOR;
     document.documentElement.style.setProperty('--theme-color', themeColor);
@@ -129,16 +145,6 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
     }
     await this.loadUserSettings();
     console.log('MainPage ngOnInit, currentCharacter:', this.currentCharacter);
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) {
-      try {
-        const state = JSON.parse(saved);
-        if (typeof state.isPlayerStatsOpen === 'boolean') this.isPlayerStatsOpen = state.isPlayerStatsOpen;
-        if (typeof state.isMapOpen === 'boolean') this.isMapOpen = state.isMapOpen;
-        if (typeof state.isTileActionsOpen === 'boolean') this.isTileActionsOpen = state.isTileActionsOpen;
-        if (typeof state.isMenuOpen === 'boolean') this.isMenuOpen = state.isMenuOpen;
-      } catch {}
-    }
 
         // Load inventory for current character
     await this.inventoryService.loadInventory();
@@ -456,19 +462,19 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
 
   getTileAriaLabel(tile: MapTile): string {
     if (tile.isPlayer) {
-      return `Your current position at coordinates (${tile.x}, ${tile.y})`;
+      return `You are here at position ${tile.x}, ${tile.y}`;
     }
     if (tile.isClickable) {
-      return `Clickable tile at (${tile.x}, ${tile.y}) - ${tile.action}`;
+      return `Move to ${tile.action} at position ${tile.x}, ${tile.y}`;
     }
-    return `Map tile at coordinates (${tile.x}, ${tile.y})`;
+    return `Map tile at position ${tile.x}, ${tile.y}`;
   }
 
   getTileAltText(tile: MapTile): string {
     if (tile.isPlayer) {
-      return 'Your current position';
+      return 'Your current position on the map';
     }
-    return `Map tile at coordinates (${tile.x}, ${tile.y})`;
+    return `Map tile at position ${tile.x}, ${tile.y}`;
   }
 
   onTileImageError(event: any, tile: MapTile) {

@@ -67,17 +67,48 @@ input:-moz-autofill {
 
 /* Global focus styles for better accessibility */
 ion-card:focus {
-  outline: 2px solid #cccccc !important;
+  outline: 3px solid #f5d97e !important;
   outline-offset: 4px !important;
+  border-radius: 8px !important;
 }
 
 /* Ensure focus is visible on interactive elements */
 a:focus,
 input:focus,
 textarea:focus,
-select:focus {
-  outline: 2px solid #cccccc !important;
+select:focus,
+button:focus,
+ion-button:focus,
+[tabindex]:focus {
+  outline: 3px solid #f5d97e !important;
   outline-offset: 2px !important;
+  border-radius: 4px !important;
+}
+
+/* Enhanced focus for game tiles */
+.map-tile:focus {
+  outline: 3px solid #f5d97e !important;
+  outline-offset: 3px !important;
+  border-radius: 6px !important;
+  transform: scale(1.05) !important;
+  transition: transform 0.2s ease !important;
+}
+
+/* Enhanced focus for action buttons */
+.action-item:focus {
+  outline: 3px solid #f5d97e !important;
+  outline-offset: 3px !important;
+  border-radius: 8px !important;
+  transform: scale(1.02) !important;
+  transition: transform 0.2s ease !important;
+}
+
+/* Enhanced focus for collapsible headers */
+.collapsible-header:focus {
+  outline: 3px solid #f5d97e !important;
+  outline-offset: 2px !important;
+  border-radius: 4px !important;
+  background-color: rgba(245, 217, 126, 0.1) !important;
 }
 
 :root {

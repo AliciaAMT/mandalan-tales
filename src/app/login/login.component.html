@@ -4,83 +4,96 @@
 
   <ion-content>
     <main id="main-content" role="main">
-    <div style="position: relative; z-index: 999; background: #121212; padding: 1rem;">
-    <ion-card *ngIf="authService.authInitialized() && !authService.user()" class="login-card">
-      <ion-card-header>
-        <h1 class="sr-only">Login to Mandalan Tales</h1>
-        <ion-card-title class="login-card-title">Login</ion-card-title>
-      </ion-card-header>
-      <form (ngSubmit)="login()" #loginForm="ngForm">
-        <fieldset>
-          <ion-list lines="none">
-            <ion-item>
-              <ion-label for="emailInput" position="stacked">Email</ion-label>
-              <ion-input id="emailInput" aria-label="email" type="email" name="email" [(ngModel)]="email" required autocomplete="email" inputmode="email"></ion-input>
-            </ion-item>
-            <ion-item>
-              <ion-label for="passwordInput" position="stacked">Password</ion-label>
-              <ion-input
-                [(ngModel)]="password"
-                [ngModelOptions]="{ updateOn: 'change' }"
-                id="passwordInput"
-                [type]="showPassword ? 'text' : 'password'"
-                name="password"
-                required
-                autocomplete="current-password"
-              ></ion-input>
+      <div style="position: relative; z-index: 999; background: #121212; padding: 1rem;">
+        <ion-card class="login-card">
+          <ion-card-header>
+            <h1 class="sr-only">Login to Mandalan Tales</h1>
+            <ion-card-title class="login-card-title">Login</ion-card-title>
+          </ion-card-header>
+
+          <form (ngSubmit)="login()" #loginForm="ngForm">
+            <fieldset>
+              <ion-list lines="none">
+                <ion-item>
+                  <ion-label for="emailInput" position="stacked">Email</ion-label>
+                  <ion-input
+                    id="emailInput"
+                    type="email"
+                    name="email"
+                    [(ngModel)]="email"
+                    required
+                    autocomplete="email"
+                    inputmode="email"
+                    aria-label="Email address"
+                  ></ion-input>
+                </ion-item>
+
+                <ion-item>
+                  <ion-label for="passwordInput" position="stacked">Password</ion-label>
+                  <ion-input
+                    [(ngModel)]="password"
+                    [ngModelOptions]="{ updateOn: 'change' }"
+                    id="passwordInput"
+                    [type]="showPassword ? 'text' : 'password'"
+                    name="password"
+                    required
+                    autocomplete="current-password"
+                    aria-label="Password"
+                  ></ion-input>
+                  <ion-button
+                    fill="clear"
+                    slot="end"
+                    type="button"
+                    (click)="togglePasswordVisibility()"
+                    [attr.aria-pressed]="showPassword"
+                    [attr.aria-label]="showPassword ? 'Hide password' : 'Show password'"
+                  >
+                    <ion-icon [name]="showPassword ? 'eye-off' : 'eye'"></ion-icon>
+                  </ion-button>
+                </ion-item>
+              </ion-list>
+
               <ion-button
-                fill="clear"
-                slot="end"
-                type="button"
-                (click)="togglePasswordVisibility()"
-                [attr.aria-pressed]="showPassword"
-                [attr.aria-label]="showPassword ? 'Hide password' : 'Show password'"
+                type="submit"
+                aria-label="Login"
+                aria-describedby="form-error"
+                color="primary"
+                class="ion-margin-top"
+                id="login-button"
+                [attr.aria-disabled]="!loginForm.form.valid ? 'true' : null"
+                [attr.disabled]="!loginForm.form.valid ? true : null"
+                expand="block"
+                [disabled]="!loginForm.form.valid"
               >
-                <ion-icon [name]="showPassword ? 'eye-off' : 'eye'"></ion-icon>
+                Login
               </ion-button>
-            </ion-item>
-          </ion-list>
-          <ion-button
-            type="submit"
-            aria-label="Login"
-            aria-describedby="form-error"
-            color="primary"
-            class="ion-margin-top"
-            id="login-button"
-            [attr.aria-disabled]="!loginForm.form.valid ? 'true' : null"
-            [attr.disabled]="!loginForm.form.valid ? true : null"
-            expand="block"
-            [disabled]="!loginForm.form.valid"
-          >
-            Login
-          </ion-button>
-          <div class="ion-text-danger error-message" *ngIf="error" id="form-error" role="alert" aria-live="assertive" tabindex="-1">
-            {{ error }}
+              <div class="ion-text-danger error-message" *ngIf="error" id="form-error" role="alert" aria-live="assertive" tabindex="-1">
+                {{ error }}
+              </div>
+            </fieldset>
+          </form>
+        </ion-card>
+
+        <ion-card *ngIf="authService.authInitialized() && authService.user()" color="warning">
+          <ion-card-header>You are already logged in</ion-card-header>
+          <ion-card-content>
+            <ion-button expand="block" color="danger" (click)="logout()">Log Out</ion-button>
+          </ion-card-content>
+        </ion-card>
+
+        <div class="login-links">
+          <a routerLink="/forgot-password">Forgot your password?</a>
+          <div class="ion-margin-top">
+            New to Mandalan Tales?
+            <a routerLink="/create-account">Create an account and begin your journey!</a>
           </div>
-        </fieldset>
-      </form>
-    </ion-card>
+        </div>
+        <!-- Temporarily disabled reCAPTCHA -->
+        <!-- <div id="recaptcha-container" class="g-recaptcha" [attr.data-sitekey]="recaptchaSiteKey" data-size="invisible" data-callback="onRecaptchaSuccess" aria-hidden="true"></div> -->
+        <p class="sr-only" id="recaptcha-desc">Invisible reCAPTCHA is used to prevent spam. No action is needed.</p>
 
-    <ion-card *ngIf="authService.authInitialized() && authService.user()" color="warning">
-      <ion-card-header>You are already logged in</ion-card-header>
-      <ion-card-content>
-        <ion-button expand="block" color="danger" (click)="logout()">Log Out</ion-button>
-      </ion-card-content>
-    </ion-card>
-
-    <div class="login-links">
-      <a routerLink="/forgot-password">Forgot your password?</a>
-      <div class="ion-margin-top">
-        New to Mandalan Tales?
-        <a routerLink="/create-account">Create an account and begin your journey!</a>
-      </div>
+            <app-app-footer></app-app-footer>
+        </div>
+        </main>
+      </ion-content>
     </div>
-    <!-- Temporarily disabled reCAPTCHA -->
-    <!-- <div id="recaptcha-container" class="g-recaptcha" [attr.data-sitekey]="recaptchaSiteKey" data-size="invisible" data-callback="onRecaptchaSuccess" aria-hidden="true"></div> -->
-    <p class="sr-only" id="recaptcha-desc">Invisible reCAPTCHA is used to prevent spam. No action is needed.</p>
-
-        <app-app-footer></app-app-footer>
-    </div>
-    </main>
-  </ion-content>
-</div>
