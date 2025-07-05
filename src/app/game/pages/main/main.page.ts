@@ -168,13 +168,6 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
       }
     }
 
-    // Set theme color from localStorage or default
-    const themeColor = localStorage.getItem('themeColor') || DEFAULT_THEME_COLOR;
-    document.documentElement.style.setProperty('--theme-color', themeColor);
-    if (this.getTextColorForTheme) {
-      const textColor = this.getTextColorForTheme(themeColor);
-      document.documentElement.style.setProperty('--header-text-color', textColor);
-    }
     await this.loadUserSettings();
     console.log('MainPage ngOnInit, currentCharacter:', this.currentCharacter);
 
@@ -199,13 +192,8 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ionViewWillEnter() {
-    const themeColor = localStorage.getItem('themeColor') || DEFAULT_THEME_COLOR;
-    document.documentElement.style.setProperty('--theme-color', themeColor);
-    document.documentElement.style.setProperty('--ion-color-primary', themeColor);
-    if (this.getTextColorForTheme) {
-      const textColor = this.getTextColorForTheme(themeColor);
-      document.documentElement.style.setProperty('--header-text-color', textColor);
-    }
+    // Load theme from database instead of localStorage
+    this.loadUserSettings();
   }
 
   ngAfterViewInit() {
@@ -533,16 +521,24 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
     if (user) {
       const settings = await this.settingsService.getUserSettings(user.uid);
       if (settings) {
-        // Apply theme color to CSS custom property
+        // Apply theme color to CSS custom properties
         document.documentElement.style.setProperty('--theme-color', settings.themeColor);
+        document.documentElement.style.setProperty('--ion-color-primary', settings.themeColor);
 
         // Set text color based on theme brightness
         const textColor = this.getTextColorForTheme(settings.themeColor);
         document.documentElement.style.setProperty('--header-text-color', textColor);
+
+        // Save to localStorage for the game to use
+        localStorage.setItem('themeColor', settings.themeColor);
       } else {
         // Apply default theme color
         document.documentElement.style.setProperty('--theme-color', DEFAULT_THEME_COLOR);
+        document.documentElement.style.setProperty('--ion-color-primary', DEFAULT_THEME_COLOR);
         document.documentElement.style.setProperty('--header-text-color', '#181200');
+
+        // Save default to localStorage
+        localStorage.setItem('themeColor', DEFAULT_THEME_COLOR);
       }
     }
   }

@@ -77,6 +77,16 @@ export class CreateCharacterPage {
     });
   }
 
+  ionViewWillEnter() {
+    // Reset theme to default gold color when entering create-character page
+    const defaultThemeColor = '#6b4e26'; // Default gold color
+    document.documentElement.style.setProperty('--theme-color', defaultThemeColor);
+    document.documentElement.style.setProperty('--ion-color-primary', defaultThemeColor);
+    document.documentElement.style.setProperty('--header-text-color', '#181200');
+    // Clear the localStorage theme color to prevent game theme from persisting
+    localStorage.removeItem('themeColor');
+  }
+
   // Generate random stats like the old demo
   generateStats(): void {
     const formData = this.characterForm.value;

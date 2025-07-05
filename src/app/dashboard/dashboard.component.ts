@@ -76,17 +76,23 @@ export class DashboardComponent implements OnInit {
     // No effect() here!
   }
 
+  ionViewWillEnter() {
+    // Reset theme to default gold color when entering dashboard
+    const defaultThemeColor = '#6b4e26'; // Default gold color
+    document.documentElement.style.setProperty('--theme-color', defaultThemeColor);
+    document.documentElement.style.setProperty('--ion-color-primary', defaultThemeColor);
+    document.documentElement.style.setProperty('--header-text-color', '#181200');
+    // Clear the localStorage theme color to prevent game theme from persisting
+    localStorage.removeItem('themeColor');
+  }
+
   async loadUserSettings(): Promise<void> {
     if (this.user) {
       const settings = await this.settingsService.getUserSettings(this.user.uid);
       if (settings) {
         this.selectedThemeColor = settings.themeColor;
-        // Set the CSS variable immediately
-        document.documentElement.style.setProperty('--theme-color', this.selectedThemeColor);
-        localStorage.setItem('themeColor', this.selectedThemeColor);
-        // Also set the text color for contrast
-        const textColor = this.getTextColorForTheme(this.selectedThemeColor);
-        document.documentElement.style.setProperty('--header-text-color', textColor);
+        // Don't apply the theme color to the dashboard - keep it as default gold
+        // The theme color is only for the game, not the dashboard
       }
     }
   }
@@ -95,13 +101,10 @@ export class DashboardComponent implements OnInit {
     if (this.user) {
       try {
         await this.settingsService.updateThemeColor(this.user.uid, this.selectedThemeColor);
-        // Update CSS custom properties for immediate effect
-        document.documentElement.style.setProperty('--theme-color', this.selectedThemeColor);
+        // Save the theme color to localStorage for the game to use
         localStorage.setItem('themeColor', this.selectedThemeColor);
-
-        // Set text color based on theme brightness
-        const textColor = this.getTextColorForTheme(this.selectedThemeColor);
-        document.documentElement.style.setProperty('--header-text-color', textColor);
+        // Don't apply the theme to the dashboard - keep it as default gold
+        // The theme will be applied when entering the game
       } catch (error) {
         console.error('Error updating theme color:', error);
       }

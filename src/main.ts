@@ -16,7 +16,8 @@ import {
   informationCircleOutline,
   mailOutline,
   documentTextOutline,
-  trashOutline
+  trashOutline,
+  alertCircleOutline
 } from 'ionicons/icons';
 
 addIcons({
@@ -26,7 +27,8 @@ addIcons({
   'information-circle-outline': informationCircleOutline,
   'mail-outline': mailOutline,
   'document-text-outline': documentTextOutline,
-  'trash-outline': trashOutline
+  'trash-outline': trashOutline,
+  'alert-circle-outline': alertCircleOutline
 });
 
 
