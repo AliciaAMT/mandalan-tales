@@ -56,7 +56,7 @@ interface Portal {
   templateUrl: './main.page.html',
   styleUrls: ['./main.page.scss'],
   standalone: true,
-  imports: [CommonModule, FormsModule, IonicModule, FocusManagerDirective, BottomIconRowComponent, DialogueModalComponent]
+  imports: [CommonModule, FormsModule, IonicModule, FocusManagerDirective, BottomIconRowComponent, DialogueModalComponent, ItemFoundModalComponent]
 })
 export class MainPage implements OnInit, AfterViewInit, OnDestroy {
   isPlayerStatsOpen = true;
@@ -1133,8 +1133,7 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
         await this.dialogueService.startDialogue(dialogueId);
       } else {
         // Fallback for NPCs without dialogue
-        await ItemFoundModalComponent.present(
-          this.modalCtrl,
+        await this.openItemModal(
           [],
           `You interact with ${npc.name}. This feature is coming soon!`
         );
@@ -1170,8 +1169,7 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
         await this.handleWaterBarrel();
         break;
       case 'fireplace': {
-        const action = await ItemFoundModalComponent.present(
-          this.modalCtrl,
+        const action = await this.openItemModal(
           [],
           'You are at the fireplace. What would you like to do?',
           [
@@ -1185,20 +1183,17 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
         if (action === 'light') {
           await this.handleFireplace();
         } else if (action === 'rest') {
-          await ItemFoundModalComponent.present(
-            this.modalCtrl,
+          await this.openItemModal(
             [],
             'You rest by the fireplace and feel a bit warmer.'
           );
         } else if (action === 'search') {
-          await ItemFoundModalComponent.present(
-            this.modalCtrl,
+          await this.openItemModal(
             [],
             'You search the fireplace but find nothing of interest.'
           );
         } else if (action === 'cook') {
-          await ItemFoundModalComponent.present(
-            this.modalCtrl,
+          await this.openItemModal(
             [],
             'The cookbook and recipe system is coming soon!'
           );
@@ -1233,8 +1228,7 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
       { label: 'Cancel', value: 'cancel' }
     ];
     const message = 'You see a simple bed. What would you like to do?';
-        const action = await ItemFoundModalComponent.present(
-          this.modalCtrl,
+        const action = await this.openItemModal(
           [],
           message,
           actions
@@ -1248,7 +1242,7 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
               'search',
               this.currentCharacter.name
             );
-            await ItemFoundModalComponent.present(this.modalCtrl, result.items || [], result.message);
+            await this.openItemModal(result.items || [], result.message);
           } else {
             // const result = await this.objectInteractionService.handleBedAction(action);
         let result = { message: '' };
@@ -1258,7 +1252,7 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
           result = { message: 'You search the bed but find nothing of interest.' };
         }
             if (result.message) {
-              await ItemFoundModalComponent.present(this.modalCtrl, [], result.message);
+              await this.openItemModal( [], result.message);
             }
           }
         }
@@ -1280,18 +1274,16 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
             object.action,
             this.currentCharacter.name
           );
-          await ItemFoundModalComponent.present(this.modalCtrl, result.items || [], result.message);
+          await this.openItemModal(result.items || [], result.message);
         } else {
-          await ItemFoundModalComponent.present(
-            this.modalCtrl,
+          await this.openItemModal(
             [],
             `You ${object.action} the ${object.name}. You find nothing of interest.`
           );
         }
         break;
       default:
-        await ItemFoundModalComponent.present(
-          this.modalCtrl,
+        await this.openItemModal(
           [],
           `You ${object.action} the ${object.name}. This feature is coming soon!`
         );
@@ -1311,15 +1303,13 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
       if (bottleItem) {
         bottleItem.waterunits = Math.min(bottleItem.waterunits + 3, bottleItem.maxwater || 10);
         await this.inventoryService.saveInventory();
-        await ItemFoundModalComponent.present(
-          this.modalCtrl,
+        await this.openItemModal(
           [],
           'You fill your bottle with fresh water from the barrel.'
         );
       }
     } else {
-      await ItemFoundModalComponent.present(
-        this.modalCtrl,
+      await this.openItemModal(
         [],
         'You need a bottle to collect water from the barrel.'
       );
@@ -1333,20 +1323,17 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
     if (hasFirewood && hasTinderbox) {
       // Start a fire
       await this.inventoryService.removeItem('Firewood', 1);
-      await ItemFoundModalComponent.present(
-        this.modalCtrl,
+      await this.openItemModal(
         [],
         'You successfully start a fire in the fireplace. The room is now warm and cozy.'
       );
     } else if (hasFirewood) {
-      await ItemFoundModalComponent.present(
-        this.modalCtrl,
+      await this.openItemModal(
         [],
         'You have firewood but need a tinderbox to start a fire.'
       );
     } else {
-      await ItemFoundModalComponent.present(
-        this.modalCtrl,
+      await this.openItemModal(
         [],
         'You need firewood and a tinderbox to start a fire.'
       );
@@ -1362,15 +1349,13 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
       if (bottleItem) {
         bottleItem.waterunits = Math.min(bottleItem.waterunits + 5, bottleItem.maxwater || 10);
         await this.inventoryService.saveInventory();
-        await ItemFoundModalComponent.present(
-          this.modalCtrl,
+        await this.openItemModal(
           [],
           'You draw fresh water from the well and fill your bottle.'
         );
       }
     } else {
-      await ItemFoundModalComponent.present(
-        this.modalCtrl,
+      await this.openItemModal(
         [],
         'You need a bottle to collect water from the well.'
       );
@@ -1424,14 +1409,12 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
           const remainingText = harvestedItem.currentQuantity > 0
             ? `(${harvestedItem.currentQuantity} remaining)`
             : '(depleted)';
-          await ItemFoundModalComponent.present(
-            this.modalCtrl,
+          await this.openItemModal(
             foundItems,
             `You harvest a ${harvestedItem.itemData.name.toLowerCase()} from the ${matchingItem.name.toLowerCase()}. ${remainingText}`
           );
         } else {
-          await ItemFoundModalComponent.present(
-            this.modalCtrl,
+          await this.openItemModal(
             [],
             'Your inventory is full.'
           );
@@ -1463,14 +1446,12 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
             image: result.image,
             quantity: 1
           }];
-          await ItemFoundModalComponent.present(
-            this.modalCtrl,
+          await this.openItemModal(
             foundItems,
             `You harvest a ${result.name.toLowerCase()} from the ${plantName.toLowerCase()}.`
           );
         } else {
-          await ItemFoundModalComponent.present(
-            this.modalCtrl,
+          await this.openItemModal(
             [],
             'Your inventory is full.'
           );
@@ -1491,8 +1472,7 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
     const chestState = localStorage.getItem(chestKey);
 
     if (chestState === 'empty') {
-      await ItemFoundModalComponent.present(
-        this.modalCtrl,
+      await this.openItemModal(
         [],
         'The chest is empty.'
       );
@@ -1560,14 +1540,12 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
     if (foundItems.length > 0) {
       // Mark chest as empty
       localStorage.setItem(chestKey, 'empty');
-      await ItemFoundModalComponent.present(
-        this.modalCtrl,
+      await this.openItemModal(
         foundItems,
         `You found ${foundItems.length} items in the chest!`
       );
     } else {
-      await ItemFoundModalComponent.present(
-        this.modalCtrl,
+      await this.openItemModal(
         [],
         'Your inventory is full.'
       );
@@ -1586,8 +1564,7 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
     const pantryState = localStorage.getItem(pantryKey);
 
     if (pantryState === 'empty') {
-      await ItemFoundModalComponent.present(
-        this.modalCtrl,
+      await this.openItemModal(
         [],
         'The pantry is mostly empty.'
       );
@@ -1649,14 +1626,12 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
     if (foundItems.length > 0) {
       // Mark pantry as empty
       localStorage.setItem(pantryKey, 'empty');
-      await ItemFoundModalComponent.present(
-        this.modalCtrl,
+      await this.openItemModal(
         foundItems,
         `You found ${foundItems.length} food items in the pantry!`
       );
     } else {
-      await ItemFoundModalComponent.present(
-        this.modalCtrl,
+      await this.openItemModal(
         [],
         'Your inventory is full.'
       );
@@ -1675,8 +1650,7 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
     const herbRackState = localStorage.getItem(herbRackKey);
 
     if (herbRackState === 'empty') {
-      await ItemFoundModalComponent.present(
-        this.modalCtrl,
+      await this.openItemModal(
         [],
         'The herb rack is mostly empty.'
       );
@@ -1733,14 +1707,12 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
     if (itemsFound > 0) {
       // Mark herb rack as empty
       localStorage.setItem(herbRackKey, 'empty');
-      await ItemFoundModalComponent.present(
-        this.modalCtrl,
+      await this.openItemModal(
         [],
         `You found ${itemsFound} herbs on the herb rack!`
       );
     } else {
-      await ItemFoundModalComponent.present(
-        this.modalCtrl,
+      await this.openItemModal(
         [],
         'Your inventory is full.'
       );
@@ -1759,8 +1731,7 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
     const rugState = localStorage.getItem(rugKey);
 
     if (rugState === 'empty') {
-      await ItemFoundModalComponent.present(
-        this.modalCtrl,
+      await this.openItemModal(
         [],
         'The rug has already been examined.'
       );
@@ -1785,8 +1756,7 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
         image: 'smallrustykey',
         quantity: 1
       }];
-      await ItemFoundModalComponent.present(
-        this.modalCtrl,
+      await this.openItemModal(
         foundItems,
         'You find a small rusty key under the rug!'
       );
@@ -1794,8 +1764,7 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
       localStorage.setItem(rugKey, 'empty');
       console.log('Rug flag set to empty:', rugKey);
     } else {
-      await ItemFoundModalComponent.present(
-        this.modalCtrl,
+      await this.openItemModal(
         [],
         'Your inventory is full. Cannot add key.'
       );
@@ -1829,8 +1798,7 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
     );
 
     if (!requirements.canUse) {
-      await ItemFoundModalComponent.present(
-        this.modalCtrl,
+      await this.openItemModal(
         [],
         requirements.message || 'You cannot use this portal.'
       );
@@ -1838,8 +1806,7 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
     }
 
     // Show confirmation dialog
-    const confirmed = await ItemFoundModalComponent.present(
-      this.modalCtrl,
+    const confirmed = await this.openItemModal(
       [],
       portalAction.portal.confirmationMessage,
       [
@@ -1858,15 +1825,13 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
       if (result.success) {
         // Announce to screen readers
         this.announceToScreenReader(result.message);
-        await ItemFoundModalComponent.present(
-          this.modalCtrl,
+        await this.openItemModal(
           [],
           result.message
         );
         // The map will be regenerated automatically due to the effect watching character changes
       } else {
-        await ItemFoundModalComponent.present(
-          this.modalCtrl,
+        await this.openItemModal(
           [],
           result.message
         );
@@ -1973,6 +1938,35 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
     return Array.from(modal.querySelectorAll<HTMLElement>(
       'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
     )).filter(el => !el.hasAttribute('disabled') && !el.getAttribute('aria-hidden'));
+  }
+
+  // Add modal state and helpers
+  itemModalOpen = false;
+  itemModalItems: FoundItem[] = [];
+  itemModalEventMessage?: string;
+  itemModalActions: { label: string, value: string }[] = [];
+  private itemModalResolve?: (value?: string) => void;
+
+  openItemModal(
+    items: FoundItem[] = [],
+    eventMessage?: string,
+    actions?: { label: string, value: string }[]
+  ): Promise<string | undefined> {
+    this.itemModalItems = items;
+    this.itemModalEventMessage = eventMessage;
+    this.itemModalActions = actions || [];
+    this.itemModalOpen = true;
+    return new Promise(resolve => {
+      this.itemModalResolve = resolve;
+    });
+  }
+
+  onItemModalClosed(action: any) {
+    this.itemModalOpen = false;
+    if (this.itemModalResolve) {
+      this.itemModalResolve(action);
+      this.itemModalResolve = undefined;
+    }
   }
 
   /**

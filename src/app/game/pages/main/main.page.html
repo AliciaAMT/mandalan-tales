@@ -1,6 +1,13 @@
 <ion-content fullscreen appFocusManager>
   <!-- Dialogue Modal -->
   <app-dialogue-modal></app-dialogue-modal>
+  <app-item-found-modal
+    [open]="itemModalOpen"
+    [items]="itemModalItems"
+    [eventMessage]="itemModalEventMessage"
+    [actions]="itemModalActions"
+    (closed)="onItemModalClosed($event)">
+  </app-item-found-modal>
 
   <main role="main" aria-label="Game Interface">
     <div
@@ -352,10 +359,40 @@
     aria-describedby="modalDesc"
     (click)="closeInfoModal()"
   >
-    <div class="info-modal-content" (click)="$event.stopPropagation()">
-      <h2 id="modalTitle">{{ infoModalAction?.name }}</h2>
-      <p id="modalDesc">{{ infoModalAction?.description }}</p>
-      <button #closeInfoBtn class="close-info-btn" (click)="closeInfoModal()" tabindex="0" aria-label="Close info">Close</button>
+    <div class="info-modal" (click)="$event.stopPropagation()">
+      <!-- Item Section -->
+      <div class="item-section">
+        <div class="item-portrait">
+          <img
+            [src]="
+              infoModalAction?.type === 'NPC'
+                ? 'assets/portraits/' + infoModalAction?.portrait + '.png'
+                : 'assets/items/' + infoModalAction?.image + '.png'
+            "
+            [alt]="infoModalAction?.name + ' image'"
+            (error)="
+              infoModalAction?.type === 'NPC'
+                ? onPortraitError($event, infoModalAction)
+                : onObjectImageError($event, infoModalAction)
+            "
+          />
+        </div>
+        <div class="item-info">
+          <h3 class="item-name">{{ infoModalAction?.name }}</h3>
+          <div class="item-description">{{ infoModalAction?.description }}</div>
+        </div>
+      </div>
+
+      <!-- Close Button -->
+      <button
+        #closeInfoBtn
+        class="close-info-btn"
+        (click)="closeInfoModal()"
+        tabindex="0"
+        aria-label="Close info"
+      >
+        ×
+      </button>
     </div>
   </div>
 </ion-content>

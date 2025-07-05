@@ -816,53 +816,7 @@ ion-content::part(scroll) {
     outline: 2px solid #fff;
     outline-offset: 1px;
   }
-  .info-modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-  }
-  .info-modal-content {
-    background: #222;
-    color: #fff;
-    padding: 24px 16px;
-    border-radius: 12px;
-    text-align: center;
-    min-width: 200px;
-    max-width: 90vw;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-    margin: 0 auto;
-  }
-  .info-modal-content h2 {
-    margin-top: 0;
-    font-size: 1.2rem;
-    margin-bottom: 12px;
-  }
-  .info-modal-content p {
-    font-size: 1rem;
-    margin-bottom: 20px;
-  }
-  .close-info-btn {
-    background: #fff;
-    color: #222;
-    border: none;
-    border-radius: 6px;
-    padding: 8px 18px;
-    font-size: 1rem;
-    cursor: pointer;
-    font-weight: bold;
-    transition: background 0.2s;
-  }
-  .close-info-btn:focus, .close-info-btn:hover {
-    background: #eee;
-    outline: 2px solid #fff;
-  }
+
   .action-item {
     position: relative;
   }
@@ -913,23 +867,167 @@ ion-content::part(scroll) {
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.8);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 1000;
+  backdrop-filter: blur(4px);
 }
 
-.info-modal-content {
-  background: #222;
-  color: #fff;
-  padding: 24px 16px;
-  border-radius: 12px;
-  text-align: center;
-  min-width: 200px;
+.info-modal {
+  background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%);
+  border: 2px solid var(--theme-color, #8d6e36);
+  border-radius: 16px;
+  padding: 24px;
   max-width: 90vw;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-  margin: 0 auto;
+  max-height: 90vh;
+  width: 600px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  position: relative;
+  overflow: hidden;
+}
+
+.item-section {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  border-left: 4px solid var(--theme-color, #8d6e36);
+}
+
+.item-portrait {
+  flex-shrink: 0;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 3px solid var(--theme-color, #8d6e36);
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.item-portrait img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.item-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.item-name {
+  margin: 0 0 8px 0;
+  color: #fff;
+  font-size: 1.4rem;
+  font-weight: bold;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.item-description {
+  color: #fff;
+  font-size: 1rem;
+  line-height: 1.5;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.close-info-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 1.5rem;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.close-info-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(1.1);
+}
+
+.close-info-btn:focus {
+  outline: none;
+  background: rgba(255, 255, 255, 0.2);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.3);
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .info-modal {
+    width: 95vw;
+    max-width: 95vw;
+    padding: 16px;
+    gap: 16px;
+  }
+
+  .item-section {
+    padding: 12px;
+    gap: 12px;
+  }
+
+  .item-portrait {
+    width: 60px;
+    height: 60px;
+  }
+
+  .item-name {
+    font-size: 1.2rem;
+  }
+
+  .item-description {
+    font-size: 0.9rem;
+  }
+
+  .close-info-btn {
+    width: 28px;
+    height: 28px;
+    font-size: 1.2rem;
+  }
+}
+
+/* Animation for modal appearance */
+.info-modal-overlay {
+  animation: fadeIn 0.3s ease-out;
+}
+
+.info-modal {
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 /* Screen Reader Only Text */
