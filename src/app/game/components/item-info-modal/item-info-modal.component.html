@@ -1,0 +1,96 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Item Information</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="close()" aria-label="Close dialog">
+        <ion-icon name="close-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+<ion-content class="ion-padding">
+  <div class="item-detail-container">
+    <!-- Item Image Section -->
+    <div class="item-image-section">
+      <img [src]="getItemImage()" [alt]="'Large image of ' + item.name" class="large-item-image" />
+    </div>
+
+    <!-- Item Basic Info -->
+    <div class="item-basic-info">
+      <h2 class="item-name">{{ item.name }}</h2>
+      <div class="item-meta">
+        <span class="item-level">Level {{ item.level }}</span>
+        <span class="item-rarity" [ngClass]="getRarityClass()">{{ item.rarity }}</span>
+        <span class="item-type">{{ item.type }}</span>
+        <span class="item-quantity" *ngIf="item.quantity > 1">Quantity: {{ item.quantity }}</span>
+      </div>
+      <p class="item-description">{{ item.description }}</p>
+    </div>
+
+    <!-- Item Stats -->
+    <div class="item-stats" *ngIf="hasStats()">
+      <h3>Statistics</h3>
+      <div class="stats-grid">
+        <div class="stat-item" *ngIf="item.damage">
+          <span class="stat-label">Damage:</span>
+          <span class="stat-value">{{ item.damage }}</span>
+        </div>
+        <div class="stat-item" *ngIf="item.defense">
+          <span class="stat-label">Defense:</span>
+          <span class="stat-value">{{ item.defense }}</span>
+        </div>
+        <div class="stat-item" *ngIf="item.speed">
+          <span class="stat-label">Speed:</span>
+          <span class="stat-value">{{ item.speed }}</span>
+        </div>
+        <div class="stat-item" *ngIf="item.range">
+          <span class="stat-label">Range:</span>
+          <span class="stat-value">{{ item.range }}</span>
+        </div>
+        <div class="stat-item" *ngIf="item.durability">
+          <span class="stat-label">Durability:</span>
+          <span class="stat-value">{{ item.durability }}</span>
+        </div>
+        <div class="stat-item" *ngIf="item.weight">
+          <span class="stat-label">Weight:</span>
+          <span class="stat-value">{{ item.weight }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Item Effects -->
+    <div class="item-effects" *ngIf="item.effects && item.effects.length > 0">
+      <h3>Effects</h3>
+      <ul class="effects-list">
+        <li *ngFor="let effect of item.effects" class="effect-item">{{ effect }}</li>
+      </ul>
+    </div>
+
+    <!-- Item Properties -->
+    <div class="item-properties" *ngIf="hasProperties()">
+      <h3>Properties</h3>
+      <div class="properties-grid">
+        <span class="property-tag" *ngIf="item.enchantable">Enchantable</span>
+        <span class="property-tag" *ngIf="item.transmutable">Transmutable</span>
+        <span class="property-tag" *ngIf="item.adjustable">Adjustable</span>
+        <span class="property-tag legendary" *ngIf="item.legendary">Legendary</span>
+        <span class="property-tag" *ngIf="item.readable">Readable</span>
+        <span class="property-tag" *ngIf="item.keylock">Locked</span>
+        <span class="property-tag" *ngIf="item.container">Container</span>
+        <span class="property-tag" *ngIf="item.duality">Dual Wield</span>
+      </div>
+    </div>
+
+    <!-- Item Value -->
+    <div class="item-value" *ngIf="item.value > 0">
+      <h3>Value</h3>
+      <p class="value-amount">{{ item.value }} Gold</p>
+    </div>
+
+    <!-- Equip Location -->
+    <div class="equip-location" *ngIf="item.equipLocation">
+      <h3>Equipped Location</h3>
+      <p>{{ item.equipLocation }}</p>
+    </div>
+  </div>
+</ion-content>

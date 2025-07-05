@@ -1,0 +1,345 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="goBack()">
+        <ion-icon name="arrow-back"></ion-icon>
+        Back
+      </ion-button>
+    </ion-buttons>
+    <ion-title>Inventory</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="inventory-container">
+    <!-- Keep Pocket -->
+    <div class="pocket-section">
+      <ion-button
+        fill="clear"
+        class="pocket-header"
+        (click)="toggleKeepPocket()"
+        [class.open]="keepPocketOpen">
+        <ion-icon
+          [name]="keepPocketOpen ? 'chevron-down' : 'chevron-forward'"
+          slot="start">
+        </ion-icon>
+        Keep Pocket
+      </ion-button>
+
+      <div class="pocket-content" [class.open]="keepPocketOpen">
+        <div class="filter-buttons">
+          <ion-button
+            size="small"
+            fill="clear"
+            [class.active]="keepFilter === 'All'"
+            (click)="setKeepFilter('All')">
+            All
+          </ion-button>
+          <ion-button
+            size="small"
+            fill="clear"
+            [class.active]="keepFilter === 'Weapon'"
+            (click)="setKeepFilter('Weapon')">
+            Weapons
+          </ion-button>
+          <ion-button
+            size="small"
+            fill="clear"
+            [class.active]="keepFilter === 'Armor'"
+            (click)="setKeepFilter('Armor')">
+            Armor
+          </ion-button>
+          <ion-button
+            size="small"
+            fill="clear"
+            [class.active]="keepFilter === 'Accessory'"
+            (click)="setKeepFilter('Accessory')">
+            Accessories
+          </ion-button>
+          <ion-button
+            size="small"
+            fill="clear"
+            [class.active]="keepFilter === 'Other'"
+            (click)="setKeepFilter('Other')">
+            Other
+          </ion-button>
+        </div>
+
+        <div class="items-grid">
+          <div
+            class="item-card"
+            *ngFor="let item of getFilteredKeepItems()">
+            <div class="item-image">
+              <img [src]="'assets/items/' + item.image + '.png'"
+                   [alt]="item.name"
+                   (error)="onItemImageError($event, item)">
+                            <ion-button
+                class="item-info-btn"
+                fill="clear"
+                size="small"
+                (click)="showItemInfo(item)"
+                [attr.aria-label]="'Show detailed information for ' + item.name">
+                <ion-icon name="information-circle-outline"></ion-icon>
+              </ion-button>
+            </div>
+            <div class="item-info">
+              <h4>{{ item.name }}</h4>
+              <p class="item-level">Level {{ item.level }}</p>
+              <p class="item-rarity"
+                 [ngClass]="{
+                   'common': item.rarity === 'Common',
+                   'uncommon': item.rarity === 'Uncommon',
+                   'rare': item.rarity === 'Rare',
+                   'epic': item.rarity === 'Epic',
+                   'legendary': item.rarity === 'Legendary',
+                   'other': item.rarity !== 'Common' && item.rarity !== 'Uncommon' && item.rarity !== 'Rare' && item.rarity !== 'Epic' && item.rarity !== 'Legendary'
+                 }">
+                {{ item.rarity }}
+              </p>
+              <p class="item-quantity" *ngIf="item.quantity > 1">
+                Amount: {{ item.quantity }}
+              </p>
+            </div>
+            <div class="item-actions">
+              <ion-button size="small" (click)="equipItem(item)">
+                Equip
+              </ion-button>
+              <ion-button size="small" fill="outline" (click)="moveToTrade(item)">
+                Move to Trade
+              </ion-button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Trade Pocket -->
+    <div class="pocket-section">
+      <ion-button
+        fill="clear"
+        class="pocket-header"
+        (click)="toggleTradePocket()"
+        [class.open]="tradePocketOpen">
+        <ion-icon
+          [name]="tradePocketOpen ? 'chevron-down' : 'chevron-forward'"
+          slot="start">
+        </ion-icon>
+        Trade Pocket
+      </ion-button>
+
+      <div class="pocket-content" [class.open]="tradePocketOpen">
+        <div class="filter-buttons">
+          <ion-button
+            size="small"
+            fill="clear"
+            [class.active]="tradeFilter === 'All'"
+            (click)="setTradeFilter('All')">
+            All
+          </ion-button>
+          <ion-button
+            size="small"
+            fill="clear"
+            [class.active]="tradeFilter === 'Weapon'"
+            (click)="setTradeFilter('Weapon')">
+            Weapons
+          </ion-button>
+          <ion-button
+            size="small"
+            fill="clear"
+            [class.active]="tradeFilter === 'Armor'"
+            (click)="setTradeFilter('Armor')">
+            Armor
+          </ion-button>
+          <ion-button
+            size="small"
+            fill="clear"
+            [class.active]="tradeFilter === 'Accessory'"
+            (click)="setTradeFilter('Accessory')">
+            Accessories
+          </ion-button>
+          <ion-button
+            size="small"
+            fill="clear"
+            [class.active]="tradeFilter === 'Other'"
+            (click)="setTradeFilter('Other')">
+            Other
+          </ion-button>
+        </div>
+
+        <div class="items-grid">
+          <div
+            class="item-card"
+            *ngFor="let item of getFilteredTradeItems()">
+            <div class="item-image">
+              <img [src]="'assets/items/' + item.image + '.png'"
+                   [alt]="item.name"
+                   (error)="onItemImageError($event, item)">
+              <ion-button
+                class="item-info-btn"
+                fill="clear"
+                size="small"
+                (click)="showItemInfo(item)"
+                [attr.aria-label]="'Show detailed information for ' + item.name">
+                <ion-icon name="information-circle-outline"></ion-icon>
+              </ion-button>
+            </div>
+            <div class="item-info">
+              <h4>{{ item.name }}</h4>
+              <p class="item-level">Level {{ item.level }}</p>
+              <p class="item-rarity">{{ item.rarity }}</p>
+              <p class="item-quantity" *ngIf="item.quantity > 1">
+                Amount: {{ item.quantity }}
+              </p>
+            </div>
+            <div class="item-actions">
+              <ion-button size="small" (click)="moveToKeep(item)">
+                Move to Keep
+              </ion-button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Food Pocket -->
+    <div class="pocket-section">
+      <ion-button
+        fill="clear"
+        class="pocket-header"
+        (click)="toggleFoodPocket()"
+        [class.open]="foodPocketOpen">
+        <ion-icon
+          [name]="foodPocketOpen ? 'chevron-down' : 'chevron-forward'"
+          slot="start">
+        </ion-icon>
+        Food Pocket
+      </ion-button>
+
+      <div class="pocket-content" [class.open]="foodPocketOpen">
+        <div class="filter-buttons">
+          <ion-button
+            size="small"
+            fill="clear"
+            [class.active]="foodFilter === 'All'"
+            (click)="setFoodFilter('All')">
+            All
+          </ion-button>
+          <ion-button
+            size="small"
+            fill="clear"
+            [class.active]="foodFilter === 'Ingredient'"
+            (click)="setFoodFilter('Ingredient')">
+            Ingredients
+          </ion-button>
+          <ion-button
+            size="small"
+            fill="clear"
+            [class.active]="foodFilter === 'Recipes'"
+            (click)="setFoodFilter('Recipes')">
+            Recipes
+          </ion-button>
+          <ion-button
+            size="small"
+            fill="clear"
+            [class.active]="foodFilter === 'Tools'"
+            (click)="setFoodFilter('Tools')">
+            Tools
+          </ion-button>
+          <ion-button
+            size="small"
+            fill="clear"
+            [class.active]="foodFilter === 'Other'"
+            (click)="setFoodFilter('Other')">
+            Other
+          </ion-button>
+        </div>
+
+        <div class="items-grid">
+          <div
+            class="item-card"
+            *ngFor="let item of getFilteredFoodItems()">
+            <div class="item-image">
+              <img [src]="'assets/items/' + item.image + '.png'"
+                   [alt]="item.name"
+                   (error)="onItemImageError($event, item)">
+              <ion-button
+                class="item-info-btn"
+                fill="clear"
+                size="small"
+                (click)="showItemInfo(item)"
+                [attr.aria-label]="'Show detailed information for ' + item.name">
+                <ion-icon name="information-circle-outline"></ion-icon>
+              </ion-button>
+            </div>
+            <div class="item-info">
+              <h4>{{ item.name }}</h4>
+              <p class="item-level">Level {{ item.level }}</p>
+              <p class="item-rarity">{{ item.rarity }}</p>
+              <p class="item-quantity" *ngIf="item.quantity > 1">
+                Amount: {{ item.quantity }}
+              </p>
+            </div>
+            <div class="item-actions">
+              <ion-button size="small" (click)="consumeItem(item)">
+                Consume
+              </ion-button>
+              <ion-button size="small" fill="outline" (click)="moveToKeep(item)">
+                Move to Keep
+              </ion-button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Equip Pocket -->
+    <div class="pocket-section">
+      <ion-button
+        fill="clear"
+        class="pocket-header"
+        (click)="toggleEquipPocket()"
+        [class.open]="equipPocketOpen">
+        <ion-icon
+          [name]="equipPocketOpen ? 'chevron-down' : 'chevron-forward'"
+          slot="start">
+        </ion-icon>
+        Equip Pocket
+      </ion-button>
+
+      <div class="pocket-content" [class.open]="equipPocketOpen">
+        <div class="items-grid">
+          <div
+            class="item-card equipped"
+            *ngFor="let item of equippedItems">
+            <div class="item-image">
+              <img [src]="'assets/items/' + item.image + '.png'"
+                   [alt]="item.name"
+                   (error)="onItemImageError($event, item)">
+              <ion-button
+                class="item-info-btn"
+                fill="clear"
+                size="small"
+                (click)="showItemInfo(item)"
+                [attr.aria-label]="'Show detailed information for ' + item.name">
+                <ion-icon name="information-circle-outline"></ion-icon>
+              </ion-button>
+            </div>
+            <div class="item-info">
+              <h4>{{ item.name }}</h4>
+              <p class="item-level">Level {{ item.level }}</p>
+              <p class="item-rarity">{{ item.rarity }}</p>
+              <p class="equip-location" *ngIf="item.equipLocation">
+                {{ item.equipLocation }}
+              </p>
+            </div>
+            <div class="item-actions">
+              <ion-button size="small" fill="outline" (click)="unequipItem(item)">
+                Unequip
+              </ion-button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</ion-content>

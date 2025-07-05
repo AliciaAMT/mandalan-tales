@@ -170,10 +170,14 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
 
     // Set theme color from localStorage or default
     const themeColor = localStorage.getItem('themeColor') || DEFAULT_THEME_COLOR;
-    document.documentElement.style.setProperty('--theme-color', themeColor);
-    if (this.getTextColorForTheme) {
-      const textColor = this.getTextColorForTheme(themeColor);
-      document.documentElement.style.setProperty('--header-text-color', textColor);
+    const gameRoot = document.querySelector('.game-root') as HTMLElement;
+    if (gameRoot) {
+      gameRoot.style.setProperty('--theme-color', themeColor);
+      gameRoot.style.setProperty('--ion-color-primary', themeColor);
+      if (this.getTextColorForTheme) {
+        const textColor = this.getTextColorForTheme(themeColor);
+        gameRoot.style.setProperty('--header-text-color', textColor);
+      }
     }
     await this.loadUserSettings();
     console.log('MainPage ngOnInit, currentCharacter:', this.currentCharacter);
@@ -200,11 +204,14 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
 
   ionViewWillEnter() {
     const themeColor = localStorage.getItem('themeColor') || DEFAULT_THEME_COLOR;
-    document.documentElement.style.setProperty('--theme-color', themeColor);
-    document.documentElement.style.setProperty('--ion-color-primary', themeColor);
-    if (this.getTextColorForTheme) {
-      const textColor = this.getTextColorForTheme(themeColor);
-      document.documentElement.style.setProperty('--header-text-color', textColor);
+    const gameRoot = document.querySelector('.game-root') as HTMLElement;
+    if (gameRoot) {
+      gameRoot.style.setProperty('--theme-color', themeColor);
+      gameRoot.style.setProperty('--ion-color-primary', themeColor);
+      if (this.getTextColorForTheme) {
+        const textColor = this.getTextColorForTheme(themeColor);
+        gameRoot.style.setProperty('--header-text-color', textColor);
+      }
     }
   }
 
@@ -534,15 +541,29 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
       const settings = await this.settingsService.getUserSettings(user.uid);
       if (settings) {
         // Apply theme color to CSS custom property
-        document.documentElement.style.setProperty('--theme-color', settings.themeColor);
+        const gameRoot = document.querySelector('.game-root') as HTMLElement;
+        if (gameRoot) {
+          gameRoot.style.setProperty('--theme-color', settings.themeColor);
+          gameRoot.style.setProperty('--ion-color-primary', settings.themeColor);
+        }
 
         // Set text color based on theme brightness
         const textColor = this.getTextColorForTheme(settings.themeColor);
-        document.documentElement.style.setProperty('--header-text-color', textColor);
+        const gameRootText = document.querySelector('.game-root') as HTMLElement;
+        if (gameRootText) {
+          gameRootText.style.setProperty('--header-text-color', textColor);
+        }
       } else {
         // Apply default theme color
-        document.documentElement.style.setProperty('--theme-color', DEFAULT_THEME_COLOR);
-        document.documentElement.style.setProperty('--header-text-color', '#181200');
+        const gameRoot = document.querySelector('.game-root') as HTMLElement;
+        if (gameRoot) {
+          gameRoot.style.setProperty('--theme-color', DEFAULT_THEME_COLOR);
+          gameRoot.style.setProperty('--ion-color-primary', DEFAULT_THEME_COLOR);
+        }
+        const gameRootText = document.querySelector('.game-root') as HTMLElement;
+        if (gameRootText) {
+          gameRootText.style.setProperty('--header-text-color', '#181200');
+        }
       }
     }
   }

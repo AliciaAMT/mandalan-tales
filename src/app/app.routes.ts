@@ -59,6 +59,11 @@ export const routes: Routes = [
     loadComponent: () => import('./game/pages/main/main.page').then( m => m.MainPage)
   },
   {
+    path: 'inventory',
+    canActivate: [AuthGuard],
+    loadComponent: () => import('./game/pages/inventory/inventory.page').then( m => m.InventoryPage)
+  },
+  {
     path: '**',
     redirectTo: '',
   }

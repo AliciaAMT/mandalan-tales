@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, effect } from '@angular/core';
+import { Component, OnInit, inject, effect, ChangeDetectorRef } from '@angular/core';
 import { AppHeaderComponent } from "../shared/header/app-header.component";
 import { AppFooterComponent } from "../shared/footer/app-footer.component";
 import { STANDALONE_IMPORTS } from '../shared/standalone-imports';
@@ -32,6 +32,7 @@ export class DashboardComponent implements OnInit {
   private modalCtrl: ModalController = inject(ModalController);
   private settingsService: SettingsService = inject(SettingsService);
   private alertCtrl: AlertController = inject(AlertController);
+  private cdr: ChangeDetectorRef = inject(ChangeDetectorRef);
 
   // Expose the character service signal directly
   characters = this.characterService.characters;
@@ -69,11 +70,24 @@ export class DashboardComponent implements OnInit {
         }
       }
       // Do NOT auto-navigate to dashboard here!
+      console.log('DashboardComponent characters:', this.characters());
+      this.cdr.detectChanges();
     });
   }
 
+  private setGoldTheme() {
+    document.documentElement.style.setProperty('--ion-color-primary', '#ceb167');
+    document.documentElement.style.setProperty('--ion-color-primary-contrast', '#000000');
+    document.documentElement.style.setProperty('--theme-color', '#ceb167');
+    document.documentElement.style.setProperty('--header-text-color', '#ceb167');
+  }
+
   ngOnInit() {
-    // No effect() here!
+    this.setGoldTheme();
+    effect(() => {
+      console.log('DashboardComponent characters (ngOnInit):', this.characters());
+      this.cdr.detectChanges();
+    });
   }
 
   async loadUserSettings(): Promise<void> {
@@ -82,11 +96,16 @@ export class DashboardComponent implements OnInit {
       if (settings) {
         this.selectedThemeColor = settings.themeColor;
         // Set the CSS variable immediately
-        document.documentElement.style.setProperty('--theme-color', this.selectedThemeColor);
-        localStorage.setItem('themeColor', this.selectedThemeColor);
-        // Also set the text color for contrast
-        const textColor = this.getTextColorForTheme(this.selectedThemeColor);
-        document.documentElement.style.setProperty('--header-text-color', textColor);
+        const gameRoot = document.querySelector('.game-root') as HTMLElement;
+        if (gameRoot) {
+          gameRoot.style.setProperty('--theme-color', this.selectedThemeColor);
+          const textColor = this.getTextColorForTheme(this.selectedThemeColor);
+          gameRoot.style.setProperty('--header-text-color', textColor);
+        } else {
+          document.documentElement.style.setProperty('--theme-color', this.selectedThemeColor);
+          const textColor = this.getTextColorForTheme(this.selectedThemeColor);
+          document.documentElement.style.setProperty('--header-text-color', textColor);
+        }
       }
     }
   }
@@ -96,12 +115,16 @@ export class DashboardComponent implements OnInit {
       try {
         await this.settingsService.updateThemeColor(this.user.uid, this.selectedThemeColor);
         // Update CSS custom properties for immediate effect
-        document.documentElement.style.setProperty('--theme-color', this.selectedThemeColor);
-        localStorage.setItem('themeColor', this.selectedThemeColor);
-
-        // Set text color based on theme brightness
-        const textColor = this.getTextColorForTheme(this.selectedThemeColor);
-        document.documentElement.style.setProperty('--header-text-color', textColor);
+        const gameRoot = document.querySelector('.game-root') as HTMLElement;
+        if (gameRoot) {
+          gameRoot.style.setProperty('--theme-color', this.selectedThemeColor);
+          const textColor = this.getTextColorForTheme(this.selectedThemeColor);
+          gameRoot.style.setProperty('--header-text-color', textColor);
+        } else {
+          document.documentElement.style.setProperty('--theme-color', this.selectedThemeColor);
+          const textColor = this.getTextColorForTheme(this.selectedThemeColor);
+          document.documentElement.style.setProperty('--header-text-color', textColor);
+        }
       } catch (error) {
         console.error('Error updating theme color:', error);
       }
@@ -162,6 +185,7 @@ export class DashboardComponent implements OnInit {
   }
 
   logout(): void {
+    this.setGoldTheme();
     this.authService.logout().then(() => {
       this.router.navigate(['/login']);
     });

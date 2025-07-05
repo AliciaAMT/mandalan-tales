@@ -26,6 +26,21 @@
   <!-- High contrast mode support -->
   <meta name="theme-color" content="#6b4e26" />
   <meta name="msapplication-TileColor" content="#6b4e26" />
+
+  <script>
+    // Set theme color from localStorage before Angular loads
+    (function() {
+      var themeColor = localStorage.getItem('themeColor');
+      var textColor = localStorage.getItem('headerTextColor');
+      if (themeColor) {
+        document.documentElement.style.setProperty('--theme-color', themeColor);
+        document.documentElement.style.setProperty('--ion-color-primary', themeColor);
+      }
+      if (textColor) {
+        document.documentElement.style.setProperty('--header-text-color', textColor);
+      }
+    })();
+  </script>
 </head>
 
 <body>

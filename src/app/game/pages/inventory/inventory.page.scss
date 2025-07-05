@@ -1,0 +1,280 @@
+.inventory-container {
+  padding: 16px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.pocket-section {
+  margin-bottom: 16px;
+  border: 1px solid var(--ion-color-primary);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.pocket-header {
+  width: 100%;
+  margin: 0;
+  padding: 12px 16px;
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--ion-color-primary) 90%, white 10%),
+    var(--ion-color-primary)
+  );
+  color: var(--header-text-color, #ffffff);
+  font-weight: 600;
+  text-align: left;
+  border: none;
+  border-radius: 0;
+
+  &.open {
+    border-bottom: 1px solid var(--ion-color-primary);
+  }
+
+  ion-icon {
+    margin-right: 8px;
+    transition: transform 0.3s ease;
+  }
+}
+
+.pocket-content {
+  display: none;
+  padding: 16px;
+  background: var(--ion-color-light);
+
+  &.open {
+    display: block;
+  }
+}
+
+.filter-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+  padding: 8px;
+  background: #000; // pure black background
+  border-radius: 8px;
+  color: #fff; // white font
+
+  ion-button {
+    --padding-start: 12px;
+    --padding-end: 12px;
+    --padding-top: 6px;
+    --padding-bottom: 6px;
+    font-size: 12px;
+    color: #fff; // white font for button text
+    &.active {
+      --background: var(--ion-color-primary);
+      --color: var(--header-text-color, #fff);
+    }
+  }
+}
+
+.items-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.item-card {
+  background: #181a1b;
+  border: 1px solid var(--ion-color-medium);
+  border-radius: 8px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: all 0.3s ease;
+
+  &:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+  }
+
+  &.equipped {
+    border-color: #183c2a; // even darker green
+    background: linear-gradient(135deg, #183c2a 80%, #181a1b 100%);
+
+    .item-info h4 {
+      color: #fff;
+    }
+  }
+}
+
+.item-image {
+  text-align: center;
+  position: relative;
+
+  img {
+    width: 64px;
+    height: 64px;
+    object-fit: contain;
+    border-radius: 4px;
+    background: transparent; // transparent background
+  }
+
+  .item-info-btn {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    --padding-start: 4px;
+    --padding-end: 4px;
+    --padding-top: 4px;
+    --padding-bottom: 4px;
+    min-width: 24px;
+    height: 24px;
+    --color: var(--ion-color-primary);
+    --background: rgba(0, 0, 0, 0.7);
+    --border-radius: 50%;
+    z-index: 2;
+
+    ion-icon {
+      font-size: 14px;
+    }
+  }
+
+  .item-info-btn:hover {
+    --background: rgba(0, 0, 0, 0.9);
+    --color: var(--ion-color-primary-shade);
+  }
+}
+
+.item-info {
+  flex: 1;
+
+  h4 {
+    margin: 0 0 4px 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: #fff;
+  }
+
+  p {
+    margin: 2px 0;
+    font-size: 15px;
+    color: #ccc;
+
+    &.item-level {
+      color: #fff;
+      font-weight: 500;
+    }
+
+    &.item-rarity {
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      &.common { color: #7CFC98; }
+      &.uncommon { color: #4fd8eb; }
+      &.rare { color: #ffd700; }
+      &.epic { color: #b388ff; }
+      &.legendary { color: #ff9800; }
+      &.other { color: #eee; }
+    }
+
+    &.item-quantity {
+      color: #ffe082;
+      font-weight: 500;
+    }
+
+    &.equip-location {
+      color: #4fd8eb;
+      font-weight: 500;
+      font-style: italic;
+    }
+  }
+}
+
+.item-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+
+  ion-button {
+    flex: 1;
+    min-width: 80px;
+    font-size: 12px;
+    --padding-start: 8px;
+    --padding-end: 8px;
+    --padding-top: 4px;
+    --padding-bottom: 4px;
+  }
+}
+
+// Mobile responsiveness
+@media (max-width: 768px) {
+  .inventory-container {
+    padding: 8px;
+  }
+
+  .items-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .filter-buttons {
+    justify-content: center;
+
+    ion-button {
+      font-size: 11px;
+      --padding-start: 8px;
+      --padding-end: 8px;
+    }
+  }
+
+  .item-card {
+    padding: 8px;
+  }
+
+  .item-actions {
+    ion-button {
+      font-size: 11px;
+      --padding-start: 6px;
+      --padding-end: 6px;
+    }
+  }
+}
+
+// Accessibility improvements
+.pocket-header:focus {
+  outline: 2px solid var(--ion-color-primary);
+  outline-offset: 2px;
+}
+
+.item-card:focus-within {
+  outline: 2px solid var(--ion-color-primary);
+  outline-offset: 2px;
+}
+
+// Error handling for missing images
+.item-image img[src*="error"] {
+  display: none;
+}
+
+.item-image img:not([src]) {
+  display: none;
+}
+
+.item-actions ion-button {
+  // Ensure all solid buttons use the contrast color
+  &.active, &[fill="solid"] {
+    --background: var(--ion-color-primary);
+    --color: var(--header-text-color, #fff);
+  }
+}
+
+.item-actions ion-button:first-child {
+  --background: var(--ion-color-primary);
+  --color: var(--header-text-color, #fff);
+}
+
+.item-actions ion-button:nth-child(2) {
+  --background: transparent;
+  --color: #ff5252;
+  --border-color: #ff5252;
+  border: 1.5px solid #ff5252;
+}
+
+.item-actions ion-button:nth-child(2):hover,
+.item-actions ion-button:nth-child(2):focus {
+  --background: #ff5252;
+  --color: #fff;
+  border: 1.5px solid #ff5252;
+}

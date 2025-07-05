@@ -1,0 +1,201 @@
+.item-info-modal {
+  background: var(--ion-background-color, #222);
+  color: var(--ion-text-color, #fff);
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  padding: 0;
+  min-width: 320px;
+  max-width: 95vw;
+  overflow: hidden;
+
+  ion-header {
+    background: var(--ion-color-primary);
+    color: var(--ion-color-primary-contrast, #fff);
+  }
+
+  ion-toolbar {
+    --background: var(--ion-color-primary);
+    --color: var(--ion-color-primary-contrast, #fff);
+  }
+
+  ion-content {
+    --background: var(--ion-background-color, #222);
+    --color: var(--ion-text-color, #fff);
+  }
+
+  .item-detail-container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 16px;
+  }
+
+  .item-image-section {
+    text-align: center;
+    margin-bottom: 24px;
+  }
+
+  .large-item-image {
+    width: 120px;
+    height: 120px;
+    object-fit: contain;
+    border-radius: 8px;
+    background: transparent;
+    border: 2px solid var(--ion-color-medium);
+  }
+
+  .item-basic-info {
+    margin-bottom: 24px;
+  }
+
+  .item-name {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin: 0 0 12px 0;
+    color: var(--ion-text-color, #fff);
+  }
+
+  .item-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .item-level, .item-type, .item-quantity {
+    background: var(--ion-color-medium);
+    color: var(--ion-color-medium-contrast);
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    font-weight: 500;
+  }
+
+  .item-rarity {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+
+  .item-rarity.common { color: #7CFC98; }
+  .item-rarity.uncommon { color: #4fd8eb; }
+  .item-rarity.rare { color: #ffd700; }
+  .item-rarity.epic { color: #b388ff; }
+  .item-rarity.legendary { color: #ff9800; }
+
+  .item-description {
+    font-size: 1rem;
+    line-height: 1.5;
+    color: var(--ion-text-color, #ccc);
+    margin: 0;
+  }
+
+  .item-stats, .item-effects, .item-properties, .item-value, .equip-location {
+    margin-bottom: 24px;
+  }
+
+  .item-stats h3, .item-effects h3, .item-properties h3, .item-value h3, .equip-location h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 0 0 12px 0;
+    color: var(--ion-text-color, #fff);
+    border-bottom: 1px solid var(--ion-color-medium);
+    padding-bottom: 4px;
+  }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 12px;
+  }
+
+  .stat-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    background: var(--ion-color-light);
+    border-radius: 6px;
+  }
+
+  .stat-label {
+    font-weight: 500;
+    color: var(--ion-text-color, #ccc);
+  }
+
+  .stat-value {
+    font-weight: 600;
+    color: var(--ion-text-color, #fff);
+  }
+
+  .effects-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .effect-item {
+    padding: 8px 12px;
+    margin-bottom: 8px;
+    background: var(--ion-color-light);
+    border-radius: 6px;
+    color: var(--ion-text-color, #fff);
+    font-weight: 500;
+  }
+
+  .properties-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .property-tag {
+    background: var(--ion-color-primary);
+    color: var(--ion-color-primary-contrast);
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 500;
+  }
+
+  .property-tag.legendary {
+    background: #ff9800;
+    color: #000;
+  }
+
+  .value-amount {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #ffd700;
+    margin: 0;
+  }
+
+  .equip-location p {
+    color: var(--ion-text-color, #4fd8eb);
+    font-weight: 500;
+    font-style: italic;
+    margin: 0;
+  }
+
+  @media (max-width: 768px) {
+    .item-detail-container {
+      max-width: 100%;
+      padding: 12px;
+    }
+
+    .large-item-image {
+      width: 100px;
+      height: 100px;
+    }
+
+    .stats-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .item-meta {
+      flex-direction: column;
+      gap: 8px;
+    }
+  }
+}

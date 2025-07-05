@@ -19,27 +19,22 @@ export class CharacterService {
   private injector = inject(Injector);
   private authService: AuthService = inject(AuthService);
   private characterDeletionService: CharacterDeletionService = inject(CharacterDeletionService);
+  private firestore = inject(Firestore);
 
-  // Expose characters as a computed signal that only queries Firestore when authenticated
-  private firestoreCharacters = toSignal<CharStats[] | undefined>(
-    runInInjectionContext(this.injector, () => {
-      const firestore = inject(Firestore);
-      return collectionData(
+  // Only create the signal when the user is available
+  characters: Signal<CharStats[]> = computed(() => {
+    const user = this.authService.user();
+    if (!user) return [];
+    return toSignal(
+      collectionData(
         query(
-          collection(firestore, 'charstats'),
-          where('userId', '==', this.authService.user() ? this.authService.user()!.uid : '')
+          collection(this.firestore, 'charstats'),
+          where('userId', '==', user.uid)
         ),
         { idField: 'id' }
-      ) as any;
-    }),
-    { initialValue: undefined }
-  );
-
-  characters = computed<CharStats[]>(() => {
-    if (!this.authService.authInitialized() || !this.authService.user()) {
-      return [];
-    }
-    return this.firestoreCharacters() ?? [];
+      ),
+      { initialValue: [] }
+    )();
   });
 
   constructor() {
