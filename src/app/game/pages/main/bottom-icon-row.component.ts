@@ -34,6 +34,8 @@ export class BottomIconRowComponent {
   onMenuClick(item: any) {
     if (item.action === 'dashboard') {
       this.router.navigate(['/dashboard']);
+    } else if (item.action === 'stats') {
+      this.router.navigate(['/game/statistics']);
     } else {
       // Placeholder for future logic
       alert(`Clicked: ${item.label}`);

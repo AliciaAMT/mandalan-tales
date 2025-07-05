@@ -1,0 +1,190 @@
+<ion-content class="ion-padding" appFocusManager>
+  <main id="main-content" role="main">
+    <div class="statistics-container">
+      <!-- Back Button -->
+      <div class="back-button-container">
+        <ion-button fill="clear" (click)="goBack()" class="back-button">
+          <ion-icon name="arrow-back" slot="start"></ion-icon>
+          Back to Game
+        </ion-button>
+      </div>
+
+      <!-- Loading State -->
+      <div *ngIf="isLoading" class="loading-container">
+        <ion-spinner name="crescent"></ion-spinner>
+        <p>Loading character statistics...</p>
+      </div>
+
+      <!-- Character Statistics -->
+      <div *ngIf="!isLoading && currentCharacter" class="statistics-content">
+        <h1 class="page-title">Character Statistics</h1>
+
+        <!-- Character Info Section -->
+        <ion-card class="character-info-card">
+          <ion-card-header>
+            <ion-card-title>Character Information</ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            <div class="character-portrait-section">
+              <img
+                [src]="'assets/portraits/transparent/' + currentCharacter.portrait + '.png'"
+                [alt]="'Portrait of ' + currentCharacter.name"
+                class="character-portrait"
+                (error)="onPortraitError($event)"
+              />
+              <div class="character-details">
+                <h2 class="character-name">{{ currentCharacter.name }}</h2>
+                <p class="character-title" *ngIf="currentCharacter.title">{{ currentCharacter.title }}</p>
+                <div class="character-basic-info">
+                  <div class="info-row">
+                    <span class="info-label">Class:</span>
+                    <span class="info-value">{{ currentCharacter.class }}</span>
+                  </div>
+                  <div class="info-row">
+                    <span class="info-label">Race:</span>
+                    <span class="info-value">{{ currentCharacter.race }}</span>
+                  </div>
+                  <div class="info-row">
+                    <span class="info-label">Condition:</span>
+                    <span class="info-value">{{ currentCharacter.cond }}</span>
+                  </div>
+                  <div class="info-row">
+                    <span class="info-label">Level:</span>
+                    <span class="info-value">{{ currentCharacter.level }}</span>
+                  </div>
+                  <div class="info-row">
+                    <span class="info-label">Experience:</span>
+                    <span class="info-value">{{ currentCharacter.experience }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </ion-card-content>
+        </ion-card>
+
+        <!-- Vital Statistics Section -->
+        <ion-card class="vital-stats-card">
+          <ion-card-header>
+            <ion-card-title>Vital Statistics</ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            <div class="vital-stats-grid">
+              <div class="vital-stat">
+                <div class="stat-icon-container">
+                  <img src="assets/items/life.webp" alt="Life" class="stat-icon" />
+                </div>
+                <div class="stat-info">
+                  <div class="stat-label">Life</div>
+                  <div class="stat-value">{{ currentCharacter.life }} / {{ currentCharacter.maxLife }}</div>
+                  <ion-progress-bar
+                    [value]="currentCharacter.life / currentCharacter.maxLife"
+                    color="danger">
+                  </ion-progress-bar>
+                </div>
+              </div>
+              <div class="vital-stat">
+                <div class="stat-icon-container">
+                  <img src="assets/items/mana.webp" alt="Mana" class="stat-icon" />
+                </div>
+                <div class="stat-info">
+                  <div class="stat-label">Mana</div>
+                  <div class="stat-value">{{ currentCharacter.mana }} / {{ currentCharacter.maxMana }}</div>
+                  <ion-progress-bar
+                    [value]="currentCharacter.mana / currentCharacter.maxMana"
+                    color="primary">
+                  </ion-progress-bar>
+                </div>
+              </div>
+              <div class="vital-stat">
+                <div class="stat-icon-container">
+                  <img src="assets/items/gold.webp" alt="Gold" class="stat-icon" />
+                </div>
+                <div class="stat-info">
+                  <div class="stat-label">Gold</div>
+                  <div class="stat-value gold-amount">{{ currentCharacter.gold }}</div>
+                </div>
+              </div>
+            </div>
+          </ion-card-content>
+        </ion-card>
+
+        <!-- Main Stats Section -->
+        <ion-card class="main-stats-card">
+          <ion-card-header>
+            <ion-card-title>Main Statistics</ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            <div class="stats-grid">
+              <div class="stat-item" *ngFor="let stat of mainStats">
+                <div class="stat-header">
+                  <span class="stat-name">{{ stat.name }}</span>
+                  <span class="stat-value" [style.color]="getStatColor(stat.value)">
+                    {{ stat.value }}
+                  </span>
+                </div>
+                <ion-progress-bar
+                  [value]="stat.value / 20"
+                  [style.--progress-background]="getStatColor(stat.value)">
+                </ion-progress-bar>
+              </div>
+            </div>
+          </ion-card-content>
+        </ion-card>
+
+        <!-- Skills Section -->
+        <ion-card class="skills-card">
+          <ion-card-header>
+            <ion-card-title>Skills</ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            <div class="skills-grid">
+              <div class="skill-item" *ngFor="let skill of skills">
+                <div class="skill-header">
+                  <span class="skill-name">{{ skill.name }}</span>
+                  <span class="skill-value" [style.color]="getSkillColor(skill.value)">
+                    {{ skill.value }}
+                  </span>
+                </div>
+                <ion-progress-bar
+                  [value]="skill.value / 50"
+                  [style.--progress-background]="getSkillColor(skill.value)">
+                </ion-progress-bar>
+              </div>
+            </div>
+          </ion-card-content>
+        </ion-card>
+
+        <!-- Resistances Section -->
+        <ion-card class="resistances-card">
+          <ion-card-header>
+            <ion-card-title>Resistances</ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            <div class="resistances-grid">
+              <div class="resistance-item" *ngFor="let resistance of resistances">
+                <div class="resistance-header">
+                  <span class="resistance-name">{{ resistance.name }}</span>
+                  <span class="resistance-value" [style.color]="getResistanceColor(resistance.value)">
+                    {{ resistance.value }}
+                  </span>
+                </div>
+                <ion-progress-bar
+                  [value]="resistance.value / 10"
+                  [style.--progress-background]="getResistanceColor(resistance.value)">
+                </ion-progress-bar>
+              </div>
+            </div>
+          </ion-card-content>
+        </ion-card>
+      </div>
+
+      <!-- No Character State -->
+      <div *ngIf="!isLoading && !currentCharacter" class="no-character">
+        <ion-icon name="person-outline" class="no-character-icon"></ion-icon>
+        <h2>No Character Found</h2>
+        <p>Please create a character first to view statistics.</p>
+        <ion-button (click)="goBack()">Back to Game</ion-button>
+      </div>
+    </div>
+  </main>
+</ion-content>

@@ -33,6 +33,15 @@ export interface CharStats {
   wisdom: number;
   luck: number;
 
+  // Combat stats
+  defense: number;
+  damage: number;
+  critical: number;
+
+  // Character achievements
+  wins: number;
+  deaths: number;
+
   // Resistances
   fireResist: number;
   iceResist: number;
@@ -45,6 +54,7 @@ export interface CharStats {
   holdResist: number;
   criticalResist: number;
   bleedResist: number;
+  immobilizeResist: number;
 
   // Skills
   cooking: number;

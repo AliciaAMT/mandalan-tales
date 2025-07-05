@@ -25,6 +25,7 @@ export interface RaceBonus {
     holdResist?: number;
     criticalResist?: number;
     bleedResist?: number;
+    immobilizeResist?: number;
     magicFind?: number;
   };
 }
@@ -51,6 +52,7 @@ export interface ClassBonus {
     holdResist?: number;
     criticalResist?: number;
     bleedResist?: number;
+    immobilizeResist?: number;
     skillPoints?: number;
     lockpicking?: number;
     enchanting?: number;

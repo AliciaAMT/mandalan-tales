@@ -114,7 +114,8 @@ export class CreateCharacterPage {
       mindResist: Math.floor(Math.random() * 11),
       holdResist: Math.floor(Math.random() * 11),
       criticalResist: Math.floor(Math.random() * 11),
-      bleedResist: Math.floor(Math.random() * 11)
+      bleedResist: Math.floor(Math.random() * 11),
+      immobilizeResist: Math.floor(Math.random() * 11)
     };
 
     // Base skills
@@ -174,6 +175,8 @@ export class CreateCharacterPage {
         (raceBonus?.bonuses.criticalResist || 0) + (classBonus?.bonuses.criticalResist || 0)),
       bleedResist: Math.max(0, baseResistances.bleedResist +
         (raceBonus?.bonuses.bleedResist || 0) + (classBonus?.bonuses.bleedResist || 0)),
+      immobilizeResist: Math.max(0, baseResistances.immobilizeResist +
+        (raceBonus?.bonuses.immobilizeResist || 0) + (classBonus?.bonuses.immobilizeResist || 0)),
 
       // Skills with bonuses
       cooking: baseSkills.cooking,
@@ -272,6 +275,13 @@ export class CreateCharacterPage {
           agility: this.generatedStats.agility,
           wisdom: this.generatedStats.wisdom,
           luck: this.generatedStats.luck,
+          // Combat stats
+          defense: 0,
+          damage: 0,
+          critical: 0,
+          // Character achievements
+          wins: 0,
+          deaths: 0,
           guild: '',
           title: 'Peasant',
           cond: 'Good',
@@ -286,6 +296,7 @@ export class CreateCharacterPage {
           holdResist: this.generatedStats.holdResist,
           criticalResist: this.generatedStats.criticalResist,
           bleedResist: this.generatedStats.bleedResist,
+          immobilizeResist: this.generatedStats.immobilizeResist || 0,
           cooking: this.generatedStats.cooking,
           alchemy: this.generatedStats.alchemy,
           enchanting: this.generatedStats.enchanting,
