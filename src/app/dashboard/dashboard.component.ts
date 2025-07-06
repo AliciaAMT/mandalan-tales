@@ -77,10 +77,10 @@ export class DashboardComponent implements OnInit {
   }
 
   ionViewWillEnter() {
-    // Reset theme to default gold color when entering dashboard
-    const defaultThemeColor = '#6b4e26'; // Default gold color
-    document.documentElement.style.setProperty('--theme-color', defaultThemeColor);
-    document.documentElement.style.setProperty('--ion-color-primary', defaultThemeColor);
+    // Reset theme to lighter gold color when entering dashboard
+    const lighterGold = '#ceb167'; // Lighter gold for non-game pages
+    document.documentElement.style.setProperty('--theme-color', lighterGold);
+    document.documentElement.style.setProperty('--ion-color-primary', lighterGold);
     document.documentElement.style.setProperty('--header-text-color', '#181200');
     // Clear the localStorage theme color to prevent game theme from persisting
     localStorage.removeItem('themeColor');

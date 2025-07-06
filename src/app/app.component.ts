@@ -26,6 +26,11 @@ export class AppComponent implements OnInit, OnDestroy {
     effect(() => {
       const event = navigationEnd$();
       if (event) {
+        // Reset theme color to default lighter gold on non-game pages
+        if (!(event as NavigationEnd).urlAfterRedirects.startsWith('/game')) {
+          document.documentElement.style.removeProperty('--ion-color-primary');
+          document.documentElement.style.removeProperty('--theme-color');
+        }
         const timeoutId = window.setTimeout(() => {
           const main = document.getElementById('main-content');
           if (main) {
