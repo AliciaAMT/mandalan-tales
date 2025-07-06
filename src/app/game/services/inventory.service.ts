@@ -410,28 +410,7 @@ export class InventoryService {
    * Initialize basic items for a new character
    */
   async initializeBasicItems(characterName: string): Promise<void> {
-    // Add basic starting items
-    const basicItems = [
-      this.createBasicItem(
-        'Bottle',
-        'An empty glass bottle.',
-        'Other',
-        'bottle',
-        1,
-        { othertype: 'Container' }
-      ),
-      this.createBasicItem(
-        'Tinderbox',
-        'A small box containing flint and steel for starting fires.',
-        'Other',
-        'tinderbox',
-        1,
-        { othertype: 'Tool' }
-      )
-    ];
-
-    for (const item of basicItems) {
-      await this.addItem(item);
-    }
+    // New characters start with no inventory items
+    // Items must be found through gameplay
   }
 }

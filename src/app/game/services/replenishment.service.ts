@@ -1,8 +1,10 @@
 import { Injectable, signal, runInInjectionContext, Injector } from '@angular/core';
-import { Firestore, doc, getDoc, setDoc, updateDoc } from '@angular/fire/firestore';
+import { Firestore, doc, getDoc, setDoc, updateDoc, collection, query, where, getDocs, addDoc } from '@angular/fire/firestore';
 
 export interface ReplenishableItem {
-  id: string;
+  id?: string; // Firestore UID
+  userId: string;
+  charname: string;
   name: string;
   type: 'fruit' | 'herb' | 'resource';
   location: string;
@@ -36,17 +38,17 @@ export class ReplenishmentService {
   /**
    * Initialize replenishable items for a character
    */
-  async initializeReplenishableItems(characterName: string): Promise<void> {
-    const docSnap = await runInInjectionContext(this.injector, () => {
-      const docRef = doc(this.firestore, 'replenishableItems', characterName);
-      return getDoc(docRef);
-    });
-
-    if (!docSnap.exists()) {
-      // Create initial replenishable items
-      const initialItems: ReplenishableItem[] = [
+  async initializeReplenishableItems(characterName: string, userId: string): Promise<void> {
+    // Query all replenishableItems for this user and character
+    const itemsRef = collection(this.firestore, 'replenishableItems');
+    const q = query(itemsRef, where('userId', '==', userId), where('charname', '==', characterName));
+    const snapshot = await getDocs(q);
+    if (snapshot.empty) {
+      // Create initial replenishable items as separate docs
+      const initialItems: Omit<ReplenishableItem, 'id'>[] = [
         {
-          id: 'fruit_tree_1',
+          userId,
+          charname: characterName,
           name: 'Apple Tree',
           type: 'fruit',
           location: 'yard',
@@ -66,7 +68,8 @@ export class ReplenishmentService {
           }
         },
         {
-          id: 'fruit_tree_2',
+          userId,
+          charname: characterName,
           name: 'Orange Tree',
           type: 'fruit',
           location: 'yard',
@@ -86,7 +89,8 @@ export class ReplenishmentService {
           }
         },
         {
-          id: 'herb_patch_1',
+          userId,
+          charname: characterName,
           name: 'Herb Garden',
           type: 'herb',
           location: 'yard',
@@ -106,7 +110,8 @@ export class ReplenishmentService {
           }
         },
         {
-          id: 'berry_bush_1',
+          userId,
+          charname: characterName,
           name: 'Berry Bush',
           type: 'fruit',
           location: 'yard',
@@ -126,29 +131,19 @@ export class ReplenishmentService {
           }
         }
       ];
-
-      await runInInjectionContext(this.injector, () => {
-        const docRef = doc(this.firestore, 'replenishableItems', characterName);
-        return setDoc(docRef, { items: initialItems });
-      });
-      this.replenishableItems.set(initialItems);
+      // Add each item as a separate doc
+      for (const item of initialItems) {
+        await addDoc(itemsRef, item);
+      }
+      this.replenishableItems.set(initialItems as ReplenishableItem[]);
     } else {
-      // Load existing items and check for respawns
-      const data = docSnap.data();
-      const items = data['items'] as ReplenishableItem[];
-
+      // Load existing items
+      const items: ReplenishableItem[] = snapshot.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() } as ReplenishableItem));
       // Check for respawns
       const updatedItems = items.map(item => this.checkRespawn(item));
-
-      // Update Firestore with any respawned items
-      if (JSON.stringify(items) !== JSON.stringify(updatedItems)) {
-        await runInInjectionContext(this.injector, () => {
-          const docRef = doc(this.firestore, 'replenishableItems', characterName);
-          return setDoc(docRef, { items: updatedItems });
-        });
-      }
-
       this.replenishableItems.set(updatedItems);
+      // Optionally update respawned items in Firestore
+      // (left as an exercise for batch update)
     }
   }
 

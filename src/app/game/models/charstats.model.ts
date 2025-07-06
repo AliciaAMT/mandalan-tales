@@ -1,8 +1,7 @@
 export interface CharStats {
   id?: string; // Added automatically by Firestore query with { idField: 'id' }
-  userId: string; // Firebase UID or user ref
-
-  name: string;
+  userId: string; // Firebase UID or user ref (required)
+  name: string; // Character name (required)
   portrait: string;
   race: string;
   class: string;

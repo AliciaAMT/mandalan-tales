@@ -176,9 +176,21 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
     console.log('Current inventory:', this.inventoryService.inventory);
 
     // Initialize replenishable items for current character
-    if (this.currentCharacter && !this.replenishmentInitialized) {
-      await this.replenishmentService.initializeReplenishableItems(this.currentCharacter.name);
+    if (
+      this.currentCharacter &&
+      typeof this.currentCharacter.name === 'string' &&
+      typeof this.currentCharacter.userId === 'string' &&
+      !this.replenishmentInitialized
+    ) {
+      const charName = this.currentCharacter.name as unknown as string;
+      const userId = this.currentCharacter.userId as unknown as string;
+      await (this.replenishmentService.initializeReplenishableItems as (name: string, userId: string) => Promise<void>)(
+        this.currentCharacter.name!,
+        this.currentCharacter.userId!
+      );
       this.replenishmentInitialized = true;
+    } else if (!this.currentCharacter?.name || !this.currentCharacter?.userId) {
+      console.error('currentCharacter.name or userId is undefined!');
     }
 
     // Generate initial map
@@ -1383,7 +1395,12 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
       plantName.toLowerCase().includes(item.name.toLowerCase())
     );
 
-    if (matchingItem && matchingItem.currentQuantity > 0) {
+    if (
+      matchingItem &&
+      matchingItem.currentQuantity > 0 &&
+      this.currentCharacter.name &&
+      matchingItem.id
+    ) {
       // Harvest from replenishable source
       const harvestedItem = await this.replenishmentService.harvestItem(
         this.currentCharacter.name,

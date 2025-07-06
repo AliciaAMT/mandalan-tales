@@ -133,42 +133,7 @@ export class CharacterService {
       const charRef = doc(collection(firestore, 'charstats'));
       batch.set(charRef, characterWithUserId);
 
-      // 2. Create starting inventory items (matching old demo)
-      // Rat Tail
-      const ratTailRef = doc(collection(firestore, 'inventory'));
-      const ratTailData: Inventory = {
-        ...DEFAULT_INVENTORY,
-        charname: characterData.name,
-        itemname: 'Rat Tail',
-        itemdescription: 'Rat tails are common ingredients in potions and enchantments.',
-        itemtype: 'Other',
-        itemimage: 'rattail',
-        itemlevel: 1,
-        itemrarity: 'Common',
-        itemvalue: 0,
-        keep: 1,
-        othertype: 'Reagent'
-      };
-      batch.set(ratTailRef, ratTailData);
-
-      // Lockpick
-      const lockpickRef = doc(collection(firestore, 'inventory'));
-      const lockpickData: Inventory = {
-        ...DEFAULT_INVENTORY,
-        charname: characterData.name,
-        itemname: 'Lockpick',
-        itemdescription: 'Lockpicks can be used on most locks that do not require special keys.',
-        itemtype: 'Other',
-        itemimage: 'lockpick',
-        itemlevel: 1,
-        itemrarity: 'Common',
-        itemvalue: 0,
-        keep: 1,
-        othertype: 'Tool'
-      };
-      batch.set(lockpickRef, lockpickData);
-
-      // 3. Create skills record
+      // 2. Create skills record
       const skillsRef = doc(collection(firestore, 'skills'));
       const skillsData: Skills = {
         ...DEFAULT_SKILLS,
