@@ -95,9 +95,10 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
   currentObjects: GameObject[] = [];
   currentPortals: Portal[] = [];
 
-  // Track last character position to prevent infinite loops
+  // Track last character position and map to prevent infinite loops
   private lastCharacterX: number = 0;
   private lastCharacterY: number = 0;
+  private lastCharacterMap: string = '';
 
   // Cache for allTileActions to prevent infinite loops
   private _allTileActionsCache: any[] = [];
@@ -135,10 +136,15 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
       if (chars.length > 0 && this.isInitialized) {
         // Only regenerate map if character actually changed
         const currentChar = this.currentCharacter;
-        if (currentChar && (currentChar.xaxis !== this.lastCharacterX || currentChar.yaxis !== this.lastCharacterY)) {
+        if (currentChar && (
+          currentChar.xaxis !== this.lastCharacterX ||
+          currentChar.yaxis !== this.lastCharacterY ||
+          currentChar.map !== this.lastCharacterMap
+        )) {
           this.generateMap();
           this.lastCharacterX = currentChar.xaxis;
           this.lastCharacterY = currentChar.yaxis;
+          this.lastCharacterMap = currentChar.map;
           // Reset replenishment flag when character changes
           this.resetReplenishmentInitialization();
         }
