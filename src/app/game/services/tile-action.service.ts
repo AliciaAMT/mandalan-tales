@@ -527,10 +527,17 @@ export class TileActionService {
 
     const flags = await this.characterService.getCharacterFlags(characterName);
     if (!flags) {
+      console.warn('No flags found for character', characterName);
       return false;
     }
 
     const flagValue = flags[tileAction.flagKey as keyof typeof flags];
+    console.log('[DEBUG] isItemAlreadyFound:', {
+      characterName,
+      flagKey: tileAction.flagKey,
+      flagValue,
+      flags
+    });
     // Check if flag is greater than 0 (meaning item has been found)
     // This matches the old demo logic where flags were set to 1, 2, etc.
     return typeof flagValue === 'number' && flagValue > 0;
@@ -650,6 +657,7 @@ export class TileActionService {
    * Handle tile action for a specific map and coordinates (ignores action string)
    */
   public async handleTileAction(map: string, x: number, y: number, characterName: string): Promise<TileActionResult> {
+    console.log('[DEBUG] handleTileAction called:', { map, x, y, characterName });
     const tileAction = this.getTileAction(map, x, y);
     if (!tileAction) {
       return { message: 'There is nothing to find here.', items: [], success: false };

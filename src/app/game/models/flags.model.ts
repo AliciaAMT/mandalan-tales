@@ -1,6 +1,7 @@
 export interface Flags {
   id?: string;
   charname: string; // Legacy field name from old demo
+  userId?: string;
 
   // Home location flags
   firelit: string; // 'y' or 'n' - is the fireplace lit

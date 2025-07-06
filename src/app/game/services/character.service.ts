@@ -109,7 +109,7 @@ export class CharacterService {
   // Method to create a new character with all associated data
   async createCharacter(characterData: CharStats): Promise<string> {
     return runInInjectionContext(this.injector, async () => {
-      const firestore = inject(Firestore);
+      const firestore = inject(Firestore); // Declare once at the top
       const currentUser = this.authService.getCurrentUser();
       if (!currentUser) {
         throw new Error('User not authenticated');
@@ -201,12 +201,33 @@ export class CharacterService {
       batch.set(countersRef, countersData);
 
       // 7. Create flags record
-      const flagsRef = doc(collection(firestore, 'flags'));
-      const flagsData: Flags = {
-        ...DEFAULT_FLAGS,
-        charname: characterData.name
-      };
-      batch.set(flagsRef, flagsData);
+      const flagsQuery = query(
+        collection(firestore, 'flags'),
+        where('charname', '==', characterData.name),
+        where('userId', '==', currentUser.uid)
+      );
+      const flagsSnapshot = await getDocs(flagsQuery);
+      if (flagsSnapshot.empty) {
+        const flagsRef = doc(collection(firestore, 'flags'));
+        const flagsData: Flags = {
+          ...DEFAULT_FLAGS,
+          charname: characterData.name,
+          userId: currentUser.uid
+        };
+        batch.set(flagsRef, flagsData);
+        console.log(`Creating new flags document for character: ${characterData.name} and user: ${currentUser.uid}`);
+      } else {
+        // Reset existing flags to 0
+        const flagsDoc = flagsSnapshot.docs[0];
+        const resetFlags: Partial<Flags> = {
+          ...DEFAULT_FLAGS,
+          charname: characterData.name,
+          userId: currentUser.uid,
+          updatedAt: Date.now()
+        };
+        batch.update(flagsDoc.ref, resetFlags);
+        console.log(`Resetting existing flags document for character: ${characterData.name} and user: ${currentUser.uid}`);
+      }
 
       // 8. Create spellbook record (empty for new characters)
       const spellbookRef = doc(collection(firestore, 'spellbook'));
@@ -218,6 +239,13 @@ export class CharacterService {
 
       // Commit all changes atomically
       await batch.commit();
+      console.log(`Successfully created character: ${characterData.name} with all associated data`);
+
+      // Verify flags were created properly
+      const flagsVerified = await this.verifyCharacterFlags(characterData.name);
+      if (!flagsVerified) {
+        console.warn(`Warning: Flags verification failed for character: ${characterData.name}`);
+      }
 
       // Reload characters after creating new one
       await this.loadCharacters();
@@ -363,6 +391,100 @@ export class CharacterService {
         // Document might not exist, which is fine
         console.log(`No replenishment data found for character: ${characterName}`);
       }
+    });
+  }
+
+  /**
+   * Reset all character flags to 0 (useful for character reset without deletion)
+   */
+  async resetCharacterFlags(characterName: string): Promise<void> {
+    return runInInjectionContext(this.injector, async () => {
+      const firestore = inject(Firestore);
+      const flagsQuery = query(
+        collection(firestore, 'flags'),
+        where('charname', '==', characterName)
+      );
+      const flagsSnapshot = await getDocs(flagsQuery);
+
+      if (flagsSnapshot.empty) {
+        // Create a new flags document if it doesn't exist
+        const flagsRef = doc(collection(firestore, 'flags'));
+        const flagsData: Flags = {
+          ...DEFAULT_FLAGS,
+          charname: characterName
+        };
+        await addDoc(collection(firestore, 'flags'), flagsData);
+        console.log(`Created new flags document for character: ${characterName}`);
+      } else {
+        // Reset existing flags to 0
+        const flagsDoc = flagsSnapshot.docs[0];
+        const resetFlags: Partial<Flags> = {
+          firelit: 'n',
+          homechest: 0,
+          homefireplace: 0,
+          homepantry: 0,
+          homerack: 0,
+          homedrawer: 0,
+          homeshelf: 0,
+          homeshelf2: 0,
+          hometable: 0,
+          homerug: 0,
+          bedroomrug: 0,
+          bedroomwardrobe: 0,
+          bedroomdesk: 0,
+          bedroomcoatrack: 0,
+          bedroomshelf: 0,
+          bedroomchest: 0,
+          bedroombed: 0,
+          quest1: 0,
+          quest2: 0,
+          quest3: 0,
+          quest4: 0,
+          quest5: 0,
+          shepfeed: 0,
+          thehiddenkey: 0,
+          familycrest: 0,
+          tutorial_completed: 0,
+          first_combat: 0,
+          first_craft: 0,
+          first_spell: 0,
+          updatedAt: Date.now()
+        };
+        await updateDoc(flagsDoc.ref, resetFlags);
+        console.log(`Reset all flags to 0 for character: ${characterName}`);
+      }
+    });
+  }
+
+  /**
+   * Verify that character flags exist and are properly initialized
+   */
+  async verifyCharacterFlags(characterName: string): Promise<boolean> {
+    return runInInjectionContext(this.injector, async () => {
+      const flags = await this.getCharacterFlags(characterName);
+      if (!flags) {
+        console.warn(`No flags document found for character: ${characterName}`);
+        return false;
+      }
+
+      // Check if all required flags exist and are numbers (not undefined)
+      const requiredFlags = [
+        'homechest', 'homefireplace', 'homepantry', 'homerack', 'homedrawer',
+        'homeshelf', 'homeshelf2', 'hometable', 'homerug', 'bedroomrug',
+        'bedroomwardrobe', 'bedroomdesk', 'bedroomcoatrack', 'bedroomshelf',
+        'bedroomchest', 'bedroombed', 'quest1', 'quest2', 'quest3', 'quest4',
+        'quest5', 'shepfeed', 'thehiddenkey', 'familycrest'
+      ];
+
+      for (const flag of requiredFlags) {
+        if (typeof flags[flag as keyof Flags] !== 'number') {
+          console.warn(`Flag ${flag} is missing or not a number for character: ${characterName}`);
+          return false;
+        }
+      }
+
+      console.log(`Flags verification successful for character: ${characterName}`);
+      return true;
     });
   }
 }

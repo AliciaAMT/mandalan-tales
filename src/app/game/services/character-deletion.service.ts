@@ -111,7 +111,7 @@ export class CharacterDeletionService {
   }
 
   /**
-   * Delete documents from a collection that match a charname field (legacy format)
+   * Delete documents from a collection that match a charname field (legacy format) and userId, and also legacy docs with just charname
    */
   private async deleteCollectionByCharacterName(
     collectionName: string,
@@ -121,15 +121,37 @@ export class CharacterDeletionService {
   ): Promise<void> {
     return runInInjectionContext(this.injector, async () => {
       try {
+        const currentUser = this.authService.getCurrentUser();
+        if (!currentUser) {
+          throw new Error('User not authenticated');
+        }
         const collectionRef = collection(firestore, collectionName);
-        const q = query(collectionRef, where('charname', '==', characterName));
-        const querySnapshot = await getDocs(q);
-
-        querySnapshot.forEach((doc) => {
+        // Delete docs with both charname and userId
+        const q1 = query(collectionRef, where('charname', '==', characterName), where('userId', '==', currentUser.uid));
+        const snapshot1 = await getDocs(q1);
+        snapshot1.forEach((doc) => {
           batch.delete(doc.ref);
         });
-
-        console.log(`Deleted ${querySnapshot.size} documents from ${collectionName} for character ${characterName}`);
+        console.log(`Deleted ${snapshot1.size} docs from ${collectionName} for charname+userId (${characterName}, ${currentUser.uid})`);
+        // Delete legacy docs with just charname (no userId)
+        const q2 = query(collectionRef, where('charname', '==', characterName));
+        const snapshot2 = await getDocs(q2);
+        // Only delete docs that do NOT have userId (legacy)
+        let legacyCount = 0;
+        snapshot2.forEach((doc) => {
+          if (!doc.data()['userId']) {
+            batch.delete(doc.ref);
+            legacyCount++;
+          }
+        });
+        if (legacyCount > 0) {
+          console.log(`Deleted ${legacyCount} legacy docs from ${collectionName} for charname only (${characterName})`);
+        }
+        // Post-deletion verification
+        const verifySnapshot = await getDocs(q2);
+        if (!verifySnapshot.empty) {
+          console.warn(`Warning: Some docs in ${collectionName} for character ${characterName} still remain after deletion! Remaining: ${verifySnapshot.size}`);
+        }
       } catch (error) {
         console.warn(`Warning: Could not delete from ${collectionName}:`, error);
         // Don't throw error here as some collections might not exist yet
@@ -200,3 +222,4 @@ export class CharacterDeletionService {
     });
   }
 }
+

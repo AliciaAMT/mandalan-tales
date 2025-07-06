@@ -1214,7 +1214,15 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
         await this.handleHerbRack();
         break;
       case 'rug':
-        await this.handleRug();
+        if (this.currentCharacter) {
+          const result = await this.tileActionService.handleTileAction(
+            this.currentCharacter.map,
+            this.currentCharacter.xaxis,
+            this.currentCharacter.yaxis,
+            this.currentCharacter.name
+          );
+          await this.openItemModal(result.items || [], result.message);
+        }
         break;
       case 'bed': {
         // const { actions, message } = await this.objectInteractionService.getBedInteraction();
