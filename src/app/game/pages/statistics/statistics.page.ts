@@ -5,6 +5,8 @@ import { Router, RouterModule } from '@angular/router';
 import { CharacterService } from '../../services/character.service';
 import { CharStats } from '../../models/charstats.model';
 import { AuthService } from '../../../services/auth.service';
+import { SettingsService } from '../../services/settings.service';
+import { DEFAULT_THEME_COLOR } from '../../models/settings.model';
 import { FocusManagerDirective } from '../../../shared/focus-manager.directive';
 
 @Component({
@@ -17,6 +19,7 @@ import { FocusManagerDirective } from '../../../shared/focus-manager.directive';
 export class StatisticsPage implements OnInit {
   private characterService = inject(CharacterService);
   private authService = inject(AuthService);
+  private settingsService = inject(SettingsService);
   private router = inject(Router);
 
   currentCharacter: CharStats | undefined;
@@ -30,17 +33,48 @@ export class StatisticsPage implements OnInit {
   ngOnInit() {
     console.log('StatisticsPage ngOnInit called');
     this.loadCurrentCharacter();
+    this.loadUserSettings();
   }
 
   ionViewWillEnter() {
     console.log('StatisticsPage ionViewWillEnter called');
-    // Reset theme to default gold color when entering statistics page
-    const defaultThemeColor = '#6b4e26'; // Default gold color
-    document.documentElement.style.setProperty('--theme-color', defaultThemeColor);
-    document.documentElement.style.setProperty('--ion-color-primary', defaultThemeColor);
-    document.documentElement.style.setProperty('--header-text-color', '#181200');
-    // Clear the localStorage theme color to prevent game theme from persisting
-    localStorage.removeItem('themeColor');
+    // Load user settings to apply the correct theme
+    this.loadUserSettings();
+  }
+
+  private async loadUserSettings(): Promise<void> {
+    const user = this.authService.getCurrentUser();
+    if (user) {
+      const settings = await this.settingsService.getUserSettings(user.uid);
+      if (settings) {
+        // Apply theme color to CSS custom properties
+        document.documentElement.style.setProperty('--theme-color', settings.themeColor);
+        document.documentElement.style.setProperty('--ion-color-primary', settings.themeColor);
+
+        // Set text color based on theme brightness
+        const textColor = this.getTextColorForTheme(settings.themeColor);
+        document.documentElement.style.setProperty('--header-text-color', textColor);
+      } else {
+        // Apply default theme color
+        document.documentElement.style.setProperty('--theme-color', DEFAULT_THEME_COLOR);
+        document.documentElement.style.setProperty('--ion-color-primary', DEFAULT_THEME_COLOR);
+        document.documentElement.style.setProperty('--header-text-color', '#181200');
+      }
+    }
+  }
+
+  private getTextColorForTheme(themeColor: string): string {
+    // Convert hex to RGB and calculate brightness
+    const hex = themeColor.replace('#', '');
+    const r = parseInt(hex.substr(0, 2), 16);
+    const g = parseInt(hex.substr(2, 2), 16);
+    const b = parseInt(hex.substr(4, 2), 16);
+
+    // Calculate relative luminance
+    const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+
+    // Use white text for dark themes (luminance < 0.5)
+    return luminance < 0.5 ? '#ffffff' : '#181200';
   }
 
   private loadCurrentCharacter() {
