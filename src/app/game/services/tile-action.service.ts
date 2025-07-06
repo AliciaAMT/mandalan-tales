@@ -94,50 +94,85 @@ export class TileActionService {
       x: 3,
       y: 1,
       action: 'search',
-      itemName: 'Worn Canvas Shirt',
-      itemDescription: 'This is an ordinary Canvas Shirt, a little worn for the wear.',
-      itemImage: 'worncanvasshirt',
-      itemType: 'Armor',
-      itemOptions: {
-        itemrarity: 'Common',
-        itemlevel: 1,
-        equiplocation: 'Chest',
-        equipable: 1,
-        weapontype: 'None',
-        armortype: 'Chest',
-        armorbase: 3
-      },
+      items: [
+        {
+          name: 'Worn Canvas Shirt',
+          description: 'This is an ordinary Canvas Shirt, a little worn for the wear.',
+          image: 'worncanvasshirt',
+          type: 'Armor',
+          options: {
+            itemrarity: 'Common',
+            itemlevel: 1,
+            equiplocation: 'Chest',
+            equipable: 1,
+            weapontype: 'None',
+            armortype: 'Chest',
+            armorbase: 3
+          }
+        },
+        {
+          name: 'Worn Canvas Pants',
+          description: 'This is an ordinary pair of Canvas Pants, a little worn for the wear.',
+          image: 'worncanvaspants',
+          type: 'Armor',
+          options: {
+            itemrarity: 'Common',
+            itemlevel: 1,
+            equiplocation: 'Legs',
+            equipable: 1,
+            weapontype: 'None',
+            armortype: 'Legs',
+            armorbase: 3
+          }
+        }
+      ],
       flagKey: 'bedroomwardrobe',
       experience: 10,
-      message: 'You search the wardrobe and find a worn canvas shirt.',
+      message: 'You search the wardrobe and find a worn canvas shirt and pants.',
       alreadyFoundMessage: 'You search the wardrobe but find nothing.'
     },
     {
       map: 'homeup',
       x: 3,
       y: 2,
-      action: 'examine',
-      itemName: 'Small Waterskin',
-      itemDescription: 'This water container holds about one eight-hour serving of water, and it is refillable.',
-      itemImage: 'smallwaterskin',
-      itemType: 'Food',
-      itemOptions: {
-        itemrarity: 'Common',
-        itemlevel: 1,
-        maxwater: 1,
-        othertype: 'Water'
-      },
+      action: 'search',
+      items: [
+        {
+          name: 'Small Waterskin',
+          description: 'This water container holds about one eight-hour serving of water, and it is refillable.',
+          image: 'smallwaterskin',
+          type: 'Food',
+          options: {
+            itemrarity: 'Common',
+            itemlevel: 1,
+            maxwater: 1,
+            othertype: 'Water'
+          }
+        },
+        {
+          name: 'Lockpick',
+          description: 'A simple lockpick, useful for opening locked containers.',
+          image: 'lockpick',
+          type: 'Other',
+          options: {
+            itemrarity: 'Common',
+            itemlevel: 1,
+            keep: 3,
+            othertype: 'Tool'
+          }
+        }
+      ],
       flagKey: 'bedroomdesk',
       experience: 10,
-      message: 'You examine the desk and find a small waterskin.',
-      alreadyFoundMessage: 'You examine the desk but find nothing.'
+      message: 'You search the desk and find a small waterskin and 3 lockpicks.',
+      alreadyFoundMessage: 'You search the desk but find nothing.'
     },
     // Coatrack at homeup (1,2) - gives Worn Canvas Cloak and Worn Canvas Hat
     {
       map: 'homeup',
       x: 1,
       y: 2,
-      action: 'examine',
+      action: 'search',
       items: [
         {
           name: 'Worn Canvas Cloak',
@@ -172,15 +207,15 @@ export class TileActionService {
       ],
       flagKey: 'bedroomcoatrack',
       experience: 10,
-      message: 'You examine the coatrack and find a worn canvas cloak and hat.',
-      alreadyFoundMessage: 'You examine the coat rack but find nothing.'
+      message: 'You search the coatrack and find a worn canvas cloak and hat.',
+      alreadyFoundMessage: 'You search the coat rack but find nothing.'
     },
     // Shelf at homeup (3,3) - gives Book of Laws
     {
       map: 'homeup',
       x: 3,
       y: 3,
-      action: 'examine',
+      action: 'search',
       itemName: 'Book of Laws',
       itemDescription: 'This is your personal copy of the kingdom\'s required reading. On the worn cover the title, \'Book of Laws\' is scratched out, and under it is written \'Book O\' Flaws\' in your own messy caligraphy.',
       itemImage: 'bookoflaws',
@@ -193,8 +228,8 @@ export class TileActionService {
       },
       flagKey: 'bedroomshelf',
       experience: 5,
-      message: 'You examine the shelf and find a book of laws.',
-      alreadyFoundMessage: 'You examine the shelf but find nothing.'
+      message: 'You search the shelf and find a book of laws.',
+      alreadyFoundMessage: 'You search the shelf but find nothing.'
     },
     // Chest at homeup (2,3) - gives Worn Canvas Shoes and Worn Canvas Gloves
     {
@@ -238,6 +273,169 @@ export class TileActionService {
       experience: 10,
       message: 'You search the chest and find worn canvas shoes and gloves.',
       alreadyFoundMessage: 'You search the Chest but find nothing.'
+    },
+    // --- Home map actions ---
+    {
+      map: 'home', x: 1, y: 1, action: 'search',
+      itemName: 'Family History Book',
+      itemDescription: 'This is your family\'s history book. It makes for interesting reading considering you do not know anything about your new family!',
+      itemImage: 'book', itemType: 'Other',
+      itemOptions: { itemrarity: 'Relic', itemlevel: 1, readable: 1, othertype: 'Book' },
+      flagKey: 'homeshelf', experience: 5,
+      message: 'You search the shelf and find a family history book.',
+      alreadyFoundMessage: 'You search the Shelf but find nothing.'
+    },
+    {
+      map: 'home', x: 2, y: 1, action: 'search',
+      itemName: 'Lockpick',
+      itemDescription: 'A simple lockpick, useful for opening locked containers.',
+      itemImage: 'lockpick', itemType: 'Other',
+      itemOptions: { itemrarity: 'Common', itemlevel: 1, othertype: 'Tool' },
+      flagKey: 'homerug', experience: 5,
+      message: 'You search under the rug and find a lockpick.',
+      alreadyFoundMessage: 'You search under the Rug but find nothing.'
+    },
+    {
+      map: 'home', x: 3, y: 1, action: 'search',
+      itemName: 'Chest',
+      itemDescription: 'A locked chest. It looks like it requires a lockpick to open.',
+      itemImage: 'chest', itemType: 'Other',
+      itemOptions: { itemrarity: 'Common', itemlevel: 1, keylock: 1, othertype: 'Container' },
+      flagKey: 'homechest', experience: 0,
+      message: 'You search the chest. It is locked. You need a lockpick to open it.',
+      alreadyFoundMessage: 'You search the Chest but find nothing.'
+    },
+    {
+      map: 'home', x: 1, y: 2, action: 'search',
+      items: [
+        { name: 'Iron Skillet', description: 'With this Iron Skillet and a fire source you can fry many foods.', image: 'skillet', type: 'Other', options: { itemrarity: 'Common', itemlevel: 1, othertype: 'Cooking' } },
+        { name: 'Cooking Oil', description: 'This type of cooking oil is needed for various recipes.', image: 'oil', type: 'Food', options: { itemrarity: 'Common', itemlevel: 1, singleuse: 1, othertype: 'Ingredient' } }
+      ],
+      flagKey: 'homeshelf2', experience: 10,
+      message: 'You search the shelf and find an iron skillet and cooking oil.',
+      alreadyFoundMessage: 'You search the Shelf but find nothing.'
+    },
+    {
+      map: 'home', x: 2, y: 2, action: 'search',
+      itemName: 'Rusty Kitchen Knife',
+      itemDescription: 'This kitchen knife is quite rusty. It won\'t do much damage, but it is a weapon none the less.',
+      itemImage: 'rustyknife', itemType: 'Weapon',
+      itemOptions: { itemrarity: 'Common', itemlevel: 1, equiplocation: 'Weapon', equipable: 1, weapontype: 'Blade', weaponbase: 2, damage: 2, duality: 1, itemrange: 0, itemspeed: 10 },
+      flagKey: 'hometable', experience: 5,
+      message: 'You search the table and find a rusty kitchen knife.',
+      alreadyFoundMessage: 'You search the Table but find nothing.'
+    },
+    {
+      map: 'home', x: 3, y: 2, action: 'search',
+      items: [
+        { name: 'Tinderbox', description: 'This tinderbox contains items to start a fire including flint and tinder.', image: 'tinderbox', type: 'Other', options: { itemrarity: 'Common', itemlevel: 1, othertype: 'Container' } },
+        { name: 'Firewood', description: 'With firewood and flint you can start a fire in the proper area such as a fireplace or campsite.', image: 'firewood', type: 'Other', options: { itemrarity: 'Common', itemlevel: 1, keep: 3, othertype: 'Firewood' } }
+      ],
+      flagKey: 'homefireplace', experience: 10,
+      message: 'You search the fireplace and find a tinderbox and firewood.',
+      alreadyFoundMessage: 'You search the Fireplace but find nothing.'
+    },
+    {
+      map: 'home', x: 1, y: 3, action: 'search',
+      items: [
+        { name: 'Raw Meat', description: 'This meat needs to be cooked before eaten.', image: 'meat', type: 'Food', options: { itemrarity: 'Common', itemlevel: 1, keep: 2, othertype: 'Ingredient' } },
+        { name: 'Bread', description: 'This is regular wheat bread.', image: 'bread', type: 'Food', options: { itemrarity: 'Common', itemlevel: 1, keep: 6, consumable: 1, singleuse: 1, othertype: 'Consumable', enhancement1: 'Life: +5', enhancement2: 'Mana: +5' } }
+      ],
+      flagKey: 'homepantry', experience: 10,
+      message: 'You search the kitchen pantry and find raw meat and bread.',
+      alreadyFoundMessage: 'You search the Kitchen Pantry but find nothing.'
+    },
+    {
+      map: 'home', x: 2, y: 3, action: 'search',
+      items: [
+        { name: 'Cinnamon', description: 'This spice is an important ingredient for flavour for many recipes.', image: 'cinnamon', type: 'Food', options: { itemrarity: 'Common', itemlevel: 1, keep: 2, othertype: 'Ingredient' } },
+        { name: 'Salt', description: 'Salt is a very important ingredient to many recipes and potions.', image: 'salt', type: 'Food', options: { itemrarity: 'Common', itemlevel: 1, keep: 3, othertype: 'Ingredient' } }
+      ],
+      flagKey: 'homerack', experience: 10,
+      message: 'You search the herb rack and find cinnamon and salt.',
+      alreadyFoundMessage: 'You search the Herb Rack but find nothing.'
+    },
+    {
+      map: 'home', x: 3, y: 3, action: 'search',
+      itemName: 'Purse',
+      itemDescription: 'The only way to know what this purse contains is to open it.',
+      itemImage: 'purse', itemType: 'Other',
+      itemOptions: { itemrarity: 'Common', itemlevel: 1, othertype: 'Container' },
+      flagKey: 'homedrawer', experience: 5,
+      message: 'You search the end table drawer and find a purse.',
+      alreadyFoundMessage: 'You search the End Table Drawer but find nothing.'
+    },
+    // --- Yard map actions ---
+    {
+      map: 'yard', x: 3, y: 3, action: 'search',
+      itemName: 'Bone Key',
+      itemDescription: 'This key appears to be made out of Bone, and is shaped like a bone as well.',
+      itemImage: 'bonekey', itemType: 'Other',
+      itemOptions: { itemrarity: 'Unique', itemlevel: 2, othertype: 'Key' },
+      flagKey: 'shepfeed', experience: 5,
+      message: 'You search Shep\'s dog house and find a bone key.',
+      alreadyFoundMessage: 'You search Shep\'s Dog House but find nothing.'
+    },
+    {
+      map: 'yard', x: 2, y: 1, action: 'search',
+      itemName: 'Lettuce',
+      itemDescription: 'Lettuce may be consumed raw, but is much better in a recipe or salad.',
+      itemImage: 'lettuce', itemType: 'Food',
+      itemOptions: { itemrarity: 'Common', itemlevel: 1, keep: 3, consumable: 1, singleuse: 1, othertype: 'Consumable', enhancement1: 'Mana +5' },
+      flagKey: 'yardgarden', experience: 5,
+      message: 'You search the garden and find lettuce.',
+      alreadyFoundMessage: 'You search the Garden but find nothing.'
+    },
+    {
+      map: 'yard', x: 1, y: 2, action: 'search',
+      itemName: 'Melon',
+      itemDescription: 'Melons may be consumed raw or cooked in recipes.',
+      itemImage: 'melon', itemType: 'Food',
+      itemOptions: { itemrarity: 'Common', itemlevel: 1, keep: 3, consumable: 1, singleuse: 1, othertype: 'Consumable', enhancement1: 'Life +5', enhancement2: 'Mana +5' },
+      flagKey: 'yardmelon', experience: 5,
+      message: 'You search the melon vines and find melons.',
+      alreadyFoundMessage: 'You search the Melon Vines but find nothing.'
+    },
+    {
+      map: 'yard', x: 3, y: 1, action: 'search',
+      itemName: 'Apple',
+      itemDescription: 'Apples may be consumed raw or cooked in recipes.',
+      itemImage: 'apple', itemType: 'Food',
+      itemOptions: { itemrarity: 'Common', itemlevel: 1, keep: 3, consumable: 1, singleuse: 1, othertype: 'Consumable', enhancement1: 'Life +5' },
+      flagKey: 'yardtrees', experience: 5,
+      message: 'You search the fruit tree and find apples.',
+      alreadyFoundMessage: 'You search the Fruit Trees but find nothing.'
+    },
+    {
+      map: 'yard', x: 3, y: 2, action: 'search',
+      itemName: 'Egg',
+      itemDescription: 'Eggs must be cooked in order to be eaten.',
+      itemImage: 'egg', itemType: 'Food',
+      itemOptions: { itemrarity: 'Common', itemlevel: 1, keep: 3, othertype: 'Ingredient' },
+      flagKey: 'yardcoop', experience: 5,
+      message: 'You search the chicken coop and find eggs.',
+      alreadyFoundMessage: 'You search the Chicken Coop but find nothing.'
+    },
+    // --- Cellar map actions ---
+    {
+      map: 'cellar', x: 1, y: 1, action: 'search',
+      itemName: 'Dry Rice',
+      itemDescription: 'Dry Rice must be cooked before eaten.',
+      itemImage: 'rice', itemType: 'Food',
+      itemOptions: { itemrarity: 'Common', itemlevel: 1, keep: 10, othertype: 'Ingredient' },
+      flagKey: 'cellarrice', experience: 5,
+      message: 'You search the canvas bag and find dry rice.',
+      alreadyFoundMessage: 'You search the Canvas Bag but find nothing.'
+    },
+    {
+      map: 'cellar', x: 3, y: 1, action: 'search',
+      itemName: 'Vegetable',
+      itemDescription: 'The various vegetables you find may be consumed raw or cooked in recipes.',
+      itemImage: 'vegetables', itemType: 'Food',
+      itemOptions: { itemrarity: 'Common', itemlevel: 1, keep: 5, consumable: 1, singleuse: 1, othertype: 'Consumable', enhancement1: 'Life +5', enhancement2: 'Mana +5' },
+      flagKey: 'cellarveggie', experience: 5,
+      message: 'You search the canvas bag and find vegetables.',
+      alreadyFoundMessage: 'You search the Canvas Bag but find nothing.'
     }
   ];
 
@@ -272,81 +470,20 @@ export class TileActionService {
   }
 
   /**
-   * Main method to handle tile actions that may yield items
+   * Get tile action for a specific map and coordinates (ignores action string for efficiency and robustness)
    */
-  async handleTileAction(
-    map: string,
-    x: number,
-    y: number,
-    action: string,
-    characterName?: string
-  ): Promise<TileActionResult> {
-    const tileAction = this.getTileAction(map, x, y, action);
-
-    if (!tileAction) {
-      return {
-        message: `You ${action} but find nothing of interest.`,
-        success: false
-      };
-    }
-
-    if (!characterName) {
-      return {
-        message: tileAction.message,
-        success: true
-      };
-    }
-
-    // Check if already found
-    if (await this.isItemAlreadyFound(tileAction, characterName)) {
-      return {
-        message: tileAction.alreadyFoundMessage || 'You search but find nothing.',
-        success: false
-      };
-    }
-
-    // Give items to player
-    const foundItems = await this.giveItemsToPlayer(tileAction, characterName);
-
-    if (foundItems.length === 0) {
-      return {
-        message: 'You find items but your inventory is full.',
-        success: false
-      };
-    }
-
-    // Set flags to prevent finding items again
-    await this.setItemFlags(tileAction, characterName);
-
-    return {
-      message: tileAction.message,
-      items: foundItems,
-      success: true
-    };
-  }
-
-  /**
-   * Get tile action for a specific map and coordinates using optimized lookup
-   */
-  getTileAction(map: string, x: number, y: number, action: string): TileAction | null {
-    // Fallback for invalid map
-    if (!map || !x || !y || !action) {
-      console.warn('Invalid parameters for getTileAction:', { map, x, y, action });
+  getTileAction(map: string, x: number, y: number): TileAction | null {
+    if (!map || !x || !y) {
+      console.warn('Invalid parameters for getTileAction:', { map, x, y });
       return null;
     }
-
     const mapActions = this.tileActionLookup.get(map);
-    if (!mapActions) {
-      return null;
-    }
-
+    if (!mapActions) return null;
     const coordKey = `${x},${y}`;
     const coordActions = mapActions.get(coordKey);
-    if (!coordActions) {
-      return null;
-    }
-
-    return coordActions.get(action) || null;
+    if (!coordActions) return null;
+    // Return the first action defined for this tile (should only be one per tile)
+    return Array.from(coordActions.values())[0] || null;
   }
 
   /**
@@ -389,7 +526,14 @@ export class TileActionService {
     }
 
     const flags = await this.characterService.getCharacterFlags(characterName);
-    return !!flags && !!flags[tileAction.flagKey as keyof typeof flags];
+    if (!flags) {
+      return false;
+    }
+
+    const flagValue = flags[tileAction.flagKey as keyof typeof flags];
+    // Check if flag is greater than 0 (meaning item has been found)
+    // This matches the old demo logic where flags were set to 1, 2, etc.
+    return typeof flagValue === 'number' && flagValue > 0;
   }
 
   /**
@@ -500,5 +644,22 @@ export class TileActionService {
    */
   getMapDisplayName(map: string): string {
     return this.portalService.getMapDisplayName(map);
+  }
+
+  /**
+   * Handle tile action for a specific map and coordinates (ignores action string)
+   */
+  public async handleTileAction(map: string, x: number, y: number, characterName: string): Promise<TileActionResult> {
+    const tileAction = this.getTileAction(map, x, y);
+    if (!tileAction) {
+      return { message: 'There is nothing to find here.', items: [], success: false };
+    }
+    const alreadyFound = await this.isItemAlreadyFound(tileAction, characterName);
+    if (alreadyFound) {
+      return { message: tileAction.alreadyFoundMessage || 'You find nothing new.', items: [], success: false };
+    }
+    const items = await this.giveItemsToPlayer(tileAction, characterName);
+    await this.setItemFlags(tileAction, characterName);
+    return { message: tileAction.message, items, success: true };
   }
 }

@@ -1235,7 +1235,6 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
               this.currentCharacter.map,
               this.currentCharacter.xaxis,
               this.currentCharacter.yaxis,
-              'search',
               this.currentCharacter.name
             );
             await this.openItemModal(result.items || [], result.message);
@@ -1267,7 +1266,6 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
             this.currentCharacter.map,
             this.currentCharacter.xaxis,
             this.currentCharacter.yaxis,
-            object.action,
             this.currentCharacter.name
           );
           await this.openItemModal(result.items || [], result.message);
@@ -1460,92 +1458,14 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
    * Handle chest interaction
    */
   private async handleChest() {
-    console.log('Handling chest interaction');
-    console.log('Current inventory:', this.inventoryService.inventory);
-
-    // Check if items are already in this chest (using character position as identifier)
-    const chestKey = `chest_${this.currentCharacter?.name}_${this.currentCharacter?.map}_${this.currentCharacter?.xaxis}_${this.currentCharacter?.yaxis}`;
-    const chestState = localStorage.getItem(chestKey);
-
-    if (chestState === 'empty') {
-      await this.openItemModal(
-        [],
-        'The chest is empty.'
-      );
-      return;
-    }
-
-    // Items that should be in this chest
-    const chestItems = [
-      {
-        name: 'Firewood',
-        description: 'With firewood and flint you can start a fire in the proper area such as a fireplace or campsite.',
-        type: 'Other',
-        image: 'firewood',
-        quantity: 3
-      },
-      {
-        name: 'Tinderbox',
-        description: 'This tinderbox contains items to start a fire including flint and tinder.',
-        type: 'Other',
-        image: 'tinderbox',
-        quantity: 1
-      },
-      {
-        name: 'Key',
-        description: 'A rusty old key that might unlock something.',
-        type: 'Other',
-        image: 'key',
-        quantity: 1,
-        options: { othertype: 'Tool' }
-      },
-      {
-        name: 'Leather Armor',
-        description: 'Light leather armor that provides basic protection.',
-        type: 'Armor',
-        image: 'leatherarmor',
-        quantity: 1,
-        options: { equipable: 1, armortype: 'Light', defense: 2 }
-      }
-    ];
-
-    // Add all items to inventory
-    const foundItems: FoundItem[] = [];
-    for (const itemData of chestItems) {
-      const item = this.inventoryService.createBasicItem(
-        itemData.name,
-        itemData.description,
-        itemData.type,
-        itemData.image,
-        itemData.quantity,
-        itemData.options || {}
-      );
-
-      const success = await this.inventoryService.addItem(item);
-      if (success) {
-        foundItems.push({
-          name: itemData.name,
-          description: itemData.description,
-          image: itemData.image,
-          quantity: itemData.quantity
-        });
-        console.log(`Added ${itemData.name} to inventory`);
-      }
-    }
-
-    if (foundItems.length > 0) {
-      // Mark chest as empty
-      localStorage.setItem(chestKey, 'empty');
-      await this.openItemModal(
-        foundItems,
-        `You found ${foundItems.length} items in the chest!`
-      );
-    } else {
-      await this.openItemModal(
-        [],
-        'Your inventory is full.'
-      );
-    }
+    if (!this.currentCharacter) return;
+    const result = await this.tileActionService.handleTileAction(
+      this.currentCharacter.map,
+      this.currentCharacter.xaxis,
+      this.currentCharacter.yaxis,
+      this.currentCharacter.name
+    );
+    await this.openItemModal(result.items || [], result.message);
   }
 
   /**
