@@ -20,30 +20,61 @@ export class CharacterService {
   private authService: AuthService = inject(AuthService);
   private characterDeletionService: CharacterDeletionService = inject(CharacterDeletionService);
 
-  // Expose characters as a computed signal that only queries Firestore when authenticated
-  private firestoreCharacters = toSignal<CharStats[] | undefined>(
-    runInInjectionContext(this.injector, () => {
-      const firestore = inject(Firestore);
-      return collectionData(
-        query(
-          collection(firestore, 'charstats'),
-          where('userId', '==', this.authService.user() ? this.authService.user()!.uid : '')
-        ),
-        { idField: 'id' }
-      ) as any;
-    }),
-    { initialValue: undefined }
-  );
-
-  characters = computed<CharStats[]>(() => {
-    if (!this.authService.authInitialized() || !this.authService.user()) {
-      return [];
-    }
-    return this.firestoreCharacters() ?? [];
-  });
+  // Simple signal to hold characters
+  private charactersSignal = signal<CharStats[]>([]);
+  characters = this.charactersSignal.asReadonly();
 
   constructor() {
-    // No need for currentUserSignal or effect here anymore
+    // Set up effect to load characters when auth is ready
+    effect(() => {
+      console.log('CharacterService effect triggered:', {
+        authInitialized: this.authService.authInitialized(),
+        user: this.authService.user() ? 'User exists' : 'No user'
+      });
+
+      if (this.authService.authInitialized() && this.authService.user()) {
+        console.log('Loading characters for user:', this.authService.user()?.uid);
+        this.loadCharacters();
+      } else {
+        // Clear characters when not authenticated
+        console.log('Clearing characters - not authenticated');
+        this.charactersSignal.set([]);
+      }
+    });
+  }
+
+  private async loadCharacters(): Promise<void> {
+    return runInInjectionContext(this.injector, async () => {
+      const currentUser = this.authService.getCurrentUser();
+      console.log('loadCharacters called, currentUser:', currentUser?.uid);
+
+      if (!currentUser) {
+        console.log('No current user, clearing characters');
+        this.charactersSignal.set([]);
+        return;
+      }
+
+      try {
+        const firestore = inject(Firestore);
+        const charactersQuery = query(
+          collection(firestore, 'charstats'),
+          where('userId', '==', currentUser.uid)
+        );
+
+        console.log('Querying Firestore for characters with userId:', currentUser.uid);
+        const characters$ = collectionData(charactersQuery, { idField: 'id' });
+
+        // Use subscription instead of toSignal
+        characters$.subscribe((characters: any) => {
+          console.log('Loaded characters:', characters.length);
+          // Cast the characters to CharStats[] type
+          this.charactersSignal.set(characters as CharStats[]);
+        });
+      } catch (error) {
+        console.error('Error loading characters:', error);
+        this.charactersSignal.set([]);
+      }
+    });
   }
 
   // Computed values for filtered characters
@@ -187,6 +218,9 @@ export class CharacterService {
 
       // Commit all changes atomically
       await batch.commit();
+
+      // Reload characters after creating new one
+      await this.loadCharacters();
 
       return charRef.id;
     });

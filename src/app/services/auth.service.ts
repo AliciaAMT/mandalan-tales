@@ -125,4 +125,33 @@ export class AuthService {
       }, 5000);
     });
   }
+
+  // Wait for auth to be initialized and user to be available
+  async waitForAuthReady(): Promise<void> {
+    if (this.authInitializedSignal() && this.userSignal()) {
+      console.log('Auth and user already ready');
+      return;
+    }
+    console.log('Waiting for auth and user to be ready...');
+    return new Promise((resolve) => {
+      let timeoutId: number;
+      let intervalId: number;
+      const cleanup = () => {
+        if (intervalId) clearInterval(intervalId);
+        if (timeoutId) clearTimeout(timeoutId);
+      };
+      intervalId = setInterval(() => {
+        if (this.authInitializedSignal() && this.userSignal()) {
+          cleanup();
+          console.log('Auth and user ready');
+          resolve();
+        }
+      }, 100);
+      timeoutId = setTimeout(() => {
+        cleanup();
+        console.log('Auth/user ready timeout - proceeding anyway');
+        resolve();
+      }, 5000);
+    });
+  }
 }

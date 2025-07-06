@@ -65,15 +65,27 @@ export class DashboardComponent implements OnInit {
         const user = this.authService.user();
         if (user && user.emailVerified) {
           this.user = user;
-          this.loadUserSettings();
+          // Don't call loadUserSettings here - let ngOnInit handle it
         }
       }
       // Do NOT auto-navigate to dashboard here!
     });
   }
 
-  ngOnInit() {
-    // No effect() here!
+  async ngOnInit() {
+    // The character service will automatically load characters when auth is ready
+    // But we still need to load user settings
+    console.log('Dashboard ngOnInit called');
+    const user = this.authService.getCurrentUser();
+    console.log('Dashboard user:', user?.uid, 'emailVerified:', user?.emailVerified);
+
+    if (user && user.emailVerified) {
+      this.user = user;
+      console.log('Loading user settings for:', user.uid);
+      await this.loadUserSettings();
+    } else {
+      console.log('User not available or not verified');
+    }
   }
 
   ionViewWillEnter() {
