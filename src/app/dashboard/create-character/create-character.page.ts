@@ -297,11 +297,16 @@ export class CreateCharacterPage {
           criticalResist: this.generatedStats.criticalResist,
           bleedResist: this.generatedStats.bleedResist,
           immobilizeResist: this.generatedStats.immobilizeResist || 0,
+          // Skills
           cooking: this.generatedStats.cooking,
           alchemy: this.generatedStats.alchemy,
           enchanting: this.generatedStats.enchanting,
           lockpicking: this.generatedStats.lockpicking,
+          blockpicking: 0, // Bonus lockpicking skill
+          bthieving: 0, // Bonus thieving skill
           magicFind: this.generatedStats.magicFind,
+          // Bonus stats
+          bluck: 0, // Bonus luck
           map: 'homeup',
           mapdimensions: 33,
           xaxis: 2,

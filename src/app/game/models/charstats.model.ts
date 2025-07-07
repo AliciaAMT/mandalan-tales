@@ -31,6 +31,7 @@ export interface CharStats {
   agility: number;
   wisdom: number;
   luck: number;
+  bluck: number; // Bonus luck
 
   // Combat stats
   defense: number;
@@ -60,6 +61,8 @@ export interface CharStats {
   alchemy: number;
   enchanting: number;
   lockpicking: number;
+  blockpicking: number; // Bonus lockpicking skill
+  bthieving: number; // Bonus thieving skill
   magicFind: number;
 
   // Map and position

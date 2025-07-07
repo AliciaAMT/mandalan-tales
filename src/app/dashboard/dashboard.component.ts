@@ -257,7 +257,15 @@ export class DashboardComponent implements OnInit {
         console.error('Error clearing replenishment data:', error);
       }
 
-      // 4. Reset character stats to default (optional - uncomment if you want this)
+      // 4. Reset all character flags to 0 (like a new character)
+      try {
+        await this.characterService.resetCharacterFlags(character.name);
+        console.log('Reset all character flags to 0');
+      } catch (error) {
+        console.error('Error resetting character flags:', error);
+      }
+
+      // 5. Reset character stats to default (optional - uncomment if you want this)
       // await this.characterService.resetCharacterStats(character.id);
 
       console.log('Complete character reset finished for:', character.name);

@@ -26,6 +26,17 @@ export interface TileAction {
   experience?: number;
   message: string;
   alreadyFoundMessage?: string;
+  isLocked?: boolean;
+  lockpickItem?: string;
+  lockpickSuccessItems?: {
+    name: string;
+    description: string;
+    image: string;
+    type: string;
+    options?: any;
+  }[];
+  lockpickSuccessMessage?: string;
+  lockpickFailMessage?: string;
 }
 
 export interface TileActionResult {
@@ -301,9 +312,36 @@ export class TileActionService {
       itemDescription: 'A locked chest. It looks like it requires a lockpick to open.',
       itemImage: 'chest', itemType: 'Other',
       itemOptions: { itemrarity: 'Common', itemlevel: 1, keylock: 1, othertype: 'Container' },
-      flagKey: 'homechest', experience: 0,
+      flagKey: 'homechest', experience: 5,
       message: 'You search the chest. It is locked. You need a lockpick to open it.',
-      alreadyFoundMessage: 'You search the Chest but find nothing.'
+      alreadyFoundMessage: 'You search the Chest but find nothing.',
+      isLocked: true,
+      lockpickItem: 'Lockpick',
+      lockpickSuccessItems: [
+        {
+          name: 'Family Crest Amulet',
+          description: 'This Family Crest Amulet is decorated with precious gems and a carving of a dragon. It has a mystical glow and you can feel the magic radiating from it.',
+          image: 'familycrest',
+          type: 'Accessory',
+          options: {
+            itemrarity: 'Relic',
+            itemlevel: 1,
+            equiplocation: 'Neck',
+            equipable: 1,
+            acctype: 'Amulet',
+            accbase: 1,
+            legendary: 1,
+            relic: 1,
+            defense: 1,
+            lightsource: 1,
+            itemvalue: 10000
+          }
+        }
+      ],
+      lockpickSuccessMessage: 'You unlock the chest and find a Family Crest Amulet!',
+      lockpickFailMessage: 'You attempt to pick the lock, but your lockpick broke.',
+      questFlagKey: 'quest4',
+      questFlagValue: 1
     },
     {
       map: 'home', x: 1, y: 2, action: 'search',
@@ -702,6 +740,93 @@ export class TileActionService {
   }
 
   /**
+   * Handle locked chest lockpicking
+   */
+  private async handleLockedChest(tileAction: TileAction, characterName: string): Promise<TileActionResult> {
+    // Check if player has the required lockpick
+    if (!tileAction.lockpickItem) {
+      return { message: 'This chest requires a lockpick to open.', items: [], success: false };
+    }
+
+    const hasLockpick = this.inventoryService.hasItem(tileAction.lockpickItem);
+    if (!hasLockpick) {
+      return { message: `You do not have a ${tileAction.lockpickItem}.`, items: [], success: false };
+    }
+
+    // Get character stats for lockpicking calculation
+    const characters = this.characterService.getCharacters();
+    const character = characters.find(c => c.name === characterName);
+    if (!character) {
+      return { message: 'Character not found.', items: [], success: false };
+    }
+
+    // Calculate lockpicking skill (matching old demo logic)
+    const lockpickingSkill = (character.lockpicking || 0) +
+                            (character.blockpicking || 0) +
+                            character.level +
+                            (character.luck || 0) +
+                            (character.bluck || 0) +
+                            (character.bthieving || 0);
+
+    // Roll against difficulty (1-20, matching old demo)
+    const difficulty = Math.floor(Math.random() * 20) + 1;
+    const success = lockpickingSkill >= difficulty;
+
+    if (success) {
+      // Success: Give items and experience
+      const foundItems: any[] = [];
+
+      if (tileAction.lockpickSuccessItems) {
+        for (const itemData of tileAction.lockpickSuccessItems) {
+          const item = this.inventoryService.createBasicItem(
+            itemData.name,
+            itemData.description,
+            itemData.type,
+            itemData.image,
+            1,
+            itemData.options || {}
+          );
+
+          const itemSuccess = await this.inventoryService.addItem(item);
+          if (itemSuccess) {
+            foundItems.push({
+              name: itemData.name,
+              description: itemData.description,
+              image: itemData.image,
+              quantity: 1
+            });
+          }
+        }
+      }
+
+      // Set flags
+      await this.setItemFlags(tileAction, characterName);
+
+      // Give experience points
+      if (tileAction.experience && tileAction.experience > 0) {
+        await this.characterService.updateCharacter(character.id!, {
+          experience: character.experience + tileAction.experience
+        });
+      }
+
+      return {
+        message: tileAction.lockpickSuccessMessage || 'You successfully pick the lock!',
+        items: foundItems,
+        success: true
+      };
+    } else {
+      // Failure: Break lockpick and show failure message
+      await this.inventoryService.removeItem(tileAction.lockpickItem, 1);
+
+      return {
+        message: tileAction.lockpickFailMessage || 'Your lockpick broke!',
+        items: [],
+        success: false
+      };
+    }
+  }
+
+  /**
    * Handle tile action for a specific map and coordinates (ignores action string)
    */
   public async handleTileAction(map: string, x: number, y: number, characterName: string): Promise<TileActionResult> {
@@ -713,6 +838,11 @@ export class TileActionService {
     const alreadyFound = await this.isItemAlreadyFound(tileAction, characterName);
     if (alreadyFound) {
       return { message: tileAction.alreadyFoundMessage || 'You find nothing new.', items: [], success: false };
+    }
+
+    // Handle locked chests specially
+    if (tileAction.isLocked) {
+      return await this.handleLockedChest(tileAction, characterName);
     }
 
     // Handle water sources specially (restore health/mana and fill water containers)
