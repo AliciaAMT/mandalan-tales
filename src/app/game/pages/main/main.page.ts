@@ -902,7 +902,7 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
           name: 'Fireplace',
           image: 'fireplace',
           description: 'A warm fireplace providing heat.',
-          action: 'warm'
+          action: 'search'
         });
       }
       if (xaxis === 2 && yaxis === 2) {
@@ -1180,7 +1180,15 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
     // Handle different object types based on the old PHP demo
     switch (object.name.toLowerCase()) {
       case 'water barrel':
-        await this.handleWaterBarrel();
+        if (this.currentCharacter) {
+          const result = await this.tileActionService.handleTileAction(
+            this.currentCharacter.map,
+            this.currentCharacter.xaxis,
+            this.currentCharacter.yaxis,
+            this.currentCharacter.name
+          );
+          await this.openItemModal(result.items || [], result.message);
+        }
         break;
       case 'fireplace': {
         const action = await this.openItemModal(
@@ -1195,17 +1203,42 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
           ]
         );
         if (action === 'light') {
-          await this.handleFireplace();
+          const hasFirewood = this.inventoryService.hasItem('Firewood');
+          const hasTinderbox = this.inventoryService.hasItem('Tinderbox');
+
+          if (hasFirewood && hasTinderbox) {
+            // Start a fire
+            await this.inventoryService.removeItem('Firewood', 1);
+            await this.openItemModal(
+              [],
+              'You successfully start a fire in the fireplace. The room is now warm and cozy.'
+            );
+          } else if (hasFirewood) {
+            await this.openItemModal(
+              [],
+              'You have firewood but need a tinderbox to start a fire.'
+            );
+          } else {
+            await this.openItemModal(
+              [],
+              'You need firewood and a tinderbox to start a fire.'
+            );
+          }
         } else if (action === 'rest') {
           await this.openItemModal(
             [],
             'You rest by the fireplace and feel a bit warmer.'
           );
         } else if (action === 'search') {
-          await this.openItemModal(
-            [],
-            'You search the fireplace but find nothing of interest.'
-          );
+          if (this.currentCharacter) {
+            const result = await this.tileActionService.handleTileAction(
+              this.currentCharacter.map,
+              this.currentCharacter.xaxis,
+              this.currentCharacter.yaxis,
+              this.currentCharacter.name
+            );
+            await this.openItemModal(result.items || [], result.message);
+          }
         } else if (action === 'cook') {
           await this.openItemModal(
             [],
@@ -1215,7 +1248,15 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
         break;
       }
       case 'well':
-        await this.handleWell();
+        if (this.currentCharacter) {
+          const result = await this.tileActionService.handleTileAction(
+            this.currentCharacter.map,
+            this.currentCharacter.xaxis,
+            this.currentCharacter.yaxis,
+            this.currentCharacter.name
+          );
+          await this.openItemModal(result.items || [], result.message);
+        }
         break;
       case 'melon plants':
       case 'garden':
@@ -1226,10 +1267,26 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
         await this.handleChest();
         break;
       case 'pantry':
-        await this.handlePantry();
+        if (this.currentCharacter) {
+          const result = await this.tileActionService.handleTileAction(
+            this.currentCharacter.map,
+            this.currentCharacter.xaxis,
+            this.currentCharacter.yaxis,
+            this.currentCharacter.name
+          );
+          await this.openItemModal(result.items || [], result.message);
+        }
         break;
       case 'herb rack':
-        await this.handleHerbRack();
+        if (this.currentCharacter) {
+          const result = await this.tileActionService.handleTileAction(
+            this.currentCharacter.map,
+            this.currentCharacter.xaxis,
+            this.currentCharacter.yaxis,
+            this.currentCharacter.name
+          );
+          await this.openItemModal(result.items || [], result.message);
+        }
         break;
       case 'rug':
         if (this.currentCharacter) {
@@ -1310,77 +1367,7 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  private async handleWaterBarrel() {
-    console.log('Handling water barrel interaction');
-    console.log('Current inventory:', this.inventoryService.inventory);
 
-    const hasBottle = this.inventoryService.hasItem('Bottle');
-    console.log('Has bottle:', hasBottle);
-
-    if (hasBottle) {
-      // Add water to bottle
-      const bottleItem = this.inventoryService.inventory.find(i => i.itemname === 'Bottle');
-      if (bottleItem) {
-        bottleItem.waterunits = Math.min(bottleItem.waterunits + 3, bottleItem.maxwater || 10);
-        await this.inventoryService.saveInventory();
-        await this.openItemModal(
-          [],
-          'You fill your bottle with fresh water from the barrel.'
-        );
-      }
-    } else {
-      await this.openItemModal(
-        [],
-        'You need a bottle to collect water from the barrel.'
-      );
-    }
-  }
-
-  private async handleFireplace() {
-    const hasFirewood = this.inventoryService.hasItem('Firewood');
-    const hasTinderbox = this.inventoryService.hasItem('Tinderbox');
-
-    if (hasFirewood && hasTinderbox) {
-      // Start a fire
-      await this.inventoryService.removeItem('Firewood', 1);
-      await this.openItemModal(
-        [],
-        'You successfully start a fire in the fireplace. The room is now warm and cozy.'
-      );
-    } else if (hasFirewood) {
-      await this.openItemModal(
-        [],
-        'You have firewood but need a tinderbox to start a fire.'
-      );
-    } else {
-      await this.openItemModal(
-        [],
-        'You need firewood and a tinderbox to start a fire.'
-      );
-    }
-  }
-
-  private async handleWell() {
-    const hasBottle = this.inventoryService.hasItem('Bottle');
-
-    if (hasBottle) {
-      // Add water to bottle
-      const bottleItem = this.inventoryService.inventory.find(i => i.itemname === 'Bottle');
-      if (bottleItem) {
-        bottleItem.waterunits = Math.min(bottleItem.waterunits + 5, bottleItem.maxwater || 10);
-        await this.inventoryService.saveInventory();
-        await this.openItemModal(
-          [],
-          'You draw fresh water from the well and fill your bottle.'
-        );
-      }
-    } else {
-      await this.openItemModal(
-        [],
-        'You need a bottle to collect water from the well.'
-      );
-    }
-  }
 
   /**
    * Handle harvesting from plants/trees
@@ -1499,172 +1486,9 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
     await this.openItemModal(result.items || [], result.message);
   }
 
-  /**
-   * Handle pantry interaction
-   */
-    private async handlePantry() {
-    console.log('Handling pantry interaction');
-    console.log('Current inventory:', this.inventoryService.inventory);
 
-    // Check if items are already collected from this pantry
-    const pantryKey = `pantry_${this.currentCharacter?.name}_${this.currentCharacter?.map}_${this.currentCharacter?.xaxis}_${this.currentCharacter?.yaxis}`;
-    const pantryState = localStorage.getItem(pantryKey);
 
-    if (pantryState === 'empty') {
-      await this.openItemModal(
-        [],
-        'The pantry is mostly empty.'
-      );
-      return;
-    }
 
-    // Items that should be in this pantry
-    const pantryItems = [
-      {
-        name: 'Bread',
-        description: 'Fresh bread from the pantry.',
-        type: 'Food',
-        image: 'bread',
-        quantity: 1,
-        options: { consumable: 1 }
-      },
-      {
-        name: 'Cheese',
-        description: 'A piece of cheese from the pantry.',
-        type: 'Food',
-        image: 'cheese',
-        quantity: 1,
-        options: { consumable: 1 }
-      },
-      {
-        name: 'Apple',
-        description: 'A fresh apple from the pantry.',
-        type: 'Food',
-        image: 'apple',
-        quantity: 1,
-        options: { consumable: 1 }
-      }
-    ];
-
-    // Add all items to inventory
-    const foundItems: FoundItem[] = [];
-    for (const itemData of pantryItems) {
-      const item = this.inventoryService.createBasicItem(
-        itemData.name,
-        itemData.description,
-        itemData.type,
-        itemData.image,
-        itemData.quantity,
-        itemData.options || {}
-      );
-
-      const success = await this.inventoryService.addItem(item);
-      if (success) {
-        foundItems.push({
-          name: itemData.name,
-          description: itemData.description,
-          image: itemData.image,
-          quantity: itemData.quantity
-        });
-        console.log(`Added ${itemData.name} to inventory`);
-      }
-    }
-
-    if (foundItems.length > 0) {
-      // Mark pantry as empty
-      localStorage.setItem(pantryKey, 'empty');
-      await this.openItemModal(
-        foundItems,
-        `You found ${foundItems.length} food items in the pantry!`
-      );
-    } else {
-      await this.openItemModal(
-        [],
-        'Your inventory is full.'
-      );
-    }
-  }
-
-  /**
-   * Handle herb rack interaction
-   */
-    private async handleHerbRack() {
-    console.log('Handling herb rack interaction');
-    console.log('Current inventory:', this.inventoryService.inventory);
-
-    // Check if items are already collected from this herb rack
-    const herbRackKey = `herbrack_${this.currentCharacter?.name}_${this.currentCharacter?.map}_${this.currentCharacter?.xaxis}_${this.currentCharacter?.yaxis}`;
-    const herbRackState = localStorage.getItem(herbRackKey);
-
-    if (herbRackState === 'empty') {
-      await this.openItemModal(
-        [],
-        'The herb rack is mostly empty.'
-      );
-      return;
-    }
-
-    // Items that should be on this herb rack
-    const herbRackItems = [
-      {
-        name: 'Aloe',
-        description: 'Aloe vera plant, useful for healing.',
-        type: 'Other',
-        image: 'aloe',
-        quantity: 1,
-        options: { othertype: 'Herb' }
-      },
-      {
-        name: 'Cinnamon',
-        description: 'Ground cinnamon spice.',
-        type: 'Other',
-        image: 'cinnamon',
-        quantity: 1,
-        options: { othertype: 'Spice' }
-      },
-      {
-        name: 'Thyme',
-        description: 'Fresh thyme herb.',
-        type: 'Other',
-        image: 'thyme',
-        quantity: 1,
-        options: { othertype: 'Herb' }
-      }
-    ];
-
-    // Add all items to inventory
-    let itemsFound = 0;
-    for (const itemData of herbRackItems) {
-      const item = this.inventoryService.createBasicItem(
-        itemData.name,
-        itemData.description,
-        itemData.type,
-        itemData.image,
-        itemData.quantity,
-        itemData.options || {}
-      );
-
-      const success = await this.inventoryService.addItem(item);
-      if (success) {
-        itemsFound++;
-        console.log(`Added ${itemData.name} to inventory`);
-      }
-    }
-
-    if (itemsFound > 0) {
-      // Mark herb rack as empty
-      localStorage.setItem(herbRackKey, 'empty');
-      await this.openItemModal(
-        [],
-        `You found ${itemsFound} herbs on the herb rack!`
-      );
-    } else {
-      await this.openItemModal(
-        [],
-        'Your inventory is full.'
-      );
-    }
-  }
 
   /**
    * Handle rug interaction

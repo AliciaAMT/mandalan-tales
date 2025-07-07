@@ -436,6 +436,25 @@ export class TileActionService {
       flagKey: 'cellarveggie', experience: 5,
       message: 'You search the canvas bag and find vegetables.',
       alreadyFoundMessage: 'You search the Canvas Bag but find nothing.'
+    },
+    // --- Water sources (special actions that restore health/mana and fill water containers) ---
+    {
+      map: 'homeup', x: 2, y: 1, action: 'search',
+      flagKey: 'homeupwaterbarrel', experience: 0,
+      message: 'You drink until you are refreshed, and you fill all of your water containers.',
+      alreadyFoundMessage: 'You have already used this water source recently.'
+    },
+    {
+      map: 'yard', x: 2, y: 2, action: 'search',
+      flagKey: 'yardwell', experience: 0,
+      message: 'You drink until you are refreshed, and you fill all of your water containers.',
+      alreadyFoundMessage: 'You have already used this water source recently.'
+    },
+    {
+      map: 'cellar', x: 1, y: 4, action: 'search',
+      flagKey: 'cellarbarrel', experience: 0,
+      message: 'You drink until you are refreshed, and you fill all of your water containers.',
+      alreadyFoundMessage: 'You have already used this water source recently.'
     }
   ];
 
@@ -597,6 +616,35 @@ export class TileActionService {
   }
 
   /**
+   * Handle water sources (restore health/mana and fill water containers)
+   */
+  private async handleWaterSource(tileAction: TileAction, characterName: string): Promise<void> {
+    // Restore full health and mana
+    const characters = this.characterService.getCharacters();
+    const character = characters.find(c => c.name === characterName);
+    if (character && character.id) {
+      await this.characterService.updateCharacter(character.id, {
+        life: character.maxLife,
+        mana: character.maxMana
+      });
+    }
+
+    // Fill all water containers to maximum capacity
+    const inventory = this.inventoryService.inventory;
+    for (const item of inventory) {
+      if (item.maxwater && item.maxwater > 0) {
+        item.waterunits = item.maxwater;
+      }
+    }
+    await this.inventoryService.saveInventory();
+
+    // Set the flag to prevent using the water source again
+    if (tileAction.flagKey) {
+      await this.characterService.setCharacterFlag(characterName, tileAction.flagKey as any, 1);
+    }
+  }
+
+  /**
    * Set flags to prevent finding items again and update quest progress
    */
   private async setItemFlags(tileAction: TileAction, characterName: string): Promise<void> {
@@ -666,6 +714,13 @@ export class TileActionService {
     if (alreadyFound) {
       return { message: tileAction.alreadyFoundMessage || 'You find nothing new.', items: [], success: false };
     }
+
+    // Handle water sources specially (restore health/mana and fill water containers)
+    if (tileAction.flagKey && tileAction.flagKey.includes('water') || tileAction.flagKey?.includes('well') || tileAction.flagKey?.includes('barrel')) {
+      await this.handleWaterSource(tileAction, characterName);
+      return { message: tileAction.message, items: [], success: true };
+    }
+
     const items = await this.giveItemsToPlayer(tileAction, characterName);
     await this.setItemFlags(tileAction, characterName);
     return { message: tileAction.message, items, success: true };
