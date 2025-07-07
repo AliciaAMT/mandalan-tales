@@ -179,6 +179,9 @@ export class DialogueService {
             case 'add_gold':
               await this.addGold(character.id!, consequence.value);
               break;
+            case 'add_item':
+              await this.addItem(character.id!, consequence.key, consequence.value);
+              break;
             case 'level_up':
               await this.levelUpCharacter(character.id!);
               break;
@@ -247,6 +250,44 @@ export class DialogueService {
       });
     } catch (error) {
       console.error('Error adding gold:', error);
+      throw error; // Re-throw to let the calling method handle it
+    }
+  }
+
+  /**
+   * Add item to character inventory
+   */
+  private async addItem(characterId: string, itemKey: string, quantity: number): Promise<void> {
+    const character = this.characterService.getCurrentCharacter();
+    if (!character) return;
+
+    try {
+      // Import the inventory service to add items
+      const { InventoryService } = await import('./inventory.service');
+      const inventoryService = this.injector.get(InventoryService);
+
+      // Create the item based on the key
+      let item;
+      switch (itemKey) {
+        case 'letter':
+          item = inventoryService.createBasicItem(
+            'Letter from Solias',
+            'This letter is your invitation to the House of Elders. The guards should let you enter when you show them this letter.',
+            'Other',
+            'letter',
+            1,
+            { itemrarity: 'Relic', itemlevel: 1, othertype: 'Quest' }
+          );
+          break;
+        default:
+          console.warn(`Unknown item key: ${itemKey}`);
+          return;
+      }
+
+      // Add the item to inventory
+      await inventoryService.addItem(item);
+    } catch (error) {
+      console.error('Error adding item:', error);
       throw error; // Re-throw to let the calling method handle it
     }
   }

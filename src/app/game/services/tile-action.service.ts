@@ -723,6 +723,18 @@ export class TileActionService {
 
     const items = await this.giveItemsToPlayer(tileAction, characterName);
     await this.setItemFlags(tileAction, characterName);
+
+    // Give experience points if specified
+    if (tileAction.experience && tileAction.experience > 0) {
+      const characters = this.characterService.getCharacters();
+      const character = characters.find(c => c.name === characterName);
+      if (character && character.id) {
+        await this.characterService.updateCharacter(character.id, {
+          experience: character.experience + tileAction.experience
+        });
+      }
+    }
+
     return { message: tileAction.message, items, success: true };
   }
 }

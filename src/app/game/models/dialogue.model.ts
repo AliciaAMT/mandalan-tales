@@ -60,7 +60,9 @@ export const FATHER_DIALOGUE: DialogueTree = {
           text: 'I will go. I seek answers.',
           nextDialogueId: 'accept_apprenticeship',
           consequences: [
-            { type: 'set_flag', key: 'quest1', value: 2 }
+            { type: 'set_flag', key: 'quest1', value: 2 },
+            { type: 'add_experience', key: 'experience', value: 5 },
+            { type: 'add_item', key: 'letter', value: 1 }
           ]
         },
         {
@@ -169,7 +171,9 @@ export const FATHER_DIALOGUE: DialogueTree = {
           text: 'Yes, I will go, since that is your wish, Father.',
           nextDialogueId: 'accept_apprenticeship',
           consequences: [
-            { type: 'set_flag', key: 'quest1', value: 2 }
+            { type: 'set_flag', key: 'quest1', value: 2 },
+            { type: 'add_experience', key: 'experience', value: 5 },
+            { type: 'add_item', key: 'letter', value: 1 }
           ]
         },
         {
