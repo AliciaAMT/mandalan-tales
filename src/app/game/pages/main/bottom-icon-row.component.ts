@@ -36,6 +36,8 @@ export class BottomIconRowComponent {
       this.router.navigate(['/dashboard']);
     } else if (item.action === 'stats') {
       this.router.navigate(['/game/statistics']);
+    } else if (item.action === 'inventory') {
+      this.router.navigate(['/game/inventory']);
     } else {
       // Placeholder for future logic
       alert(`Clicked: ${item.label}`);

@@ -1,0 +1,29 @@
+<ion-content class="ion-padding" appFocusManager>
+  <main id="main-content" role="main">
+    <div class="inventory-container">
+      <!-- Back Button -->
+      <div class="back-button-container">
+        <ion-button
+          fill="clear"
+          (click)="goBack()"
+          class="back-button"
+          aria-label="Back to Game">
+          <ion-icon name="arrow-back" slot="start" aria-hidden="true"></ion-icon>
+          Back to Game
+        </ion-button>
+      </div>
+
+      <!-- Page Content -->
+      <div class="inventory-content">
+        <h1 class="page-title">Inventory</h1>
+
+        <!-- Your inventory content will go here -->
+        <ion-card>
+          <ion-card-content>
+            <p>Inventory page content will be added here.</p>
+          </ion-card-content>
+        </ion-card>
+      </div>
+    </div>
+  </main>
+</ion-content>

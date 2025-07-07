@@ -1,0 +1,25 @@
+// Inventory Page Styles
+.inventory-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0;
+}
+
+.back-button-container {
+  margin-bottom: 1rem;
+
+  .back-button {
+    --color: var(--ion-color-primary);
+    font-weight: 500;
+  }
+}
+
+.inventory-content {
+  .page-title {
+    font-size: 2rem;
+    font-weight: bold;
+    color: var(--ion-color-dark);
+    margin-bottom: 1.5rem;
+    text-align: center;
+  }
+}
