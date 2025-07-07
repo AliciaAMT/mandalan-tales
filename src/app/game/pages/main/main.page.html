@@ -194,11 +194,7 @@
                     <span aria-hidden="true">&#9432;</span>
                   </button>
                   <img
-                    [src]="
-                      action.type === 'NPC'
-                        ? 'assets/portraits/' + action.portrait + '.png'
-                        : 'assets/items/' + action.image + '.png'
-                    "
+                    [src]="getNPCImagePath(action)"
                     [alt]="action.name"
                     class="action-image"
                     (error)="
@@ -248,7 +244,7 @@
                     <span aria-hidden="true">&#9432;</span>
                   </button>
                   <img
-                    [src]="'assets/portraits/' + npc.portrait + '.png'"
+                    [src]="getNPCPortraitPath(npc)"
                     [alt]="npc.name + ' portrait'"
                     class="action-image"
                     (error)="onPortraitError($event, npc)"
@@ -364,11 +360,7 @@
       <div class="item-section">
         <div class="item-portrait">
           <img
-            [src]="
-              infoModalAction?.type === 'NPC'
-                ? 'assets/portraits/' + infoModalAction?.portrait + '.png'
-                : 'assets/items/' + infoModalAction?.image + '.png'
-            "
+            [src]="getNPCImagePath(infoModalAction)"
             [alt]="infoModalAction?.name + ' image'"
             (error)="
               infoModalAction?.type === 'NPC'

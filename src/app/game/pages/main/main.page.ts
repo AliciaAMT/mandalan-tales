@@ -34,6 +34,7 @@ interface NPC {
   portrait: string;
   description?: string;
   action: string;
+  isEnemy?: boolean; // Indicates if this NPC is an enemy (uses enemy image path)
 }
 
 interface GameObject {
@@ -745,16 +746,15 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
       });
     }
 
-    // Random rat in home (2,2) - 30% chance
+    // Rat in home (2,2) - 100% chance (like old demo)
     if (map === 'home' && xaxis === 2 && yaxis === 2) {
-      if (Math.random() < 0.3) {
-        npcs.push({
-          name: 'Rat',
-          portrait: 'default', // Will use a fallback image
-          description: 'A small rat scurrying about.',
-          action: 'fight'
-        });
-      }
+      npcs.push({
+        name: 'Rat',
+        portrait: 'rat', // Use the rat enemy image
+        description: 'A small rat scurrying about. Level 1',
+        action: 'fight',
+        isEnemy: true // This is an enemy, use enemy image path
+      });
     }
 
     // Update cache
@@ -1607,6 +1607,33 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
           result.message
         );
       }
+    }
+  }
+
+  // Get the correct image path for NPCs (enemies vs portraits)
+  getNPCImagePath(npc: any): string {
+    if (npc.type === 'NPC') {
+      if (npc.isEnemy) {
+        // Enemies use webp format from enemies directory
+        return `assets/enemies/${npc.portrait}.webp`;
+      } else {
+        // Regular NPCs use png format from portraits directory
+        return `assets/portraits/${npc.portrait}.png`;
+      }
+    } else {
+      // Objects and portals use items directory
+      return `assets/items/${npc.image}.png`;
+    }
+  }
+
+  // Get the correct image path for desktop NPCs
+  getNPCPortraitPath(npc: NPC): string {
+    if (npc.isEnemy) {
+      // Enemies use webp format from enemies directory
+      return `assets/enemies/${npc.portrait}.webp`;
+    } else {
+      // Regular NPCs use png format from portraits directory
+      return `assets/portraits/${npc.portrait}.png`;
     }
   }
 

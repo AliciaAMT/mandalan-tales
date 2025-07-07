@@ -1,10 +1,10 @@
 .bottom-icon-row {
   display: flex;
   justify-content: center;
-  align-items: flex-end;
+  align-items: center;
   flex-wrap: wrap;
   width: 100%;
-  padding: 8px 0 0 0;
+  padding: 12px 0 16px 0;
   box-sizing: border-box;
   gap: 8px;
   .icon-item {
@@ -25,12 +25,12 @@
       align-items: center;
       width: 100%;
       img {
-        width: 44px;
-        height: 44px;
-        max-width: 56px;
-        max-height: 56px;
-        min-width: 36px;
-        min-height: 36px;
+        width: 52px;
+        height: 52px;
+        max-width: 64px;
+        max-height: 64px;
+        min-width: 44px;
+        min-height: 44px;
         margin-bottom: 6px;
         object-fit: contain;
         display: block;
@@ -64,12 +64,12 @@
       min-width: 48px;
       max-width: 70px;
       button img {
-        width: 32px;
-        height: 32px;
-        max-width: 40px;
-        max-height: 40px;
-        min-width: 24px;
-        min-height: 24px;
+        width: 40px;
+        height: 40px;
+        max-width: 48px;
+        max-height: 48px;
+        min-width: 32px;
+        min-height: 32px;
         margin-bottom: 4px;
       }
       .icon-label {
