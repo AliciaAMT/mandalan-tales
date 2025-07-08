@@ -17,12 +17,127 @@
       <div class="inventory-content">
         <h1 class="page-title">Inventory</h1>
 
-        <!-- Your inventory content will go here -->
-        <ion-card>
-          <ion-card-content>
-            <p>Inventory page content will be added here.</p>
-          </ion-card-content>
-        </ion-card>
+        <!-- Inventory Sections -->
+        <div class="inventory-sections">
+
+          <!-- Equipped Items Section -->
+          <div class="inventory-section equipped-items" role="region" aria-label="Equipped Items" [ngClass]="{'collapsed': !isEquippedItemsOpen}">
+            <h2 class="collapsible-header" (click)="toggleEquippedItems()" tabindex="0" role="button" [attr.aria-expanded]="isEquippedItemsOpen" aria-controls="equipped-items-content">
+              Equipped Items
+            </h2>
+            <div id="equipped-items-content" class="section-content" *ngIf="isEquippedItemsOpen">
+              <div class="equipped-items-grid">
+                <div class="equipment-slot">
+                  <div class="slot-label">Head</div>
+                  <div class="slot-content empty">
+                    <ion-icon name="add-circle-outline" aria-hidden="true"></ion-icon>
+                    <span>Empty</span>
+                  </div>
+                </div>
+                <div class="equipment-slot">
+                  <div class="slot-label">Chest</div>
+                  <div class="slot-content empty">
+                    <ion-icon name="add-circle-outline" aria-hidden="true"></ion-icon>
+                    <span>Empty</span>
+                  </div>
+                </div>
+                <div class="equipment-slot">
+                  <div class="slot-label">Legs</div>
+                  <div class="slot-content empty">
+                    <ion-icon name="add-circle-outline" aria-hidden="true"></ion-icon>
+                    <span>Empty</span>
+                  </div>
+                </div>
+                <div class="equipment-slot">
+                  <div class="slot-label">Hands</div>
+                  <div class="slot-content empty">
+                    <ion-icon name="add-circle-outline" aria-hidden="true"></ion-icon>
+                    <span>Empty</span>
+                  </div>
+                </div>
+                <div class="equipment-slot">
+                  <div class="slot-label">Feet</div>
+                  <div class="slot-content empty">
+                    <ion-icon name="add-circle-outline" aria-hidden="true"></ion-icon>
+                    <span>Empty</span>
+                  </div>
+                </div>
+                <div class="equipment-slot">
+                  <div class="slot-label">Weapon</div>
+                  <div class="slot-content empty">
+                    <ion-icon name="add-circle-outline" aria-hidden="true"></ion-icon>
+                    <span>Empty</span>
+                  </div>
+                </div>
+                <div class="equipment-slot">
+                  <div class="slot-label">Offhand</div>
+                  <div class="slot-content empty">
+                    <ion-icon name="add-circle-outline" aria-hidden="true"></ion-icon>
+                    <span>Empty</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Keep Pocket Section -->
+          <div class="inventory-section keep-pocket" role="region" aria-label="Keep Pocket" [ngClass]="{'collapsed': !isKeepPocketOpen}">
+            <h2 class="collapsible-header" (click)="toggleKeepPocket()" tabindex="0" role="button" [attr.aria-expanded]="isKeepPocketOpen" aria-controls="keep-pocket-content">
+              Keep Pocket
+            </h2>
+            <div id="keep-pocket-content" class="section-content" *ngIf="isKeepPocketOpen">
+              <div class="pocket-filters">
+                <button class="filter-btn" type="button">All</button>
+                <button class="filter-btn" type="button">Weapons</button>
+                <button class="filter-btn" type="button">Armor</button>
+                <button class="filter-btn" type="button">Accessories</button>
+                <button class="filter-btn" type="button">Other</button>
+              </div>
+              <div class="pocket-items">
+                <p class="empty-message">No items in keep pocket</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Trade Pocket Section -->
+          <div class="inventory-section trade-pocket" role="region" aria-label="Trade Pocket" [ngClass]="{'collapsed': !isTradePocketOpen}">
+            <h2 class="collapsible-header" (click)="toggleTradePocket()" tabindex="0" role="button" [attr.aria-expanded]="isTradePocketOpen" aria-controls="trade-pocket-content">
+              Trade Pocket
+            </h2>
+            <div id="trade-pocket-content" class="section-content" *ngIf="isTradePocketOpen">
+              <div class="pocket-filters">
+                <button class="filter-btn" type="button">All</button>
+                <button class="filter-btn" type="button">Weapons</button>
+                <button class="filter-btn" type="button">Armor</button>
+                <button class="filter-btn" type="button">Accessories</button>
+                <button class="filter-btn" type="button">Other</button>
+              </div>
+              <div class="pocket-items">
+                <p class="empty-message">No items in trade pocket</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Food Pocket Section -->
+          <div class="inventory-section food-pocket" role="region" aria-label="Food Pocket" [ngClass]="{'collapsed': !isFoodPocketOpen}">
+            <h2 class="collapsible-header" (click)="toggleFoodPocket()" tabindex="0" role="button" [attr.aria-expanded]="isFoodPocketOpen" aria-controls="food-pocket-content">
+              Food Pocket
+            </h2>
+            <div id="food-pocket-content" class="section-content" *ngIf="isFoodPocketOpen">
+              <div class="pocket-filters">
+                <button class="filter-btn" type="button">All</button>
+                <button class="filter-btn" type="button">Ingredients</button>
+                <button class="filter-btn" type="button">Recipes</button>
+                <button class="filter-btn" type="button">Tools</button>
+                <button class="filter-btn" type="button">Other</button>
+              </div>
+              <div class="pocket-items">
+                <p class="empty-message">No items in food pocket</p>
+              </div>
+            </div>
+          </div>
+
+        </div>
       </div>
     </div>
   </main>
