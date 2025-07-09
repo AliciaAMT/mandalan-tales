@@ -1,163 +1,193 @@
-import { Directive, ElementRef, OnInit, OnDestroy, Input, NgZone } from '@angular/core';
+import { Directive, ElementRef, HostListener, Input, OnInit, OnDestroy } from '@angular/core';
 
 @Directive({
   selector: '[appFocusManager]',
   standalone: true
 })
 export class FocusManagerDirective implements OnInit, OnDestroy {
-  @Input() appFocusManager: string | boolean = true;
+  @Input() appFocusManager: 'remove' | 'prevent' | boolean | string = 'remove';
 
   private observer: MutationObserver | null = null;
-  private originalTabIndex: string | null = null;
-  private originalInert: string | null = null;
-  private focusedElement: HTMLElement | null = null;
-  private hiddenElements = new Set<HTMLElement>();
 
-  constructor(private el: ElementRef, private ngZone: NgZone) {}
+  constructor(private el: ElementRef) {}
 
   ngOnInit() {
-    // Convert string to boolean if needed
-    const isEnabled = this.appFocusManager === true || this.appFocusManager === 'true';
-    if (!isEnabled) return;
+    // Convert various input types to the expected behavior
+    const behavior = this.getBehavior();
 
-    // Watch for aria-hidden changes
+    // Set up mutation observer to watch for alert elements
     this.observer = new MutationObserver((mutations) => {
-      this.ngZone.run(() => {
-        mutations.forEach((mutation) => {
-          if (mutation.type === 'attributes' && mutation.attributeName === 'aria-hidden') {
-            const target = mutation.target as HTMLElement;
-            const isHidden = target.getAttribute('aria-hidden') === 'true';
-
-            if (isHidden) {
-              // When hidden, handle focus management
-              this.handleElementHidden(target);
-            } else {
-              // When shown, restore focus management
-              this.handleElementShown(target);
+      mutations.forEach((mutation) => {
+        if (mutation.type === 'childList') {
+          mutation.addedNodes.forEach((node) => {
+            if (node instanceof HTMLElement && node.tagName === 'ION-ALERT') {
+              this.handleAlertAdded(node);
             }
-          }
-        });
+          });
+        }
       });
     });
 
-    this.observer.observe(this.el.nativeElement, {
-      attributes: true,
-      attributeFilter: ['aria-hidden'],
+    this.observer.observe(document.body, {
+      childList: true,
       subtree: true
     });
-
-    // Also watch for focus events to track the currently focused element
-    this.el.nativeElement.addEventListener('focusin', (event: FocusEvent) => {
-      this.focusedElement = event.target as HTMLElement;
-    }, true);
-
-    // Proactively check for hidden elements on initialization
-    this.checkForHiddenElements();
   }
 
   ngOnDestroy() {
     if (this.observer) {
       this.observer.disconnect();
     }
-    // Restore all hidden elements
-    this.hiddenElements.forEach(element => {
-      this.handleElementShown(element);
+  }
+
+  private getBehavior(): 'remove' | 'prevent' {
+    // Handle various input types for backward compatibility
+    if (typeof this.appFocusManager === 'string') {
+      if (this.appFocusManager === 'remove' || this.appFocusManager === 'prevent') {
+        return this.appFocusManager;
+      }
+      // If it's a string but not the expected values, treat as 'remove'
+      return 'remove';
+    }
+
+    if (typeof this.appFocusManager === 'boolean') {
+      return this.appFocusManager ? 'remove' : 'prevent';
+    }
+
+    // Default to 'remove'
+    return 'remove';
+  }
+
+  private handleAlertAdded(alertElement: HTMLElement) {
+    // Watch for when the alert is about to be dismissed
+    const dismissObserver = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.type === 'attributes' && mutation.attributeName === 'aria-hidden') {
+          const ariaHidden = alertElement.getAttribute('aria-hidden');
+          if (ariaHidden === 'true') {
+            // Remove focus from all alert buttons before aria-hidden is applied
+            this.removeFocusFromAlert(alertElement);
+            dismissObserver.disconnect();
+          }
+        }
+      });
     });
-    this.hiddenElements.clear();
-  }
 
-  private checkForHiddenElements() {
-    const hiddenElements = this.el.nativeElement.querySelectorAll('[aria-hidden="true"]');
-    hiddenElements.forEach((element: HTMLElement) => {
-      this.handleElementHidden(element);
+    dismissObserver.observe(alertElement, {
+      attributes: true,
+      attributeFilter: ['aria-hidden']
     });
   }
 
-  private handleElementHidden(element: HTMLElement) {
-    this.hiddenElements.add(element);
-
-    // Check if the hidden element contains the currently focused element
-    if (this.focusedElement && element.contains(this.focusedElement)) {
-      // Move focus to the router outlet or body
-      this.moveFocusToRouterOutletOrBody();
-    }
-
-    // Use the inert attribute instead of aria-hidden for better accessibility
-    if (!element.hasAttribute('inert')) {
-      this.originalInert = element.getAttribute('inert');
-      element.setAttribute('inert', '');
-    }
-
-    // Also remove focusable elements from tab order as backup
-    this.removeFromTabOrder(element);
-  }
-
-  private handleElementShown(element: HTMLElement) {
-    this.hiddenElements.delete(element);
-
-    // Remove the inert attribute
-    if (element.hasAttribute('inert') && !this.originalInert) {
-      element.removeAttribute('inert');
-    } else if (this.originalInert) {
-      element.setAttribute('inert', this.originalInert);
-      this.originalInert = null;
-    }
-
-    // Restore focusable elements
-    this.restoreTabOrder(element);
-  }
-
-  private moveFocusToRouterOutletOrBody() {
-    // Try to focus the router outlet itself
-    const routerOutlet = document.getElementById('main-content');
-    if (routerOutlet && routerOutlet !== this.focusedElement) {
-      (routerOutlet as HTMLElement).focus();
-      return;
-    }
-
-    // Try to focus the first visible focusable element
-    const visibleFocusable = document.querySelector(
-      'button:not([aria-hidden="true"]):not([inert]), [href]:not([aria-hidden="true"]):not([inert]), input:not([aria-hidden="true"]):not([inert]), select:not([aria-hidden="true"]):not([inert]), textarea:not([aria-hidden="true"]):not([inert]), [tabindex]:not([tabindex="-1"]):not([aria-hidden="true"]):not([inert])'
-    ) as HTMLElement;
-
-    if (visibleFocusable) {
-      visibleFocusable.focus();
-      return;
-    }
-
-    // Fallback: focus the body
-    (document.body as HTMLElement).focus();
-  }
-
-  private removeFromTabOrder(element: HTMLElement) {
-    const focusableElements = element.querySelectorAll(
-      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-    );
-
-    focusableElements.forEach((el) => {
-      const htmlEl = el as HTMLElement;
-      if (!htmlEl.hasAttribute('data-original-tabindex')) {
-        const currentTabIndex = htmlEl.getAttribute('tabindex');
-        htmlEl.setAttribute('data-original-tabindex', currentTabIndex || '');
-        htmlEl.setAttribute('tabindex', '-1');
+  private removeFocusFromAlert(alertElement: HTMLElement) {
+    // Remove focus from all buttons in the alert
+    const buttons = alertElement.querySelectorAll('button, .alert-button, ion-focusable, [tabindex]');
+    buttons.forEach((button: Element) => {
+      if (button instanceof HTMLElement) {
+        button.blur();
       }
     });
+
+    // Remove focus from the alert element itself
+    alertElement.blur();
   }
 
-  private restoreTabOrder(element: HTMLElement) {
-    const focusableElements = element.querySelectorAll(
-      'button, [href], input, select, textarea, [tabindex="-1"]'
-    );
+  @HostListener('click', ['$event'])
+  onClick(event: Event) {
+    const behavior = this.getBehavior();
+    if (behavior === 'remove') {
+      // Only remove focus from non-alert elements before the click action
+      this.removeFocusFromNonAlertElements();
+    }
+  }
 
-    focusableElements.forEach((el) => {
-      const htmlEl = el as HTMLElement;
-      const originalTabIndex = htmlEl.getAttribute('data-original-tabindex');
-      if (originalTabIndex) {
-        htmlEl.setAttribute('tabindex', originalTabIndex);
-        htmlEl.removeAttribute('data-original-tabindex');
-      } else {
-        htmlEl.removeAttribute('tabindex');
+  @HostListener('keydown', ['$event'])
+  onKeyDown(event: KeyboardEvent) {
+    const behavior = this.getBehavior();
+    if (behavior === 'prevent' && event.key === 'Tab') {
+      // Prevent tab navigation to maintain focus control
+      event.preventDefault();
+    }
+  }
+
+  private removeFocusFromNonAlertElements() {
+    // Remove focus from any focused element that's not in an alert
+    if (document.activeElement instanceof HTMLElement) {
+      const activeElement = document.activeElement;
+      // Check if the active element is inside an alert
+      const isInAlert = activeElement.closest('ion-alert');
+      if (!isInAlert) {
+        activeElement.blur();
+      }
+    }
+
+    // Remove focus from all buttons and focusable elements that are not in alerts
+    const allFocusableElements = document.querySelectorAll('button, [tabindex], input, select, textarea, a[href], ion-button, ion-focusable');
+    allFocusableElements.forEach((element: Element) => {
+      if (element instanceof HTMLElement) {
+        const isInAlert = element.closest('ion-alert');
+        if (!isInAlert) {
+          element.blur();
+        }
       }
     });
+
+    // Set focus to body to ensure no non-alert element has focus
+    if (document.body instanceof HTMLElement) {
+      document.body.focus();
+      document.body.blur();
+    }
+  }
+
+  // Static method that can be called from components
+  static removeAllFocus() {
+    // Remove focus from any focused element
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
+
+    // Remove focus from all buttons and focusable elements
+    const allFocusableElements = document.querySelectorAll('button, [tabindex], input, select, textarea, a[href], ion-button, .alert-button, ion-focusable');
+    allFocusableElements.forEach((element: Element) => {
+      if (element instanceof HTMLElement) {
+        element.blur();
+      }
+    });
+
+    // Set focus to body to ensure no element has focus
+    if (document.body instanceof HTMLElement) {
+      document.body.focus();
+      document.body.blur();
+    }
+  }
+
+  // Static method for removing focus only from non-alert elements
+  static removeFocusFromNonAlertElements() {
+    // Remove focus from any focused element that's not in an alert
+    if (document.activeElement instanceof HTMLElement) {
+      const activeElement = document.activeElement;
+      // Check if the active element is inside an alert
+      const isInAlert = activeElement.closest('ion-alert');
+      if (!isInAlert) {
+        activeElement.blur();
+      }
+    }
+
+    // Remove focus from all buttons and focusable elements that are not in alerts
+    const allFocusableElements = document.querySelectorAll('button, [tabindex], input, select, textarea, a[href], ion-button, ion-focusable');
+    allFocusableElements.forEach((element: Element) => {
+      if (element instanceof HTMLElement) {
+        const isInAlert = element.closest('ion-alert');
+        if (!isInAlert) {
+          element.blur();
+        }
+      }
+    });
+
+    // Set focus to body to ensure no non-alert element has focus
+    if (document.body instanceof HTMLElement) {
+      document.body.focus();
+      document.body.blur();
+    }
   }
 }

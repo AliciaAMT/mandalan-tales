@@ -11,7 +11,7 @@ import { STANDALONE_IMPORTS } from '../shared/standalone-imports';
   templateUrl: './about.component.html',
   styleUrls: ['./about.component.scss'],
   standalone: true,
-  imports: [ CommonModule, AppHeaderComponent, AppFooterComponent, RouterModule, STANDALONE_IMPORTS /*, SkipLinkComponent */ ],
+  imports: [ CommonModule, AppHeaderComponent, AppFooterComponent, RouterModule, STANDALONE_IMPORTS ],
 })
 
 export class AboutComponent {

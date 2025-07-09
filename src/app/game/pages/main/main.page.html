@@ -1,48 +1,78 @@
 <ion-content fullscreen appFocusManager>
-  <div
-    class="main-game-responsive-grid"
-    [ngStyle]="{
-      'grid-template-rows': gridTemplateRows,
-      'grid-template-columns': gridTemplateColumns,
-      'grid-template-areas': gridTemplateAreas
-    }"
-  >
-    <!-- Player Stats (Left/Top) -->
-    <div class="main-section player-stats" [ngClass]="{'collapsed': !isPlayerStatsOpen}" [style.grid-area]="playerStatsArea">
-      <button class="collapsible-header" (click)="togglePlayerStats()">Player Stats</button>
-      <div class="section-content" *ngIf="isPlayerStatsOpen">
-        <ng-container *ngIf="currentCharacter; else noChar">
-          <div class="player-stats-list">
-            <div class="player-stats-row portrait-row">
-              <img class="stat-icon portrait" [src]="'assets/portraits/transparent/' + currentCharacter.portrait + '.png'" alt="Portrait" />
-              <div class="player-name-title" *ngIf="isMobile">
-                <strong>{{ currentCharacter.name }}</strong>
-                <span *ngIf="currentCharacter.title">({{ currentCharacter.title }})</span>
-              </div>
-            </div>
-            <div class="player-stats-row name-row" *ngIf="!isMobile">
-              <div class="player-name-title">
-                <strong>{{ currentCharacter.name }}</strong>
-                <span *ngIf="currentCharacter.title">({{ currentCharacter.title }})</span>
-              </div>
-            </div>
+  <!-- Dialogue Modal -->
+  <app-dialogue-modal></app-dialogue-modal>
+  <app-item-found-modal
+    [open]="itemModalOpen"
+    [items]="itemModalItems"
+    [eventMessage]="itemModalEventMessage"
+    [actions]="itemModalActions"
+    (closed)="onItemModalClosed($event)">
+  </app-item-found-modal>
 
-            <!-- Mobile: Stat columns row -->
-            <div class="player-stats-row stats-columns-row" *ngIf="isMobile">
-              <div class="stats-col stats-col-1">
-                <div class="player-stats-row">
-                  <img class="stat-icon" src="assets/items/hourglass.webp" alt="Level" />
-                  <div>
-                    <div>Level {{ currentCharacter.level }}</div>
-                    <div>XP: {{ currentCharacter.experience }}</div>
+  <main role="main" aria-label="Game Interface">
+    <div
+      class="main-game-responsive-grid"
+      [ngStyle]="{
+        'grid-template-rows': gridTemplateRows,
+        'grid-template-columns': gridTemplateColumns,
+        'grid-template-areas': gridTemplateAreas
+      }"
+    >
+      <!-- Player Stats (Left/Top) -->
+      <div class="main-section player-stats" role="region" aria-label="Player Stats" [ngClass]="{'collapsed': !isPlayerStatsOpen}" [style.grid-area]="playerStatsArea">
+        <h2 class="collapsible-header" (click)="togglePlayerStats()" tabindex="0" role="button" [attr.aria-expanded]="isPlayerStatsOpen" aria-controls="player-stats-content">
+          Player Stats
+        </h2>
+        <div id="player-stats-content" class="section-content" *ngIf="isPlayerStatsOpen">
+          <ng-container *ngIf="currentCharacter; else noChar">
+            <div class="player-stats-list">
+              <div class="player-stats-row portrait-row">
+                <img class="stat-icon portrait" [src]="'assets/portraits/transparent/' + currentCharacter.portrait + '.png'" alt="Portrait" />
+                <div class="player-name-title" *ngIf="isMobile">
+                  <strong>{{ currentCharacter.name }}</strong>
+                  <span *ngIf="currentCharacter.title">({{ currentCharacter.title }})</span>
+                </div>
+              </div>
+              <div class="player-stats-row name-row" *ngIf="!isMobile">
+                <div class="player-name-title">
+                  <strong>{{ currentCharacter.name }}</strong>
+                  <span *ngIf="currentCharacter.title">({{ currentCharacter.title }})</span>
+                </div>
+              </div>
+
+              <!-- Mobile: Stat columns row -->
+              <div class="player-stats-row stats-columns-row" *ngIf="isMobile">
+                <div class="stats-col stats-col-1">
+                  <div class="player-stats-row">
+                    <img class="stat-icon" src="assets/items/hourglass.webp" alt="Level" />
+                    <div>
+                      <div>Level {{ currentCharacter.level }}</div>
+                      <div>XP: {{ currentCharacter.experience }}</div>
+                    </div>
+                  </div>
+                  <div class="player-stats-row">
+                    <img class="stat-icon" src="assets/items/gold.webp" alt="Gold" />
+                    <div>Gold: <span class="gold-amount">{{ currentCharacter.gold }}</span></div>
                   </div>
                 </div>
-                <div class="player-stats-row">
-                  <img class="stat-icon" src="assets/items/gold.webp" alt="Gold" />
-                  <div>Gold: <span class="gold-amount">{{ currentCharacter.gold }}</span></div>
+                <div class="stats-col stats-col-2">
+                  <div class="player-stats-row">
+                    <img class="stat-icon" src="assets/items/life.webp" alt="Life" />
+                    <div>Life: {{ currentCharacter.life }} / {{ currentCharacter.maxLife }}</div>
+                  </div>
+                  <div class="player-stats-row">
+                    <img class="stat-icon" src="assets/items/mana.webp" alt="Mana" />
+                    <div>Mana: {{ currentCharacter.mana }} / {{ currentCharacter.maxMana }}</div>
+                  </div>
                 </div>
               </div>
-              <div class="stats-col stats-col-2">
+
+              <!-- Desktop: Original stat rows -->
+              <ng-container *ngIf="!isMobile">
+                <div class="player-stats-row">
+                  <img class="stat-icon" src="assets/items/hourglass.webp" alt="Level" />
+                  <div>Level {{ currentCharacter.level }}<br>XP: {{ currentCharacter.experience }}</div>
+                </div>
                 <div class="player-stats-row">
                   <img class="stat-icon" src="assets/items/life.webp" alt="Life" />
                   <div>Life: {{ currentCharacter.life }} / {{ currentCharacter.maxLife }}</div>
@@ -51,282 +81,310 @@
                   <img class="stat-icon" src="assets/items/mana.webp" alt="Mana" />
                   <div>Mana: {{ currentCharacter.mana }} / {{ currentCharacter.maxMana }}</div>
                 </div>
-              </div>
+                <div class="player-stats-row">
+                  <img class="stat-icon" src="assets/items/gold.webp" alt="Gold" />
+                  <div>Gold: <span class="gold-amount">{{ currentCharacter.gold }}</span></div>
+                </div>
+              </ng-container>
             </div>
-
-            <!-- Desktop: Original stat rows -->
-            <ng-container *ngIf="!isMobile">
-              <div class="player-stats-row">
-                <img class="stat-icon" src="assets/items/hourglass.webp" alt="Level" />
-                <div>Level {{ currentCharacter.level }}<br>XP: {{ currentCharacter.experience }}</div>
-              </div>
-              <div class="player-stats-row">
-                <img class="stat-icon" src="assets/items/life.webp" alt="Life" />
-                <div>Life: {{ currentCharacter.life }} / {{ currentCharacter.maxLife }}</div>
-              </div>
-              <div class="player-stats-row">
-                <img class="stat-icon" src="assets/items/mana.webp" alt="Mana" />
-                <div>Mana: {{ currentCharacter.mana }} / {{ currentCharacter.maxMana }}</div>
-              </div>
-              <div class="player-stats-row">
-                <img class="stat-icon" src="assets/items/gold.webp" alt="Gold" />
-                <div>Gold: <span class="gold-amount">{{ currentCharacter.gold }}</span></div>
-              </div>
-            </ng-container>
-          </div>
-        </ng-container>
-        <ng-template #noChar>
-          <div>No character loaded.</div>
-        </ng-template>
+          </ng-container>
+          <ng-template #noChar>
+            <div>No character loaded.</div>
+          </ng-template>
+        </div>
       </div>
-    </div>
 
-    <!-- Map (Center/Second) -->
-    <div class="main-section map" [ngClass]="{'collapsed': !isMapOpen}" [style.grid-area]="mapArea">
-      <button class="collapsible-header" (click)="toggleMap()">Map</button>
-      <div class="section-content" *ngIf="isMapOpen">
-        <div class="map-container" *ngIf="currentCharacter; else noMap">
-          <div class="map-grid" #mapGrid>
-            <div
-              *ngFor="let row of mapTiles; let rowIndex = index"
-              class="map-row"
-            >
+      <!-- Map (Center/Second) -->
+      <div class="main-section map" role="region" aria-label="Map" [ngClass]="{'collapsed': !isMapOpen}" [style.grid-area]="mapArea">
+        <h2 class="collapsible-header" (click)="toggleMap()" tabindex="0" role="button" [attr.aria-expanded]="isMapOpen" aria-controls="map-content">
+          {{ getCurrentMapDisplayName() }}
+        </h2>
+        <div id="map-content" class="section-content" *ngIf="isMapOpen">
+          <div class="map-container" *ngIf="currentCharacter; else noMap">
+            <div class="map-grid" #mapGrid>
               <div
-                *ngFor="let tile of row; let colIndex = index"
-                class="map-tile"
-                [class.player-tile]="tile.isPlayer"
-                [class.clickable-tile]="tile.isClickable"
-                [class.invalid-tile]="tile.imageSrc.includes('yard00.webp') && !tile.isPlayer"
-                (click)="onTileClick(tile)"
-                (keydown.enter)="onTileClick(tile)"
-                (keydown.space)="onTileClick(tile)"
-                [attr.aria-label]="getTileAriaLabel(tile)"
-                [tabindex]="tile.isClickable ? 0 : -1"
-                role="button"
+                *ngFor="let row of mapTiles; let rowIndex = index"
+                class="map-row"
               >
-                <img
-                  [src]="tile.imageSrc"
-                  [alt]="getTileAltText(tile)"
-                  class="tile-image"
-                  (error)="onTileImageError($event, tile)"
-                />
-                <div class="tile-overlay" *ngIf="tile.isPlayer">
-                  <div class="player-indicator">YOU</div>
+                <div
+                  *ngFor="let tile of row; let colIndex = index"
+                  class="map-tile"
+                  [class.player-tile]="tile.isPlayer"
+                  [class.clickable-tile]="tile.isClickable"
+                  [class.invalid-tile]="tile.imageSrc.includes('yard00.webp') && !tile.isPlayer"
+                  (click)="onTileClick(tile)"
+                  (keydown.enter)="onTileClick(tile)"
+                  (keydown.space)="onTileClick(tile)"
+                  [attr.aria-label]="getTileAriaLabel(tile)"
+                  [tabindex]="tile.isClickable ? 0 : -1"
+                  role="button"
+                >
+                  <img
+                    [src]="tile.imageSrc"
+                    [alt]="getTileAltText(tile)"
+                    class="tile-image"
+                    (error)="onTileImageError($event, tile)"
+                  />
+                  <div class="tile-overlay" *ngIf="tile.isPlayer">
+                    <div class="player-indicator">YOU</div>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-
-          <!-- Debug section - hidden from screen readers and keyboard navigation -->
-          <div class="debug-info"
-               style="margin-top: 20px; padding: 10px; background: rgba(0,0,0,0.1); border-radius: 8px;"
-               tabindex="-1"
-               aria-hidden="true">
-            <h4>Debug Info:</h4>
-            <p>Map Tiles Count: {{ mapTiles.length }}</p>
-            <p *ngIf="mapTiles.length > 0">First Row Tiles: {{ mapTiles[0].length }}</p>
-
-            <!-- Test buttons - not keyboard accessible -->
-            <div style="margin: 10px 0;">
-              <button (click)="generateTestMap()"
-                      style="margin-right: 10px; padding: 5px 10px;"
-                      tabindex="-1"
-                      aria-hidden="true">Generate Test Map</button>
-              <button (click)="generateMap()"
-                      style="padding: 5px 10px;"
-                      tabindex="-1"
-                      aria-hidden="true">Generate Real Map</button>
-            </div>
-
-            <div *ngFor="let row of mapTiles; let rowIndex = index">
-              <p>Row {{ rowIndex }}:</p>
-              <ul>
-                <li *ngFor="let tile of row">
-                  ({{ tile.x }}, {{ tile.y }}) - {{ tile.imageSrc }} - Player: {{ tile.isPlayer }} - Clickable: {{ tile.isClickable }}
-                </li>
-              </ul>
-            </div>
-          </div>
+          <ng-template #noMap>
+            <div class="no-map-message">No character loaded.</div>
+          </ng-template>
         </div>
-        <ng-template #noMap>
-          <div class="no-map-message">No character loaded.</div>
-        </ng-template>
       </div>
-    </div>
 
-    <!-- Tile Actions (Right/Third) -->
-    <div class="main-section tile-actions" [ngClass]="{'collapsed': !isTileActionsOpen}" [style.grid-area]="tileActionsArea">
-      <button class="collapsible-header" (click)="toggleTileActions()">Tile Actions</button>
-      <div class="section-content" *ngIf="isTileActionsOpen">
-        <div class="tile-actions-container" *ngIf="currentCharacter; else noTileActions">
-          <!-- Mobile: All actions in one grid -->
-          <div class="action-section" *ngIf="isMobile && getAllTileActions().length > 0">
-            <div class="action-grid">
-              <div
-                *ngFor="let action of getAllTileActions()"
-                class="action-item"
-                [ngClass]="{
-                  'npc-item': action.type === 'NPC',
-                  'object-item': action.type === 'Object',
-                  'portal-item': action.type === 'Portal'
-                }"
-                (click)="
-                  action.type === 'NPC' ? interactWithNPC(action) :
-                  action.type === 'Object' ? interactWithObject(action) :
-                  usePortal(action)
-                "
-                (keydown.enter)="
-                  action.type === 'NPC' ? interactWithNPC(action) :
-                  action.type === 'Object' ? interactWithObject(action) :
-                  usePortal(action)
-                "
-                (keydown.space)="
-                  action.type === 'NPC' ? interactWithNPC(action) :
-                  action.type === 'Object' ? interactWithObject(action) :
-                  usePortal(action)
-                "
-                tabindex="0"
-                [attr.aria-label]="
-                  action.type === 'NPC'
-                    ? 'Interact with ' + action.name
-                    : action.type === 'Object'
-                    ? 'Interact with ' + action.name
-                    : 'Use portal to ' + action.destination
-                "
-              >
-                <div class="card-type">{{ action.type }}</div>
-                <div class="card-type-line"></div>
-                <button
-                  class="info-btn"
+      <!-- Tile Actions (Right/Third) -->
+      <div class="main-section tile-actions" role="region" aria-label="Tile Actions" [ngClass]="{'collapsed': !isTileActionsOpen}" [style.grid-area]="tileActionsArea">
+        <h2 class="collapsible-header" (click)="toggleTileActions()" tabindex="0" role="button" [attr.aria-expanded]="isTileActionsOpen" aria-controls="tile-actions-content">
+          Tile Actions
+        </h2>
+        <div id="tile-actions-content" class="section-content" *ngIf="isTileActionsOpen">
+          <div class="tile-actions-container" *ngIf="currentCharacter; else noTileActions">
+            <!-- Mobile: All actions in one grid -->
+            <div class="action-section" *ngIf="isMobile && allTileActions.length > 0">
+              <div class="action-grid">
+                <div
+                  *ngFor="let action of allTileActions"
+                  class="action-item"
+                  [ngClass]="{
+                    'npc-item': action.type === 'NPC',
+                    'object-item': action.type === 'Object',
+                    'portal-item': action.type === 'Portal'
+                  }"
+                  (click)="
+                    action.type === 'NPC' ? interactWithNPC(action) :
+                    action.type === 'Object' ? interactWithObject(action) :
+                    usePortal(action)
+                  "
+                  (keydown.enter)="
+                    action.type === 'NPC' ? interactWithNPC(action) :
+                    action.type === 'Object' ? interactWithObject(action) :
+                    usePortal(action)
+                  "
+                  (keydown.space)="
+                    action.type === 'NPC' ? interactWithNPC(action) :
+                    action.type === 'Object' ? interactWithObject(action) :
+                    usePortal(action)
+                  "
                   tabindex="0"
-                  type="button"
-                  [attr.aria-label]="'Show info about ' + action.name"
-                  (click)="$event.stopPropagation(); openInfoModal(action)"
-                  (keydown.enter)="$event.stopPropagation(); openInfoModal(action)"
-                  (keydown.space)="$event.stopPropagation(); openInfoModal(action)"
-                >
-                  <span aria-hidden="true">&#9432;</span>
-                </button>
-                <img
-                  [src]="
+                  [attr.aria-label]="
                     action.type === 'NPC'
-                      ? 'assets/portraits/' + action.portrait + '.png'
-                      : 'assets/items/' + action.image + '.png'
-                  "
-                  [alt]="action.name"
-                  class="action-image"
-                  (error)="
-                    action.type === 'NPC'
-                      ? onPortraitError($event, action)
+                      ? 'Interact with ' + action.name
                       : action.type === 'Object'
-                      ? onObjectImageError($event, action)
-                      : onPortalImageError($event, action)
+                      ? 'Interact with ' + action.name
+                      : 'Use portal to ' + action.destination
                   "
-                />
-                <div class="action-name">{{ action.name }}</div>
+                >
+                  <div class="card-type">{{ action.type }}</div>
+                  <div class="card-type-line"></div>
+                  <button
+                    class="info-btn"
+                    tabindex="0"
+                    type="button"
+                    [attr.aria-label]="'Show info about ' + action.name"
+                    (click)="$event.stopPropagation(); openInfoModal(action)"
+                    (keydown.enter)="$event.stopPropagation(); openInfoModal(action)"
+                    (keydown.space)="$event.stopPropagation(); openInfoModal(action)"
+                  >
+                    <span aria-hidden="true">&#9432;</span>
+                  </button>
+                  <img
+                    [src]="getNPCImagePath(action)"
+                    [alt]="action.name"
+                    class="action-image"
+                    (error)="
+                      action.type === 'NPC'
+                        ? onPortraitError($event, action)
+                        : action.type === 'Object'
+                        ? onObjectImageError($event, action)
+                        : onPortalImageError($event, action)
+                    "
+                  />
+                  <div class="action-name">{{ action.name }}</div>
+                </div>
               </div>
             </div>
-          </div>
 
-          <!-- Info Modal for Mobile -->
-          <div *ngIf="isMobile && infoModalOpen" class="info-modal-overlay" (click)="closeInfoModal()">
-            <div class="info-modal-content" (click)="$event.stopPropagation()">
-              <h2>{{ infoModalAction?.name }}</h2>
-              <p>{{ infoModalAction?.description }}</p>
-              <button class="close-info-btn" (click)="closeInfoModal()" tabindex="0" aria-label="Close info">Close</button>
-            </div>
-          </div>
-
-          <!-- Desktop: Keep original sections -->
-          <div class="action-section" *ngIf="!isMobile && getCurrentNPCs().length > 0">
-            <h4 class="section-title">NPCs</h4>
-            <div class="action-grid">
-              <div
-                *ngFor="let npc of getCurrentNPCs()"
-                class="action-item npc-item"
-                (click)="interactWithNPC(npc)"
-                (keydown.enter)="interactWithNPC(npc)"
-                (keydown.space)="interactWithNPC(npc)"
-                tabindex="0"
-                [attr.aria-label]="'Interact with ' + npc.name"
-              >
-                <img
-                  [src]="'assets/portraits/' + npc.portrait + '.png'"
-                  [alt]="npc.name + ' portrait'"
-                  class="action-image"
-                  (error)="onPortraitError($event, npc)"
-                />
-                <div class="action-name">{{ npc.name }}</div>
-                <div class="action-description" *ngIf="npc.description">{{ npc.description }}</div>
+            <!-- Info Modal for Mobile -->
+            <div *ngIf="isMobile && infoModalOpen" class="info-modal-overlay" (click)="closeInfoModal()">
+              <div class="info-modal-content" (click)="$event.stopPropagation()">
+                <h2>{{ infoModalAction?.name }}</h2>
+                <p>{{ infoModalAction?.description }}</p>
+                <button #closeInfoBtn class="close-info-btn" (click)="closeInfoModal()" tabindex="0" aria-label="Close info">Close</button>
               </div>
             </div>
-          </div>
 
-          <div class="action-section" *ngIf="!isMobile && getCurrentObjects().length > 0">
-            <h4 class="section-title">Objects</h4>
-            <div class="action-grid">
-              <div
-                *ngFor="let object of getCurrentObjects()"
-                class="action-item object-item"
-                (click)="interactWithObject(object)"
-                (keydown.enter)="interactWithObject(object)"
-                (keydown.space)="interactWithObject(object)"
-                tabindex="0"
-                [attr.aria-label]="'Interact with ' + object.name"
-              >
-                <img
-                  [src]="'assets/items/' + object.image + '.png'"
-                  [alt]="object.name"
-                  class="action-image"
-                  (error)="onObjectImageError($event, object)"
-                />
-                <div class="action-name">{{ object.name }}</div>
-                <div class="action-description" *ngIf="object.description">{{ object.description }}</div>
+            <!-- Desktop: Keep original sections -->
+            <div class="action-section" *ngIf="!isMobile && currentNPCs.length > 0">
+              <h4 class="section-title">NPCs</h4>
+              <div class="action-grid">
+                <div
+                  *ngFor="let npc of currentNPCs"
+                  class="action-item npc-item"
+                  (click)="interactWithNPC(npc)"
+                  (keydown.enter)="interactWithNPC(npc)"
+                  (keydown.space)="interactWithNPC(npc)"
+                  tabindex="0"
+                  [attr.aria-label]="'Interact with ' + npc.name"
+                >
+                  <button
+                    class="info-btn"
+                    tabindex="0"
+                    type="button"
+                    [attr.aria-label]="'Show info about ' + npc.name"
+                    (click)="$event.stopPropagation(); openInfoModal(npc)"
+                    (keydown.enter)="$event.stopPropagation(); openInfoModal(npc)"
+                    (keydown.space)="$event.stopPropagation(); openInfoModal(npc)"
+                  >
+                    <span aria-hidden="true">&#9432;</span>
+                  </button>
+                  <img
+                    [src]="getNPCPortraitPath(npc)"
+                    [alt]="npc.name + ' portrait'"
+                    class="action-image"
+                    (error)="onPortraitError($event, npc)"
+                  />
+                  <div class="action-name">{{ npc.name }}</div>
+                </div>
               </div>
             </div>
-          </div>
 
-          <div class="action-section" *ngIf="!isMobile && getCurrentPortals().length > 0">
-            <h4 class="section-title">Portals</h4>
-            <div class="action-grid">
-              <div
-                *ngFor="let portal of getCurrentPortals()"
-                class="action-item portal-item"
-                (click)="usePortal(portal)"
-                (keydown.enter)="usePortal(portal)"
-                (keydown.space)="usePortal(portal)"
-                tabindex="0"
-                [attr.aria-label]="'Use portal to ' + portal.destination"
-              >
-                <img
-                  [src]="'assets/items/' + portal.image + '.png'"
-                  [alt]="portal.name"
-                  class="action-image"
-                  (error)="onPortalImageError($event, portal)"
-                />
-                <div class="action-name">{{ portal.name }}</div>
-                <div class="action-description" *ngIf="portal.description">{{ portal.description }}</div>
+            <div class="action-section" *ngIf="!isMobile && currentObjects.length > 0">
+              <h4 class="section-title">Objects</h4>
+              <div class="action-grid">
+                <div
+                  *ngFor="let object of currentObjects"
+                  class="action-item object-item"
+                  (click)="interactWithObject(object)"
+                  (keydown.enter)="interactWithObject(object)"
+                  (keydown.space)="interactWithObject(object)"
+                  tabindex="0"
+                  [attr.aria-label]="'Interact with ' + object.name"
+                >
+                  <button
+                    class="info-btn"
+                    tabindex="0"
+                    type="button"
+                    [attr.aria-label]="'Show info about ' + object.name"
+                    (click)="$event.stopPropagation(); openInfoModal(object)"
+                    (keydown.enter)="$event.stopPropagation(); openInfoModal(object)"
+                    (keydown.space)="$event.stopPropagation(); openInfoModal(object)"
+                  >
+                    <span aria-hidden="true">&#9432;</span>
+                  </button>
+                  <img
+                    [src]="'assets/items/' + object.image + '.png'"
+                    [alt]="object.name"
+                    class="action-image"
+                    (error)="onObjectImageError($event, object)"
+                  />
+                  <div class="action-name">{{ object.name }}</div>
+                </div>
               </div>
             </div>
-          </div>
 
-          <!-- No actions available -->
-          <div class="no-actions" *ngIf="getCurrentNPCs().length === 0 && getCurrentObjects().length === 0 && getCurrentPortals().length === 0">
-            <p>No actions available at this location.</p>
+            <div class="action-section" *ngIf="!isMobile && currentPortals.length > 0">
+              <h4 class="section-title">Portals</h4>
+              <div class="action-grid">
+                <div
+                  *ngFor="let portal of currentPortals"
+                  class="action-item portal-item"
+                  (click)="usePortal(portal)"
+                  (keydown.enter)="usePortal(portal)"
+                  (keydown.space)="usePortal(portal)"
+                  tabindex="0"
+                  [attr.aria-label]="'Use portal to ' + portal.destination"
+                >
+                  <button
+                    class="info-btn"
+                    tabindex="0"
+                    type="button"
+                    [attr.aria-label]="'Show info about ' + portal.name"
+                    (click)="$event.stopPropagation(); openInfoModal(portal)"
+                    (keydown.enter)="$event.stopPropagation(); openInfoModal(portal)"
+                    (keydown.space)="$event.stopPropagation(); openInfoModal(portal)"
+                  >
+                    <span aria-hidden="true">&#9432;</span>
+                  </button>
+                  <img
+                    [src]="'assets/items/' + portal.image + '.png'"
+                    [alt]="portal.name"
+                    class="action-image"
+                    (error)="onPortalImageError($event, portal)"
+                  />
+                  <div class="action-name">{{ portal.name }}</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- No actions available -->
+            <div class="no-actions" *ngIf="currentNPCs.length === 0 && currentObjects.length === 0 && currentPortals.length === 0">
+              <p>No actions available at this location.</p>
+            </div>
           </div>
+          <ng-template #noTileActions>
+            <div class="no-tile-actions-message">No character loaded.</div>
+          </ng-template>
         </div>
-        <ng-template #noTileActions>
-          <div class="no-tile-actions-message">No character loaded.</div>
-        </ng-template>
+      </div>
+
+      <!-- Menu (Bottom/Last) -->
+      <div class="main-section menu" role="navigation" aria-label="Game Menu" [ngClass]="{'collapsed': !isMenuOpen}" [style.grid-area]="menuArea">
+        <h2 class="collapsible-header" (click)="toggleMenu()" tabindex="0" role="button" [attr.aria-expanded]="isMenuOpen" aria-controls="menu-content">
+          Menu
+        </h2>
+        <div id="menu-content" class="section-content" *ngIf="isMenuOpen">
+          <app-bottom-icon-row />
+        </div>
       </div>
     </div>
+  </main>
 
-    <!-- Menu (Bottom/Last) -->
-    <div class="main-section menu" [ngClass]="{'collapsed': !isMenuOpen}" [style.grid-area]="menuArea">
-      <button class="collapsible-header" (click)="toggleMenu()">Menu</button>
-      <div class="section-content" *ngIf="isMenuOpen">
-        <span>Menu Placeholder</span>
+  <!-- Info Modal (global, for both mobile and desktop) -->
+  <div
+    *ngIf="infoModalOpen"
+    class="info-modal-overlay"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="modalTitle"
+    aria-describedby="modalDesc"
+    (click)="closeInfoModal()"
+  >
+    <div class="info-modal" (click)="$event.stopPropagation()">
+      <!-- Item Section -->
+      <div class="item-section">
+        <div class="item-portrait">
+          <img
+            [src]="getNPCImagePath(infoModalAction)"
+            [alt]="infoModalAction?.name + ' image'"
+            (error)="
+              infoModalAction?.type === 'NPC'
+                ? onPortraitError($event, infoModalAction)
+                : onObjectImageError($event, infoModalAction)
+            "
+          />
+        </div>
+        <div class="item-info">
+          <h3 class="item-name">{{ infoModalAction?.name }}</h3>
+          <div class="item-description">{{ infoModalAction?.description }}</div>
+        </div>
       </div>
+
+      <!-- Close Button -->
+      <button
+        #closeInfoBtn
+        class="close-info-btn"
+        (click)="closeInfoModal()"
+        tabindex="0"
+        aria-label="Close info"
+      >
+        ×
+      </button>
     </div>
   </div>
 </ion-content>

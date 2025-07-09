@@ -17,6 +17,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { CharStats } from '../../game/models/charstats.model';
 import { CharacterDeletionService } from '../../game/services/character-deletion.service';
+import { FocusManagerDirective } from '../../shared/focus-manager.directive';
 
 @Component({
   selector: 'app-character-details-modal',
@@ -198,8 +199,9 @@ import { CharacterDeletionService } from '../../game/services/character-deletion
           expand="block"
           color="danger"
           (click)="confirmDelete()"
-          class="delete-button">
-          <ion-icon slot="start" name="trash-outline"></ion-icon>
+          appFocusManager="remove"
+        >
+          <ion-icon name="trash-outline" slot="start"></ion-icon>
           Delete Character
         </ion-button>
       </div>
@@ -207,7 +209,7 @@ import { CharacterDeletionService } from '../../game/services/character-deletion
   `,
   styles: [`
     .character-details {
-      max-width: 600px;
+      max-width: 800px;
       margin: 0 auto;
     }
 
@@ -217,8 +219,10 @@ import { CharacterDeletionService } from '../../game/services/character-deletion
       gap: 1rem;
       margin-bottom: 1.5rem;
       padding: 1rem;
-      background: rgba(255, 255, 255, 0.05);
-      border-radius: 8px;
+      background: linear-gradient(135deg, #2c2c2c, #1a1a1a);
+      border-radius: 12px;
+      color: #ffffff;
+      border: 1px solid #404040;
     }
 
     .portrait-container {
@@ -228,38 +232,41 @@ import { CharacterDeletionService } from '../../game/services/character-deletion
     .character-portrait {
       width: 80px;
       height: 80px;
-      border-radius: 8px;
+      border-radius: 50%;
+      border: 3px solid rgba(255, 255, 255, 0.2);
       object-fit: cover;
     }
 
     .character-info h2 {
       margin: 0 0 0.5rem 0;
-      color: #f5d97e;
       font-size: 1.5rem;
+      font-weight: bold;
+      color: #f5d97e;
     }
 
     .character-subtitle {
       margin: 0 0 0.25rem 0;
-      color: #ccc;
       font-size: 1rem;
+      color: #cccccc;
     }
 
     .character-level {
       margin: 0 0 0.25rem 0;
+      font-size: 0.9rem;
       color: #4caf50;
       font-weight: 600;
     }
 
     .character-gender {
       margin: 0;
-      color: #888;
       font-size: 0.9rem;
+      color: #888888;
     }
 
     .stats-grid, .resistances-grid, .skills-grid, .info-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0.75rem;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
     }
 
     .stat-item, .resistance-item, .skill-item, .info-item {
@@ -267,27 +274,24 @@ import { CharacterDeletionService } from '../../game/services/character-deletion
       justify-content: space-between;
       align-items: center;
       padding: 0.5rem;
-      background: rgba(255, 255, 255, 0.03);
-      border-radius: 4px;
+      background: var(--ion-color-light);
+      border-radius: 8px;
     }
 
     .stat-label, .resistance-label, .skill-label, .info-label {
-      color: #ccc;
-      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--ion-color-medium);
     }
 
     .stat-value, .resistance-value, .skill-value, .info-value {
-      color: #f5d97e;
-      font-weight: 600;
-      font-size: 0.9rem;
-    }
-
-    .delete-button {
-      margin-top: 2rem;
+      font-weight: bold;
+      color: var(--ion-color-dark);
     }
 
     ion-card {
       margin-bottom: 1rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     }
 
     ion-card-header {
@@ -323,7 +327,8 @@ import { CharacterDeletionService } from '../../game/services/character-deletion
     IonCardHeader,
     IonCardTitle,
     IonCardContent,
-    IonIcon
+    IonIcon,
+    FocusManagerDirective
   ]
 })
 export class CharacterDetailsModalComponent {
@@ -338,6 +343,8 @@ export class CharacterDetailsModalComponent {
   }
 
   async confirmDelete() {
+    FocusManagerDirective.removeFocusFromNonAlertElements();
+
     const alert = await this.alertCtrl.create({
       header: 'Delete Character',
       message: `Are you sure you want to delete "${this.character.name}"? This will permanently remove the character and ALL associated data including inventory, spells, skills, quests, and game progress. This action cannot be undone.`,
@@ -352,10 +359,15 @@ export class CharacterDetailsModalComponent {
           role: 'destructive',
           cssClass: 'danger',
           handler: () => {
-            this.deleteCharacter();
+            console.log('Delete Permanently button clicked');
+            (async () => {
+              await this.deleteCharacter();
+            })();
           }
         }
-      ]
+      ],
+      keyboardClose: true,
+      backdropDismiss: false
     });
 
     await alert.present();
@@ -363,61 +375,58 @@ export class CharacterDetailsModalComponent {
 
   async deleteCharacter() {
     try {
-      // Show loading alert
+      FocusManagerDirective.removeFocusFromNonAlertElements();
+
+      console.log('Showing loading alert...');
       const loadingAlert = await this.alertCtrl.create({
         header: 'Deleting Character',
         message: 'Removing character and all associated data...',
-        backdropDismiss: false
+        backdropDismiss: false,
+        keyboardClose: false
       });
       await loadingAlert.present();
+      console.log('Loading alert presented.');
 
-      // Use the comprehensive deletion service
+      console.log('Calling deleteCharacterCompletely...');
       await this.characterDeletionService.deleteCharacterCompletely(
         this.character.id!,
         this.character.name
       );
+      console.log('deleteCharacterCompletely finished.');
 
-      // Verify deletion was successful
-      const verificationResult = await this.characterDeletionService.verifyCharacterDeletion(
-        this.character.id!,
-        this.character.name
-      );
-
+      console.log('Dismissing loading alert...');
       await loadingAlert.dismiss();
+      console.log('Loading alert dismissed.');
 
-      if (verificationResult) {
-        // Show success message
-        const successAlert = await this.alertCtrl.create({
-          header: 'Character Deleted',
-          message: `"${this.character.name}" and all associated data have been permanently removed.`,
-          buttons: ['OK']
-        });
-        await successAlert.present();
-
-        // Dismiss modal with deletion confirmation
-        this.modalCtrl.dismiss({ deleted: true });
-      } else {
-        // Show warning about potential incomplete deletion
-        const warningAlert = await this.alertCtrl.create({
-          header: 'Deletion Warning',
-          message: 'Character was deleted but some associated data may still exist. Please contact support if you notice any issues.',
-          buttons: ['OK']
-        });
-        await warningAlert.present();
-
-        // Still dismiss modal as main character was deleted
-        this.modalCtrl.dismiss({ deleted: true, warning: true });
-      }
+      console.log('About to dismiss modal after successful deletion');
+      this.modalCtrl.dismiss({ deleted: true });
+      console.log('Modal dismiss called');
     } catch (error) {
       console.error('Error deleting character:', error);
+
+      // Dismiss loading alert if it's still showing
+      try {
+        const loadingAlert = document.querySelector('ion-alert');
+        if (loadingAlert) {
+          await this.alertCtrl.dismiss();
+        }
+      } catch (dismissError) {
+        console.warn('Could not dismiss loading alert:', dismissError);
+      }
+
+      // Remove focus from non-alert elements before showing error alert
+      FocusManagerDirective.removeFocusFromNonAlertElements();
 
       // Show error alert
       const errorAlert = await this.alertCtrl.create({
         header: 'Deletion Failed',
         message: `Failed to delete character: ${error}. Please try again or contact support.`,
-        buttons: ['OK']
+        buttons: ['OK'],
+        keyboardClose: true,
+        backdropDismiss: false
       });
       await errorAlert.present();
+      await errorAlert.onDidDismiss();
     }
   }
 }

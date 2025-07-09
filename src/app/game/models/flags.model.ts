@@ -1,6 +1,7 @@
 export interface Flags {
   id?: string;
   charname: string; // Legacy field name from old demo
+  userId?: string;
 
   // Home location flags
   firelit: string; // 'y' or 'n' - is the fireplace lit
@@ -29,6 +30,9 @@ export interface Flags {
   quest3: number; // Quest 3 completion
   quest4: number; // Quest 4 completion
   quest5: number; // Quest 5 completion
+
+  // NPC interaction flags
+  shepfeed: number; // Old Shep feeding state (0-3)
 
   // Item flags
   thehiddenkey: number; // Hidden key state (0-3)
@@ -69,6 +73,7 @@ export const DEFAULT_FLAGS: Omit<Flags, 'charname'> = {
   quest3: 0,
   quest4: 0,
   quest5: 0,
+  shepfeed: 0,
   thehiddenkey: 0,
   familycrest: 0,
   tutorial_completed: 0,

@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { IonicModule, ActionSheetController, ModalController } from '@ionic/angular';
@@ -7,6 +7,7 @@ import { AppHeaderComponent } from 'src/app/shared/header/app-header.component';
 import { AppFooterComponent } from 'src/app/shared/footer/app-footer.component';
 import { RACE_BONUSES, CLASS_BONUSES, getRaceBonus, getClassBonus } from 'src/app/game/config/character-config';
 import { CharacterService } from 'src/app/game/services/character.service';
+import { InventoryService } from 'src/app/game/services/inventory.service';
 import { CharStats } from 'src/app/game/models/charstats.model';
 
 @Component({
@@ -22,6 +23,7 @@ export class CreateCharacterPage {
   private modalCtrl: ModalController = inject(ModalController);
   private router: Router = inject(Router);
   private characterService: CharacterService = inject(CharacterService);
+  private inventoryService: InventoryService = inject(InventoryService);
 
   characterForm: FormGroup;
   formError: string | null = null;
@@ -75,6 +77,16 @@ export class CreateCharacterPage {
     });
   }
 
+  ionViewWillEnter() {
+    // Reset theme to default gold color when entering create-character page
+    const defaultThemeColor = '#6b4e26'; // Default gold color
+    document.documentElement.style.setProperty('--theme-color', defaultThemeColor);
+    document.documentElement.style.setProperty('--ion-color-primary', defaultThemeColor);
+    document.documentElement.style.setProperty('--header-text-color', '#181200');
+    // Clear the localStorage theme color to prevent game theme from persisting
+    localStorage.removeItem('themeColor');
+  }
+
   // Generate random stats like the old demo
   generateStats(): void {
     const formData = this.characterForm.value;
@@ -102,7 +114,8 @@ export class CreateCharacterPage {
       mindResist: Math.floor(Math.random() * 11),
       holdResist: Math.floor(Math.random() * 11),
       criticalResist: Math.floor(Math.random() * 11),
-      bleedResist: Math.floor(Math.random() * 11)
+      bleedResist: Math.floor(Math.random() * 11),
+      immobilizeResist: Math.floor(Math.random() * 11)
     };
 
     // Base skills
@@ -162,6 +175,8 @@ export class CreateCharacterPage {
         (raceBonus?.bonuses.criticalResist || 0) + (classBonus?.bonuses.criticalResist || 0)),
       bleedResist: Math.max(0, baseResistances.bleedResist +
         (raceBonus?.bonuses.bleedResist || 0) + (classBonus?.bonuses.bleedResist || 0)),
+      immobilizeResist: Math.max(0, baseResistances.immobilizeResist +
+        (raceBonus?.bonuses.immobilizeResist || 0) + (classBonus?.bonuses.immobilizeResist || 0)),
 
       // Skills with bonuses
       cooking: baseSkills.cooking,
@@ -187,7 +202,10 @@ export class CreateCharacterPage {
       componentProps: {
         portraitOptions: this.portraitOptions,
         selectedPortrait: this.selectedPortrait
-      }
+      },
+      backdropDismiss: true,
+      showBackdrop: true,
+      keyboardClose: true
     });
 
     await modal.present();
@@ -196,6 +214,17 @@ export class CreateCharacterPage {
     if (data && data.selectedPortrait) {
       this.selectedPortrait = data.selectedPortrait;
     }
+
+    // Wait for modal to be fully dismissed before managing focus
+    await modal.onDidDismiss();
+
+    // Ensure focus returns to the trigger button after modal dismissal
+    setTimeout(() => {
+      const portraitButton = document.getElementById('portraitButton');
+      if (portraitButton) {
+        portraitButton.focus();
+      }
+    }, 200);
   }
 
   selectPortrait(option: any): void {
@@ -246,6 +275,13 @@ export class CreateCharacterPage {
           agility: this.generatedStats.agility,
           wisdom: this.generatedStats.wisdom,
           luck: this.generatedStats.luck,
+          // Combat stats
+          defense: 0,
+          damage: 0,
+          critical: 0,
+          // Character achievements
+          wins: 0,
+          deaths: 0,
           guild: '',
           title: 'Peasant',
           cond: 'Good',
@@ -260,11 +296,17 @@ export class CreateCharacterPage {
           holdResist: this.generatedStats.holdResist,
           criticalResist: this.generatedStats.criticalResist,
           bleedResist: this.generatedStats.bleedResist,
+          immobilizeResist: this.generatedStats.immobilizeResist || 0,
+          // Skills
           cooking: this.generatedStats.cooking,
           alchemy: this.generatedStats.alchemy,
           enchanting: this.generatedStats.enchanting,
           lockpicking: this.generatedStats.lockpicking,
+          blockpicking: 0, // Bonus lockpicking skill
+          bthieving: 0, // Bonus thieving skill
           magicFind: this.generatedStats.magicFind,
+          // Bonus stats
+          bluck: 0, // Bonus luck
           map: 'homeup',
           mapdimensions: 33,
           xaxis: 2,
@@ -279,6 +321,9 @@ export class CreateCharacterPage {
 
         // Save character to Firebase
         await this.characterService.createCharacter(characterData);
+
+        // Initialize inventory for the new character
+        await this.inventoryService.initializeForNewCharacter(characterData.name);
 
         // Navigate to dashboard
         this.router.navigate(['/dashboard']);
@@ -317,17 +362,18 @@ export class CreateCharacterPage {
       </ion-toolbar>
     </ion-header>
     <ion-content class="ion-padding">
-      <div class="portrait-grid">
+      <div class="portrait-grid" role="grid" aria-label="Portrait selection grid">
         <div
-          *ngFor="let portrait of portraitOptions"
+          *ngFor="let portrait of portraitOptions; let i = index"
           class="portrait-item"
           [class.selected]="portrait.id === selectedPortrait"
           (click)="selectPortrait(portrait.id)"
-          tabindex="0"
           role="button"
+          tabindex="0"
           [attr.aria-label]="'Select ' + portrait.name + ' portrait'"
-          (keydown.enter)="selectPortrait(portrait.id)"
-          (keydown.space)="selectPortrait(portrait.id)">
+          [attr.aria-pressed]="portrait.id === selectedPortrait"
+          (keydown)="onPortraitKeydown($event, portrait.id)"
+        >
           <ion-img [src]="portrait.image" [alt]="portrait.name"></ion-img>
           <p class="portrait-name">{{ portrait.name }}</p>
         </div>
@@ -352,33 +398,21 @@ export class CreateCharacterPage {
       cursor: pointer;
       transition: all 0.2s ease;
       background: rgba(255, 255, 255, 0.05);
+      outline: none;
     }
 
-    .portrait-item:hover {
+    .portrait-item:hover,
+    .portrait-item:focus {
       border-color: var(--ion-color-primary);
       background: rgba(255, 255, 255, 0.1);
+      outline: 2px solid #cccccc !important;
+      outline-offset: 2px !important;
     }
 
     .portrait-item.selected {
       border-color: var(--ion-color-primary);
       background: rgba(var(--ion-color-primary-rgb), 0.2);
       box-shadow: 0 0 10px var(--ion-color-primary);
-    }
-
-    .portrait-item:focus {
-      outline: 2px solid #cccccc !important;
-      outline-offset: 2px !important;
-      border-color: #cccccc !important;
-      background: rgba(255, 255, 255, 0.1) !important;
-    }
-
-    .portrait-item:focus ion-img {
-      opacity: 1 !important;
-      filter: none !important;
-    }
-
-    .portrait-item:focus .portrait-name {
-      color: #cccccc !important;
     }
 
     .portrait-item ion-img {
@@ -388,11 +422,6 @@ export class CreateCharacterPage {
       object-fit: cover;
       opacity: 1;
       transition: opacity 0.2s ease;
-    }
-
-    .portrait-item:focus-within ion-img {
-      opacity: 1 !important;
-      filter: none !important;
     }
 
     .portrait-name {
@@ -405,20 +434,62 @@ export class CreateCharacterPage {
   standalone: true,
   imports: [CommonModule, IonicModule]
 })
-export class PortraitSelectorModal {
+export class PortraitSelectorModal implements OnInit {
   portraitOptions: any[] = [];
   selectedPortrait: string = '';
 
   constructor(private modalCtrl: ModalController) {}
+
+  ngOnInit() {
+    // Listen for modal dismissal events
+    this.modalCtrl.getTop().then(modal => {
+      if (modal) {
+        modal.onWillDismiss().then(() => {
+          this.removeAllFocus();
+        });
+      }
+    });
+  }
 
   selectPortrait(portraitId: string) {
     this.selectedPortrait = portraitId;
     this.dismiss(portraitId);
   }
 
+  onPortraitKeydown(event: KeyboardEvent, portraitId: string) {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      this.selectPortrait(portraitId);
+    } else if (event.key === 'Escape') {
+      event.preventDefault();
+      this.dismiss();
+    }
+  }
+
   dismiss(selectedPortrait?: string) {
+    // Remove focus from all elements in the modal
+    this.removeAllFocus();
+
     this.modalCtrl.dismiss({
       selectedPortrait: selectedPortrait || this.selectedPortrait
     });
+  }
+
+  private removeAllFocus() {
+    // Remove focus from any focused element
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
+
+    // Also remove focus from any elements within the modal
+    const modalElement = document.querySelector('ion-modal');
+    if (modalElement) {
+      const focusableElements = modalElement.querySelectorAll('button, [tabindex], input, select, textarea, a[href]');
+      focusableElements.forEach((element: Element) => {
+        if (element instanceof HTMLElement) {
+          element.blur();
+        }
+      });
+    }
   }
 }

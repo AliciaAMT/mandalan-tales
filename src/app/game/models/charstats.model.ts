@@ -1,8 +1,7 @@
 export interface CharStats {
   id?: string; // Added automatically by Firestore query with { idField: 'id' }
-  userId: string; // Firebase UID or user ref
-
-  name: string;
+  userId: string; // Firebase UID or user ref (required)
+  name: string; // Character name (required)
   portrait: string;
   race: string;
   class: string;
@@ -32,6 +31,16 @@ export interface CharStats {
   agility: number;
   wisdom: number;
   luck: number;
+  bluck: number; // Bonus luck
+
+  // Combat stats
+  defense: number;
+  damage: number;
+  critical: number;
+
+  // Character achievements
+  wins: number;
+  deaths: number;
 
   // Resistances
   fireResist: number;
@@ -45,12 +54,15 @@ export interface CharStats {
   holdResist: number;
   criticalResist: number;
   bleedResist: number;
+  immobilizeResist: number;
 
   // Skills
   cooking: number;
   alchemy: number;
   enchanting: number;
   lockpicking: number;
+  blockpicking: number; // Bonus lockpicking skill
+  bthieving: number; // Bonus thieving skill
   magicFind: number;
 
   // Map and position

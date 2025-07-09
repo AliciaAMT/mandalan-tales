@@ -1,7 +1,7 @@
 import { AppHeaderComponent } from "../shared/header/app-header.component";
 import { AppFooterComponent } from "../shared/footer/app-footer.component";
 import { FormsModule } from '@angular/forms';
-import { AfterViewInit, Component, inject, OnDestroy } from '@angular/core';
+import { AfterViewInit, Component, inject, OnDestroy, effect } from '@angular/core';
 import { AuthService } from '../services/auth.service';
 import { Router, RouterModule } from '@angular/router';
 import { NgIf } from "@angular/common";
@@ -28,10 +28,10 @@ declare global {
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
   standalone: true,
-  imports: [AppHeaderComponent, AppFooterComponent, FormsModule, NgIf, STANDALONE_IMPORTS, RouterModule/*, SkipLinkComponent*/],
+  imports: [AppHeaderComponent, AppFooterComponent, FormsModule, NgIf, STANDALONE_IMPORTS, RouterModule],
 })
 export class LoginComponent implements AfterViewInit, OnDestroy {
-  private authService: AuthService = inject(AuthService);
+  public authService: AuthService = inject(AuthService);
   private router: Router = inject(Router);
   private toastCtrl: ToastController = inject(ToastController);
   private alertCtrl: AlertController = inject(AlertController);
@@ -48,6 +48,15 @@ export class LoginComponent implements AfterViewInit, OnDestroy {
 
   // Use the signal directly
   alreadyLoggedIn = this.authService.isLoggedIn;
+
+  constructor() {
+    // Redirect to dashboard if already logged in
+    effect(() => {
+      if (this.authService.authInitialized() && this.authService.user()) {
+        this.router.navigate(['/dashboard']);
+      }
+    });
+  }
 
   togglePasswordVisibility(): void {
     this.showPassword = !this.showPassword;
@@ -103,10 +112,6 @@ export class LoginComponent implements AfterViewInit, OnDestroy {
     }
 
     try {
-      // Temporarily disable reCAPTCHA for now
-      // TODO: Re-enable once proper invisible reCAPTCHA v2 is configured
-
-      // Proceed with login directly
       const cred = await this.authService.login(this.email, this.password);
 
       if (!cred.user.emailVerified) {
@@ -157,7 +162,9 @@ export class LoginComponent implements AfterViewInit, OnDestroy {
             this.resendVerificationEmail(user);
           }
         }
-      ]
+      ],
+      backdropDismiss: false,
+      keyboardClose: true
     });
 
     await alert.present();

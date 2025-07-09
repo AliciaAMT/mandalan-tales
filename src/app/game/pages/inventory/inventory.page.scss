@@ -1,0 +1,351 @@
+// Inventory Page Styles
+.inventory-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0;
+  background: #000;
+  min-height: 100vh;
+}
+
+.back-button-container {
+  margin-bottom: 1rem;
+
+  .back-button {
+    --color: #ffffff;
+    font-weight: 500;
+  }
+}
+
+.inventory-content {
+  .page-title {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #ffffff;
+    margin-bottom: 1.5rem;
+    text-align: center;
+  }
+}
+
+// Inventory Sections
+.inventory-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.inventory-section {
+  border: 1px solid #333;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #141414;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
+  min-width: 0;
+  min-height: 0;
+  transition: flex 0.3s, max-height 0.3s, min-height 0.3s;
+
+  &.collapsed {
+    min-height: 0;
+    min-width: 0;
+    max-height: 48px;
+    flex: 0 0 auto;
+  }
+
+  &.collapsed .section-content {
+    display: none;
+  }
+}
+
+// Collapsible Header (matching main game page)
+.collapsible-header {
+  background: linear-gradient(90deg, var(--ion-color-primary) 0%, color-mix(in srgb, var(--ion-color-primary) 80%, white) 100%);
+  color: var(--header-text-color, #181200);
+  font-weight: bold;
+  border: none;
+  padding: 12px 16px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  text-align: left;
+  width: 100%;
+  box-sizing: border-box;
+
+  &:hover {
+    background: linear-gradient(90deg, color-mix(in srgb, var(--ion-color-primary) 90%, white) 0%, color-mix(in srgb, var(--ion-color-primary) 70%, white) 100%);
+  }
+
+  &:focus {
+    outline: 3px solid #fff;
+    outline-offset: -3px;
+    border: 3px solid #fff;
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.8), 0 0 30px rgba(255, 255, 255, 0.4);
+  }
+}
+
+// Section Content
+.section-content {
+  padding: 16px;
+  flex: 1 1 auto;
+  overflow: visible;
+  transition: opacity 0.2s;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  height: auto;
+  min-height: 0;
+  margin-top: 0;
+  border-radius: 0 0 8px 8px;
+  background: #141414;
+}
+
+// Equipped Items Grid
+.equipped-items-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 1rem;
+  width: 100%;
+}
+
+.equipment-slot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+
+  .slot-label {
+    font-weight: 600;
+    color: #888;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .slot-content {
+    border: 2px solid #fff !important;
+    border-radius: 8px;
+    padding: 1rem;
+    min-height: 80px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: #000 !important;
+    transition: all 0.3s ease;
+    width: 100%;
+
+    .inventory-item-name {
+      text-align: center;
+      font-weight: bold;
+      font-size: 0.9rem;
+      margin-top: 0.5rem;
+      word-wrap: break-word;
+      max-width: 100%;
+    }
+
+    &.clickable {
+      cursor: pointer;
+
+      &:hover {
+        border-color: var(--ion-color-primary, #fff) !important;
+        background: #111 !important;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
+      }
+
+      &:active {
+        transform: translateY(0);
+        box-shadow: 0 2px 6px rgba(255, 255, 255, 0.1);
+      }
+    }
+
+    &.empty {
+      border-style: dashed;
+      background: #000 !important;
+      color: #fff !important;
+
+      ion-icon {
+        font-size: 1.5rem;
+        margin-bottom: 0.5rem;
+        color: #fff !important;
+      }
+
+      span {
+        font-size: 0.8rem;
+        color: #fff !important;
+      }
+    }
+  }
+}
+
+// Pocket Filters
+.pocket-filters {
+  margin-bottom: 1rem;
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.filter-btn {
+  background: #222;
+  color: #fff;
+  border: 1px solid var(--ion-color-primary, #888);
+  border-radius: 16px;
+  padding: 0.4em 1.2em;
+  font-size: 0.95em;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, border 0.2s;
+  outline: none;
+  white-space: nowrap;
+  min-width: 80px;
+  box-sizing: border-box;
+}
+
+.filter-btn:hover, .filter-btn:focus {
+  background: var(--ion-color-primary, #444);
+  color: #fff;
+  border-color: var(--ion-color-primary, #fff);
+}
+
+.filter-btn.active {
+  background: var(--ion-color-primary, #fff);
+  color: #181200;
+  border-color: var(--ion-color-primary, #fff);
+}
+
+@media (max-width: 600px) {
+  .pocket-filters {
+    gap: 0.3rem;
+    justify-content: flex-start;
+  }
+  .filter-btn {
+    font-size: 0.9em;
+    min-width: 60px;
+    padding: 0.3em 0.7em;
+  }
+}
+
+// Pocket Items
+.pocket-items {
+  width: 100%;
+  min-height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 1rem;
+
+  .empty-message {
+    color: #888;
+    font-style: italic;
+    margin: 0;
+  }
+}
+
+.inventory-items-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: flex-start;
+  margin-top: 1rem;
+}
+
+.inventory-item-card {
+  background: #111;
+  color: #fff;
+  border-radius: 0.75rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.6);
+  border: 1px solid #222;
+  padding: 1rem 0.75rem 0.75rem 0.75rem;
+  margin: 0;
+  min-width: 140px;
+  max-width: 180px;
+  flex: 1 1 140px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.inventory-item-image {
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.inventory-item-name {
+  font-weight: bold;
+  font-size: 1.1rem;
+  margin-bottom: 0.25rem;
+}
+
+.inventory-item-details {
+  font-size: 0.95rem;
+  margin-bottom: 0.25rem;
+}
+
+.inventory-item-desc {
+  font-size: 0.85rem;
+  color: #ccc;
+  margin-top: 0.25rem;
+}
+
+@media (max-width: 600px) {
+  .inventory-items-grid {
+    gap: 0.5rem;
+  }
+  .inventory-item-card {
+    min-width: 120px;
+    max-width: 100%;
+    padding: 0.75rem 0.5rem 0.5rem 0.5rem;
+  }
+  .inventory-item-image {
+    width: 48px;
+    height: 48px;
+  }
+}
+
+// Responsive Design
+@media (max-width: 768px) {
+  .inventory-container {
+    padding: 0 0.5rem;
+  }
+
+  .equipped-items-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+
+  .pocket-filters {
+    ion-segment {
+      font-size: 0.7rem;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .equipped-items-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+// Dark mode support
+@media (prefers-color-scheme: dark) {
+  .inventory-section {
+    background: var(--ion-color-dark);
+    border-color: var(--ion-color-dark-tint);
+  }
+
+  .slot-content {
+    background: var(--ion-color-dark-tint) !important;
+    border-color: var(--ion-color-dark-shade) !important;
+
+    &.empty {
+      background: var(--ion-color-dark-shade) !important;
+    }
+  }
+}
