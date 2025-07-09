@@ -18,7 +18,8 @@ import {
   documentTextOutline,
   trashOutline,
   alertCircleOutline,
-  arrowBackOutline
+  arrowBackOutline,
+  addCircleOutline
 } from 'ionicons/icons';
 
 addIcons({
@@ -30,7 +31,8 @@ addIcons({
   'document-text-outline': documentTextOutline,
   'trash-outline': trashOutline,
   'alert-circle-outline': alertCircleOutline,
-  'arrow-back': arrowBackOutline
+  'arrow-back': arrowBackOutline,
+  'add-circle-outline': addCircleOutline
 });
 
 

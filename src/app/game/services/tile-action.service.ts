@@ -70,7 +70,9 @@ export class TileActionService {
         itemrarity: 'Relic',
         itemlevel: 1,
         keylock: 1,
-        othertype: 'Container'
+        othertype: 'Container',
+        contentType: 'fixed',
+        fixedContent: 'Sharpened Bone Dagger'
       },
       flagKey: 'bedroombed',
       questFlagKey: 'thehiddenkey',
@@ -311,7 +313,7 @@ export class TileActionService {
       itemName: 'Chest',
       itemDescription: 'A locked chest. It looks like it requires a lockpick to open.',
       itemImage: 'chest', itemType: 'Other',
-      itemOptions: { itemrarity: 'Common', itemlevel: 1, keylock: 1, othertype: 'Container' },
+      itemOptions: { itemrarity: 'Common', itemlevel: 1, keylock: 1, othertype: 'Container', contentType: 'random' },
       flagKey: 'homechest', experience: 5,
       message: 'You search the chest. It is locked. You need a lockpick to open it.',
       alreadyFoundMessage: 'You search the Chest but find nothing.',
@@ -366,7 +368,7 @@ export class TileActionService {
     {
       map: 'home', x: 3, y: 2, action: 'search',
       items: [
-        { name: 'Tinderbox', description: 'This tinderbox contains items to start a fire including flint and tinder.', image: 'tinderbox', type: 'Other', options: { itemrarity: 'Common', itemlevel: 1, othertype: 'Container' } },
+        { name: 'Tinderbox', description: 'This tinderbox contains items to start a fire including flint and tinder.', image: 'tinderbox', type: 'Other', options: { itemrarity: 'Common', itemlevel: 1, othertype: 'Container', contentType: 'NA' } },
         { name: 'Firewood', description: 'With firewood and flint you can start a fire in the proper area such as a fireplace or campsite.', image: 'firewood', type: 'Other', options: { itemrarity: 'Common', itemlevel: 1, keep: 3, othertype: 'Firewood' } }
       ],
       flagKey: 'homefireplace', experience: 10,
@@ -398,7 +400,7 @@ export class TileActionService {
       itemName: 'Purse',
       itemDescription: 'The only way to know what this purse contains is to open it.',
       itemImage: 'purse', itemType: 'Other',
-      itemOptions: { itemrarity: 'Common', itemlevel: 1, othertype: 'Container' },
+      itemOptions: { itemrarity: 'Common', itemlevel: 1, othertype: 'Container', contentType: 'gold' },
       flagKey: 'homedrawer', experience: 5,
       message: 'You search the end table drawer and find a purse.',
       alreadyFoundMessage: 'You search the End Table Drawer but find nothing.'

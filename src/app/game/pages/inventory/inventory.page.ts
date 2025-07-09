@@ -3,20 +3,20 @@ import { CommonModule } from '@angular/common';
 import { IonicModule } from '@ionic/angular';
 import { Router, RouterModule } from '@angular/router';
 import { FocusManagerDirective } from '../../../shared/focus-manager.directive';
-import { addIcons } from 'ionicons';
-import { addCircleOutline } from 'ionicons/icons';
+import { ItemDetailsModalComponent } from './item-details-modal.component';
+import { ContainerModalComponent } from './container-modal.component';
 import { AuthService } from '../../../services/auth.service';
 import { SettingsService } from '../../services/settings.service';
 import { InventoryService } from '../../services/inventory.service';
-import { DEFAULT_THEME_COLOR } from '../../models/settings.model';
 import { Inventory } from '../../models/inventory.model';
-import { ItemDetailsModalComponent } from './item-details-modal.component';
-import { ModalController } from '@ionic/angular';
+import { ModalController } from '@ionic/angular/standalone';
+import { rollLoot, LootItem } from '../../services/loot-tables';
+import { CharacterService } from '../../services/character.service';
 
 @Component({
   selector: 'app-inventory',
   standalone: true,
-  imports: [CommonModule, IonicModule, RouterModule, FocusManagerDirective, ItemDetailsModalComponent],
+  imports: [CommonModule, IonicModule, RouterModule, FocusManagerDirective, ItemDetailsModalComponent, ContainerModalComponent],
   templateUrl: './inventory.page.html',
   styleUrls: ['./inventory.page.scss']
 })
@@ -26,10 +26,10 @@ export class InventoryPage implements OnInit {
   private settingsService = inject(SettingsService);
   public inventoryService = inject(InventoryService);
   private modalCtrl = inject(ModalController);
+  private characterService = inject(CharacterService);
 
   constructor() {
-    // Register the icons we're using
-    addIcons({ addCircleOutline });
+    // Initialize any required services
   }
 
   // Collapsible sections state
@@ -49,6 +49,210 @@ export class InventoryPage implements OnInit {
   foodPocketItems: Inventory[] = [];
 
   selectedItem: Inventory | null = null;
+
+  containerModalOpen = false;
+  containerModalItem: Inventory | null = null;
+  containerModalHasKey = false;
+  containerModalHasLockpick = false;
+  containerModalFoundItems: string[] = [];
+  containerModalOpened = false; // Track if container has been opened
+  itemDetailsLootResult: string[] = []; // Track loot result for item details modal
+
+  async openContainerModal(item: Inventory) {
+    console.log('openContainerModal called', item);
+    console.log('item.keylock:', item.keylock);
+    console.log('item.othertype:', item.othertype);
+    console.log('item.contentType:', item.contentType);
+
+    // Handle container opening directly in the item details modal
+    if (item.keylock === 0 && item.othertype === 'Container') {
+      await this.handleContainerLoot(item);
+      // Keep the item details modal open to show the result
+      return;
+    }
+
+    // For locked containers, open the container modal
+    this.containerModalItem = item;
+    this.containerModalHasKey = false; // TODO: check inventory for key
+    this.containerModalHasLockpick = true; // TODO: check inventory for lockpick
+    this.containerModalFoundItems = [];
+    this.containerModalOpen = true;
+  }
+
+  async handleContainerLoot(item: Inventory) {
+    // --- Loot logic ---
+    if (item.keylock === 0 && item.othertype === 'Container') {
+      if (item.contentType === 'gold') {
+        const gold = rollLoot('gold');
+        console.log('[Container Gold Roll]', gold);
+        if (typeof gold === 'number' && gold > 0) {
+          const char = this.characterService.getCurrentCharacter();
+          if (char) {
+            await this.characterService.updateCharacter(char.id!, { gold: (char.gold || 0) + gold });
+            this.itemDetailsLootResult = [`You found ${gold} gold coins!`];
+            await this.inventoryService.removeItem(item.itemname, 1);
+          } else {
+            this.itemDetailsLootResult = ['No character found to add gold.'];
+          }
+        } else {
+          this.itemDetailsLootResult = ['No gold found.'];
+          await this.inventoryService.removeItem(item.itemname, 1);
+        }
+      } else if (item.contentType === 'random') {
+        const loot = rollLoot('random');
+        console.log('[Container Random Loot Roll]', loot);
+        if (loot && typeof loot === 'object') {
+          await this.inventoryService.addItem({
+            itemname: loot.name,
+            itemdescription: loot.description,
+            itemtype: loot.type,
+            itemimage: loot.image,
+            itemlevel: loot.level,
+            itemrarity: loot.rarity,
+            itemvalue: loot.value,
+            keep: 1,
+            ['equipable']: loot['equipable'] || 0,
+            ['equiplocation']: loot['equiplocation'] || '',
+            ['weapontype']: loot['weapontype'] || '',
+            ['armortype']: loot['armortype'] || '',
+            ['acctype']: loot['acctype'] || '',
+            ['enhancement1']: loot['enhancement1'] || '',
+            ['enhancement2']: loot['enhancement2'] || '',
+            ['enhancement3']: loot['enhancement3'] || '',
+            ['legendary']: loot['legendary'] || 0
+          });
+          this.itemDetailsLootResult = [`You found: ${loot.name} (Level ${loot.level} ${loot.rarity})`];
+          await this.inventoryService.removeItem(item.itemname, 1);
+        } else {
+          this.itemDetailsLootResult = ['The container is empty.'];
+          await this.inventoryService.removeItem(item.itemname, 1);
+        }
+      } else if (item.contentType === 'fixed' && item.fixedContent) {
+        await this.inventoryService.addItem({
+          itemname: item.fixedContent,
+          itemdescription: 'A special item found in a fixed-content container.',
+          itemtype: 'Other',
+          itemimage: '',
+          itemlevel: 1,
+          itemrarity: 'Relic',
+          itemvalue: 0,
+          keep: 1
+        });
+        this.itemDetailsLootResult = [item.fixedContent];
+        await this.inventoryService.removeItem(item.itemname, 1);
+      } else {
+        this.itemDetailsLootResult = ['The container is empty.'];
+        await this.inventoryService.removeItem(item.itemname, 1);
+      }
+
+      // Refresh inventory data to reflect the changes
+      await this.loadInventoryData();
+    }
+  }
+
+  async onContainerOpen() {
+    if (!this.containerModalItem || this.containerModalOpened) return;
+    const item = this.containerModalItem;
+    this.containerModalOpened = true; // Prevent multiple opens
+    await this.handleContainerLoot(item);
+  }
+
+  closeContainerModal() {
+    this.containerModalOpen = false;
+    this.containerModalItem = null;
+    this.containerModalFoundItems = [];
+    this.containerModalOpened = false; // Reset the opened flag
+  }
+
+  async onContainerUnlock() {
+    if (!this.containerModalItem || this.containerModalOpened) return;
+    // Use the same loot logic as openContainerModal for unlocking
+    const item = this.containerModalItem;
+    this.containerModalOpened = true; // Prevent multiple opens
+    if (item.othertype === 'Container') {
+      if (item.contentType === 'gold') {
+        const gold = rollLoot('gold');
+        console.log('[Unlock Gold Roll]', gold);
+        if (typeof gold === 'number' && gold > 0) {
+          const char = this.characterService.getCurrentCharacter();
+          if (char) {
+            await this.characterService.updateCharacter(char.id!, { gold: (char.gold || 0) + gold });
+            this.containerModalFoundItems = [`You found ${gold} gold coins!`];
+            // Remove the container after successful loot
+            await this.inventoryService.removeItem(item.itemname, 1);
+          } else {
+            this.containerModalFoundItems = ['No character found to add gold.'];
+          }
+        } else {
+          this.containerModalFoundItems = ['No gold found.'];
+          // Remove the container even if empty
+          await this.inventoryService.removeItem(item.itemname, 1);
+        }
+      } else if (item.contentType === 'random') {
+        const loot = rollLoot('random');
+        console.log('[Unlock Random Loot Roll]', loot);
+        if (loot && typeof loot === 'object') {
+          await this.inventoryService.addItem({
+            itemname: loot.name,
+            itemdescription: loot.description,
+            itemtype: loot.type,
+            itemimage: loot.image,
+            itemlevel: loot.level,
+            itemrarity: loot.rarity,
+            itemvalue: loot.value,
+            keep: 1,
+            ['equipable']: loot['equipable'] || 0,
+            ['equiplocation']: loot['equiplocation'] || '',
+            ['weapontype']: loot['weapontype'] || '',
+            ['armortype']: loot['armortype'] || '',
+            ['acctype']: loot['acctype'] || '',
+            ['enhancement1']: loot['enhancement1'] || '',
+            ['enhancement2']: loot['enhancement2'] || '',
+            ['enhancement3']: loot['enhancement3'] || '',
+            ['legendary']: loot['legendary'] || 0
+          });
+          this.containerModalFoundItems = [`You found: ${loot.name} (Level ${loot.level} ${loot.rarity})`];
+          // Remove the container after successful loot
+          await this.inventoryService.removeItem(item.itemname, 1);
+        } else {
+          this.containerModalFoundItems = ['The container is empty.'];
+          // Remove the container even if empty
+          await this.inventoryService.removeItem(item.itemname, 1);
+        }
+      } else if (item.contentType === 'fixed' && item.fixedContent) {
+        await this.inventoryService.addItem({
+          itemname: item.fixedContent,
+          itemdescription: 'A special item found in a fixed-content container.',
+          itemtype: 'Other',
+          itemimage: '',
+          itemlevel: 1,
+          itemrarity: 'Relic',
+          itemvalue: 0,
+          keep: 1
+        });
+        this.containerModalFoundItems = [item.fixedContent];
+        // Remove the container after successful loot
+        await this.inventoryService.removeItem(item.itemname, 1);
+      } else {
+        this.containerModalFoundItems = ['The container is empty.'];
+        // Remove the container even if empty
+        await this.inventoryService.removeItem(item.itemname, 1);
+      }
+    }
+    // Mark the container as unlocked
+    item.keylock = 0;
+  }
+
+  onContainerLockpick() {
+    // Placeholder: lockpick logic (random success)
+    const success = Math.random() > 0.5;
+    if (success) {
+      this.containerModalFoundItems = ['Gemstone', 'Scroll'];
+      this.containerModalItem!.keylock = 0;
+    } else {
+      this.containerModalFoundItems = [];
+    }
+  }
 
   ngOnInit() {
     console.log('InventoryPage ngOnInit called');
@@ -72,8 +276,10 @@ export class InventoryPage implements OnInit {
         const textColor = this.getTextColorForTheme(settings.themeColor);
         document.documentElement.style.setProperty('--header-text-color', textColor);
       } else {
-        document.documentElement.style.setProperty('--theme-color', DEFAULT_THEME_COLOR);
-        document.documentElement.style.setProperty('--ion-color-primary', DEFAULT_THEME_COLOR);
+        // Use default theme color
+        const defaultThemeColor = '#c9a682';
+        document.documentElement.style.setProperty('--theme-color', defaultThemeColor);
+        document.documentElement.style.setProperty('--ion-color-primary', defaultThemeColor);
         document.documentElement.style.setProperty('--header-text-color', '#181200');
       }
     }
@@ -290,6 +496,7 @@ export class InventoryPage implements OnInit {
 
   closeItemModal() {
     this.selectedItem = null;
+    this.itemDetailsLootResult = []; // Reset loot result
   }
 
   async onEquip() {

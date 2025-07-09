@@ -114,6 +114,24 @@ export class InventoryService {
       const currentCharacter = this.getCurrentCharacter();
       if (!currentCharacter) return false;
 
+      // --- Container logic: set contentType/fixedContent for known containers ---
+      if (item.itemname === 'Purse' || item.itemname === 'Money Purse') {
+        item.contentType = 'gold';
+        item.othertype = 'Container';
+      }
+      if (item.itemname === 'Locked Box') {
+        item.contentType = 'fixed';
+        item.fixedContent = 'Sharpened Bone Dagger';
+        item.othertype = 'Container';
+      }
+      if (item.itemname === 'Chest' || item.itemname === 'Crate' || item.itemname === 'Sack' || item.itemname === 'Trunk' || item.itemname === 'Satchel' || item.itemname === 'Coffer') {
+        item.contentType = 'random';
+        item.othertype = 'Container';
+      }
+      if (item.itemname === 'Tinderbox') {
+        item.contentType = 'NA';
+      }
+
       console.log(`Adding item to inventory: ${item.itemname}`);
 
       // Check if item already exists in local inventory
@@ -312,7 +330,9 @@ export class InventoryService {
         crushing: item.crushing || 0,
         itemrange: item.itemrange || 0,
         itemspeed: item.itemspeed || 0,
-        levelling: item.levelling || 0
+        levelling: item.levelling || 0,
+        contentType: item.contentType || '',
+        fixedContent: item.fixedContent || ''
       };
 
       const docRef = await runInInjectionContext(this.injector, () => {
@@ -396,6 +416,23 @@ export class InventoryService {
     quantity: number = 1,
     options: Partial<Inventory> = {}
   ): Partial<Inventory> {
+    // --- Container logic: set contentType/fixedContent for known containers ---
+    if (name === 'Purse' || name === 'Money Purse') {
+      options.contentType = 'gold';
+      options.othertype = 'Container';
+    }
+    if (name === 'Locked Box') {
+      options.contentType = 'fixed';
+      options.fixedContent = 'Sharpened Bone Dagger';
+      options.othertype = 'Container';
+    }
+    if (name === 'Chest' || name === 'Crate' || name === 'Sack' || name === 'Trunk' || name === 'Satchel' || name === 'Coffer') {
+      options.contentType = 'random';
+      options.othertype = 'Container';
+    }
+    if (name === 'Tinderbox') {
+      options.contentType = 'NA';
+    }
     return {
       itemname: name,
       itemdescription: description,

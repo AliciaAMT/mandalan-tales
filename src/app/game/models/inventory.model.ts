@@ -207,6 +207,10 @@ export interface Inventory {
   itemrange: number; // Item range
   itemspeed: number; // Item speed
 
+  // Container logic
+  contentType?: string; // e.g. 'gold', 'random', 'fixed', 'NA'
+  fixedContent?: string; // e.g. 'Sharpened Bone Dagger' for fixed-content containers
+
   // Timestamps
   createdAt?: any;
   updatedAt?: any;
@@ -371,6 +375,8 @@ export const DEFAULT_INVENTORY: Omit<Inventory, 'charname'> = {
   crushing: 0,
   itemrange: 0,
   itemspeed: 0,
+  contentType: 'NA',
+  fixedContent: undefined,
   createdAt: Date.now(),
   updatedAt: Date.now()
 };

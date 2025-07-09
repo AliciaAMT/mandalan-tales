@@ -178,6 +178,7 @@
   <app-item-details-modal
     *ngIf="selectedItem"
     [item]="selectedItem"
+    [lootResult]="itemDetailsLootResult"
     (close)="closeItemModal()"
     (equip)="onEquip()"
     (equipLeft)="onEquipLeft()"
@@ -187,6 +188,18 @@
     (read)="onRead()"
     (unlock)="onUnlock()"
     (open)="onOpen()"
+    (openContainer)="openContainerModal($event)"
     (unequip)="onUnequip()"
   ></app-item-details-modal>
+
+  <app-container-modal
+    *ngIf="containerModalOpen && containerModalItem"
+    [item]="containerModalItem"
+    [hasKey]="containerModalHasKey"
+    [hasLockpick]="containerModalHasLockpick"
+    [foundItems]="containerModalFoundItems"
+    (close)="closeContainerModal()"
+    (open)="onContainerOpen()"
+    (lockpick)="onContainerLockpick()"
+  ></app-container-modal>
 </ion-content>

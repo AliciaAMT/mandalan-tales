@@ -36,7 +36,17 @@ function createTestCharacter() {
       quantity: 1,
       waterunits: 0,
       maxwater: 10,
-      othertype: 'Container'
+      othertype: 'Container',
+      contentType: 'NA'
+    },
+    {
+      itemname: 'Purse',
+      description: 'A small purse. The only way to know what it contains is to open it.',
+      type: 'Other',
+      image: 'purse',
+      quantity: 1,
+      othertype: 'Container',
+      contentType: 'gold'
     }
   ];
 
