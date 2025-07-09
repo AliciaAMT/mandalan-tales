@@ -1,0 +1,48 @@
+/* All menu items should behave like buttons */
+ion-item {
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+/* Hover effect for all menu items */
+ion-item:hover {
+  --background: var(--ion-color-light);
+  --color: var(--ion-color-dark);
+}
+
+/* Focus effect for all menu items */
+ion-item:focus {
+  --background: var(--ion-color-light);
+  --color: var(--ion-color-dark);
+  outline: 2px solid var(--ion-color-primary);
+  outline-offset: 2px;
+}
+
+/* Active/pressed state */
+ion-item:active {
+  --background: var(--ion-color-medium);
+  --color: var(--ion-color-dark);
+}
+
+/* Ensure all menu items have button-like behavior */
+ion-menu-toggle ion-item {
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+ion-menu-toggle ion-item:hover {
+  --background: var(--ion-color-light);
+  --color: var(--ion-color-dark);
+}
+
+ion-menu-toggle ion-item:focus {
+  --background: var(--ion-color-light);
+  --color: var(--ion-color-dark);
+  outline: 2px solid var(--ion-color-primary);
+  outline-offset: 2px;
+}
+
+ion-menu-toggle ion-item:active {
+  --background: var(--ion-color-medium);
+  --color: var(--ion-color-dark);
+}

@@ -35,6 +35,7 @@
 /* @import "@ionic/angular/css/palettes/dark.always.css"; */
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
 @import '@ionic/angular/css/palettes/dark.system.css';
+
 ion-content {
   --background: #000000;
   background: #000000; // fallback for inner divs
@@ -56,3 +57,100 @@ input:-moz-autofill {
   color: #fff !important;
   background-color: #000 !important;
 }
+/* Allow text selection globally */
+* {
+  -webkit-user-select: text !important;
+  -moz-user-select: text !important;
+  -ms-user-select: text !important;
+  user-select: text !important;
+}
+
+/* Global focus styles for better accessibility */
+ion-card:focus {
+  outline: 3px solid #f5d97e !important;
+  outline-offset: 4px !important;
+  border-radius: 8px !important;
+}
+
+/* Ensure focus is visible on interactive elements */
+a:focus,
+input:focus,
+textarea:focus,
+select:focus,
+button:focus,
+ion-button:focus,
+[tabindex]:focus {
+  outline: 3px solid #f5d97e !important;
+  outline-offset: 2px !important;
+  border-radius: 4px !important;
+}
+
+/* Enhanced focus for game tiles */
+.map-tile:focus {
+  outline: 3px solid #f5d97e !important;
+  outline-offset: 3px !important;
+  border-radius: 6px !important;
+  transform: scale(1.05) !important;
+  transition: transform 0.2s ease !important;
+}
+
+/* Enhanced focus for action buttons */
+.action-item:focus {
+  outline: 3px solid #f5d97e !important;
+  outline-offset: 3px !important;
+  border-radius: 8px !important;
+  transform: scale(1.02) !important;
+  transition: transform 0.2s ease !important;
+}
+
+/* Enhanced focus for collapsible headers */
+.collapsible-header:focus {
+  outline: 3px solid #f5d97e !important;
+  outline-offset: 2px !important;
+  border-radius: 4px !important;
+  background-color: rgba(245, 217, 126, 0.1) !important;
+}
+
+:root {
+  --theme-color: #6b4e26;
+  --ion-color-primary: var(--theme-color, #6b4e26);
+}
+
+/* Ensure alert buttons have proper contrast */
+ion-alert {
+  --background: var(--ion-background-color, #ffffff);
+  --color: var(--ion-text-color, #000000);
+}
+
+ion-alert .alert-button {
+  color: var(--ion-color-primary-contrast, #ffffff) !important;
+  background: var(--ion-color-primary, #3880ff) !important;
+}
+
+ion-alert .alert-button.alert-button-role-cancel {
+  color: var(--ion-color-medium, #92949c) !important;
+  background: transparent !important;
+}
+
+ion-alert .alert-button.alert-button-role-destructive {
+  color: var(--ion-color-danger-contrast, #ffffff) !important;
+  background: var(--ion-color-danger, #eb445a) !important;
+}
+
+.collapsible-header {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  font-size: 1rem;
+  font-weight: bold;
+  /* Optional: match button background, border, or padding if needed */
+  background: none;
+  border: none;
+  padding: 0.5em 1em;
+  color: #fff;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+  outline: none;
+}
+
+

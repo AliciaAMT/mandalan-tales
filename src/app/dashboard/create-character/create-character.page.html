@@ -1,0 +1,204 @@
+<app-app-header></app-app-header>
+
+<ion-content class="ion-padding">
+  <main id="main-content" role="main">
+    <form [formGroup]="characterForm" (ngSubmit)="onSubmit()">
+      <ion-card class="character-card">
+        <ion-card-header>
+          <h1 class="sr-only">Create New Character</h1>
+          <ion-card-title>Character Info</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <fieldset>
+            <ion-list lines="none">
+              <!-- Character Info Section -->
+              <div class="character-info-grid">
+                <ion-item>
+                  <ion-label position="stacked">Character Name</ion-label>
+                  <ion-input
+                    type="text"
+                    formControlName="name"
+                    placeholder="Enter character name"
+                    aria-label="Character name">
+                  </ion-input>
+                </ion-item>
+
+                <ion-item>
+                  <ion-label position="stacked">Gender</ion-label>
+                  <ion-select
+                    formControlName="gender"
+                    placeholder="Select gender"
+                    aria-label="Character gender"
+                    interface="popover">
+                    <ion-select-option value="male">Male</ion-select-option>
+                    <ion-select-option value="female">Female</ion-select-option>
+                  </ion-select>
+                </ion-item>
+
+                <ion-item>
+                  <ion-label position="stacked">Race</ion-label>
+                  <ion-select
+                    formControlName="race"
+                    placeholder="Select race"
+                    aria-label="Character race"
+                    interface="popover">
+                    <ion-select-option *ngFor="let race of races" [value]="race">{{ race }}</ion-select-option>
+                  </ion-select>
+                </ion-item>
+
+                <ion-item>
+                  <ion-label position="stacked">Class</ion-label>
+                  <ion-select
+                    formControlName="class"
+                    placeholder="Select class"
+                    aria-label="Character class"
+                    interface="popover">
+                    <ion-select-option *ngFor="let class of classes" [value]="class">{{ class }}</ion-select-option>
+                  </ion-select>
+                </ion-item>
+              </div>
+
+              <!-- Generated Stats Display -->
+              <div *ngIf="generatedStats">
+                <h3 class="stats-heading">Generated Character Stats</h3>
+                <p class="stats-description">Your character's stats are randomly generated with race and class bonuses applied.</p>
+
+                <ion-item>
+                  <ion-label position="stacked">Character Stats</ion-label>
+                  <div class="stats-grid">
+                    <div class="stats-column">
+                      <ion-item>
+                        <ion-label position="stacked">Strength</ion-label>
+                        <ion-input
+                          type="number"
+                          [value]="generatedStats.strength"
+                          readonly
+                          aria-label="Strength stat">
+                        </ion-input>
+                      </ion-item>
+
+                      <ion-item>
+                        <ion-label position="stacked">Agility</ion-label>
+                        <ion-input
+                          type="number"
+                          [value]="generatedStats.agility"
+                          readonly
+                          aria-label="Agility stat">
+                        </ion-input>
+                      </ion-item>
+
+                      <ion-item>
+                        <ion-label position="stacked">Wisdom</ion-label>
+                        <ion-input
+                          type="number"
+                          [value]="generatedStats.wisdom"
+                          readonly
+                          aria-label="Wisdom stat">
+                        </ion-input>
+                      </ion-item>
+                    </div>
+
+                    <div class="stats-column">
+                      <ion-item>
+                        <ion-label position="stacked">Speed</ion-label>
+                        <ion-input
+                          type="number"
+                          [value]="generatedStats.speed"
+                          readonly
+                          aria-label="Speed stat">
+                        </ion-input>
+                      </ion-item>
+
+                      <ion-item>
+                        <ion-label position="stacked">Accuracy</ion-label>
+                        <ion-input
+                          type="number"
+                          [value]="generatedStats.accuracy"
+                          readonly
+                          aria-label="Accuracy stat">
+                        </ion-input>
+                      </ion-item>
+
+                      <ion-item>
+                        <ion-label position="stacked">Luck</ion-label>
+                        <ion-input
+                          type="number"
+                          [value]="generatedStats.luck"
+                          readonly
+                          aria-label="Luck stat">
+                        </ion-input>
+                      </ion-item>
+                    </div>
+                  </div>
+                </ion-item>
+
+                <!-- Health and Mana -->
+                <ion-item>
+                  <ion-label position="stacked">Health & Mana</ion-label>
+                  <div class="stats-grid">
+                    <div class="stats-column">
+                      <ion-item>
+                        <ion-label position="stacked">Health</ion-label>
+                        <ion-input
+                          type="number"
+                          [value]="50 + (generatedStats.life || 0)"
+                          readonly
+                          aria-label="Health">
+                        </ion-input>
+                      </ion-item>
+                    </div>
+                    <div class="stats-column">
+                      <ion-item>
+                        <ion-label position="stacked">Mana</ion-label>
+                        <ion-input
+                          type="number"
+                          [value]="30 + (generatedStats.mana || 0)"
+                          readonly
+                          aria-label="Mana">
+                        </ion-input>
+                      </ion-item>
+                    </div>
+                  </div>
+                </ion-item>
+              </div>
+
+              <ion-item button (click)="openPortraitSelector()" class="portrait-selector">
+                <ion-label for="portraitButton">Portrait</ion-label>
+                <ion-thumbnail slot="end" *ngIf="selectedPortrait">
+                  <ion-img
+                    [src]="getSelectedPortraitImage()"
+                    [alt]="getSelectedPortraitName()">
+                  </ion-img>
+                </ion-thumbnail>
+                <ion-button
+                  id="portraitButton"
+                  fill="clear"
+                  slot="end"
+                  type="button"
+                  (click)="openPortraitSelector()"
+                  aria-label="Choose character portrait">
+                  <ion-icon name="person-outline"></ion-icon>
+                </ion-button>
+              </ion-item>
+
+              <ion-button
+                expand="block"
+                type="submit"
+                [disabled]="!characterForm.valid || !selectedPortrait"
+                aria-label="Create character"
+                aria-describedby="form-error"
+                class="ion-margin-top">
+                Create Character
+              </ion-button>
+
+              <div class="ion-text-danger error-message" *ngIf="formError" id="form-error" role="alert" aria-live="assertive">
+                {{ formError }}
+              </div>
+            </ion-list>
+          </fieldset>
+        </ion-card-content>
+      </ion-card>
+    </form>
+  </main>
+  <app-app-footer></app-app-footer>
+</ion-content>

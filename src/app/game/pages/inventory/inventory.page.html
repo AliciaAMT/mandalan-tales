@@ -1,0 +1,205 @@
+<ion-content class="ion-padding" appFocusManager>
+  <main id="main-content" role="main">
+    <div class="inventory-container">
+      <!-- Back Button -->
+      <div class="back-button-container">
+        <ion-button
+          fill="clear"
+          (click)="goBack()"
+          class="back-button"
+          aria-label="Back to Game">
+          <ion-icon name="arrow-back" slot="start" aria-hidden="true"></ion-icon>
+          Back to Game
+        </ion-button>
+      </div>
+
+      <!-- Page Content -->
+      <div class="inventory-content">
+        <h1 class="page-title">Inventory</h1>
+
+        <!-- Inventory Sections -->
+        <div class="inventory-sections">
+
+          <!-- Equipped Items Section -->
+          <div class="inventory-section equipped-items" role="region" aria-label="Equipped Items" [ngClass]="{'collapsed': !isEquippedItemsOpen}">
+            <h2 class="collapsible-header" (click)="toggleEquippedItems()" tabindex="0" role="button" [attr.aria-expanded]="isEquippedItemsOpen" aria-controls="equipped-items-content">
+              Equipped Items
+            </h2>
+            <div id="equipped-items-content" class="section-content" *ngIf="isEquippedItemsOpen">
+              <div class="equipped-items-grid">
+                <div class="equipment-slot" *ngFor="let slot of getEquipmentSlots()">
+                  <div class="slot-label">{{ slot }}</div>
+                  <ng-container *ngIf="hasEquippedItem(slot); else emptySlot">
+                    <div class="slot-content clickable" (click)="openEquippedItemModal(slot)">
+                      <img [src]="getEquippedItemImage(slot)"
+                           [alt]="getEquippedItemName(slot)"
+                           class="inventory-item-image" />
+                      <div class="inventory-item-name">{{ getEquippedItemName(slot) }}</div>
+                    </div>
+                  </ng-container>
+                  <ng-template #emptySlot>
+                    <div class="slot-content empty">
+                      <ion-icon name="add-circle-outline" aria-hidden="true"></ion-icon>
+                      <span>Empty</span>
+                    </div>
+                  </ng-template>
+                </div>
+                <!-- Finger (Rings) - up to 4 -->
+                <div class="equipment-slot" *ngFor="let ring of getRingIndices()">
+                  <div class="slot-label">Ring {{ ring + 1 }}</div>
+                  <ng-container *ngIf="hasRingItem(ring); else emptyRingSlot">
+                    <div class="slot-content clickable" (click)="openRingItemModal(ring)">
+                      <img [src]="getRingImage(ring)" [alt]="getRingName(ring)" class="inventory-item-image" />
+                      <div class="inventory-item-name">{{ getRingName(ring) }}</div>
+                    </div>
+                  </ng-container>
+                  <ng-template #emptyRingSlot>
+                    <div class="slot-content empty">
+                      <ion-icon name="add-circle-outline" aria-hidden="true"></ion-icon>
+                      <span>Empty</span>
+                    </div>
+                  </ng-template>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Keep Pocket Section -->
+          <div class="inventory-section keep-pocket" role="region" aria-label="Keep Pocket" [ngClass]="{'collapsed': !isKeepPocketOpen}">
+            <h2 class="collapsible-header" (click)="toggleKeepPocket()" tabindex="0" role="button" [attr.aria-expanded]="isKeepPocketOpen" aria-controls="keep-pocket-content">
+              Keep Pocket
+            </h2>
+            <div id="keep-pocket-content" class="section-content" *ngIf="isKeepPocketOpen">
+              <div class="pocket-filters">
+                <button class="filter-btn" type="button" [class.active]="keepFilter==='All'" (click)="setKeepFilter('All')">All</button>
+                <button class="filter-btn" type="button" [class.active]="keepFilter==='Weapon'" (click)="setKeepFilter('Weapon')">Weapons</button>
+                <button class="filter-btn" type="button" [class.active]="keepFilter==='Armor'" (click)="setKeepFilter('Armor')">Armor</button>
+                <button class="filter-btn" type="button" [class.active]="keepFilter==='Accessory'" (click)="setKeepFilter('Accessory')">Accessories</button>
+                <button class="filter-btn" type="button" [class.active]="keepFilter==='Other'" (click)="setKeepFilter('Other')">Other</button>
+              </div>
+              <div class="pocket-items">
+                <ng-container *ngIf="keepPocketItems.length > 0; else noKeepItems">
+                  <div class="inventory-items-grid">
+                    <ng-container *ngFor="let item of keepPocketItems">
+                      <div class="inventory-item-card" (click)="openItemModal(item)">
+                        <img [src]="getItemImage(item)" [alt]="item.itemname" class="inventory-item-image" />
+                        <div class="inventory-item-name">{{ item.itemname }}</div>
+                        <div class="inventory-item-details">
+                          <div>Level {{ item.itemlevel }} {{ item.itemrarity }}</div>
+                          <div>Amount: {{ getItemAmount(item) }}</div>
+                        </div>
+                      </div>
+                    </ng-container>
+                  </div>
+                </ng-container>
+                <ng-template #noKeepItems>
+                  <p class="empty-message">No items in keep pocket</p>
+                </ng-template>
+              </div>
+            </div>
+          </div>
+
+          <!-- Trade Pocket Section -->
+          <div class="inventory-section trade-pocket" role="region" aria-label="Trade Pocket" [ngClass]="{'collapsed': !isTradePocketOpen}">
+            <h2 class="collapsible-header" (click)="toggleTradePocket()" tabindex="0" role="button" [attr.aria-expanded]="isTradePocketOpen" aria-controls="trade-pocket-content">
+              Trade Pocket
+            </h2>
+            <div id="trade-pocket-content" class="section-content" *ngIf="isTradePocketOpen">
+              <div class="pocket-filters">
+                <button class="filter-btn" type="button" [class.active]="tradeFilter==='All'" (click)="setTradeFilter('All')">All</button>
+                <button class="filter-btn" type="button" [class.active]="tradeFilter==='Weapon'" (click)="setTradeFilter('Weapon')">Weapons</button>
+                <button class="filter-btn" type="button" [class.active]="tradeFilter==='Armor'" (click)="setTradeFilter('Armor')">Armor</button>
+                <button class="filter-btn" type="button" [class.active]="tradeFilter==='Accessory'" (click)="setTradeFilter('Accessory')">Accessories</button>
+                <button class="filter-btn" type="button" [class.active]="tradeFilter==='Other'" (click)="setTradeFilter('Other')">Other</button>
+              </div>
+              <div class="pocket-items">
+                <ng-container *ngIf="tradePocketItems.length > 0; else noTradeItems">
+                  <div class="inventory-items-grid">
+                    <ng-container *ngFor="let item of tradePocketItems">
+                      <div class="inventory-item-card" (click)="openItemModal(item)">
+                        <img [src]="getItemImage(item)" [alt]="item.itemname" class="inventory-item-image" />
+                        <div class="inventory-item-name">{{ item.itemname }}</div>
+                        <div class="inventory-item-details">
+                          <div>Level {{ item.itemlevel }} | {{ item.itemrarity }}</div>
+                          <div *ngIf="showAmount(item)">Amount: {{ getItemAmount(item) }}</div>
+                          <div class="inventory-item-value" *ngIf="showValue(item)">Value: {{ item.itemvalue }} Gold</div>
+                        </div>
+                      </div>
+                    </ng-container>
+                  </div>
+                </ng-container>
+                <ng-template #noTradeItems>
+                  <p class="empty-message">No items in trade pocket</p>
+                </ng-template>
+              </div>
+            </div>
+          </div>
+
+          <!-- Food Pocket Section -->
+          <div class="inventory-section food-pocket" role="region" aria-label="Food Pocket" [ngClass]="{'collapsed': !isFoodPocketOpen}">
+            <h2 class="collapsible-header" (click)="toggleFoodPocket()" tabindex="0" role="button" [attr.aria-expanded]="isFoodPocketOpen" aria-controls="food-pocket-content">
+              Food Pocket
+            </h2>
+            <div id="food-pocket-content" class="section-content" *ngIf="isFoodPocketOpen">
+              <div class="pocket-filters">
+                <button class="filter-btn" type="button" [class.active]="foodFilter==='All'" (click)="setFoodFilter('All')">All</button>
+                <button class="filter-btn" type="button" [class.active]="foodFilter==='Ingredients'" (click)="setFoodFilter('Ingredients')">Ingredients</button>
+                <button class="filter-btn" type="button" [class.active]="foodFilter==='Recipes'" (click)="setFoodFilter('Recipes')">Recipes</button>
+                <button class="filter-btn" type="button" [class.active]="foodFilter==='Tools'" (click)="setFoodFilter('Tools')">Tools</button>
+                <button class="filter-btn" type="button" [class.active]="foodFilter==='Other'" (click)="setFoodFilter('Other')">Other</button>
+              </div>
+              <div class="pocket-items">
+                <ng-container *ngIf="foodPocketItems.length > 0; else noFoodItems">
+                  <div class="inventory-items-grid">
+                    <ng-container *ngFor="let item of foodPocketItems">
+                      <div class="inventory-item-card" (click)="openItemModal(item)">
+                        <img [src]="getItemImage(item)" [alt]="item.itemname" class="inventory-item-image" />
+                        <div class="inventory-item-name">{{ item.itemname }}</div>
+                        <div class="inventory-item-details">
+                          <div>Level {{ item.itemlevel }} | {{ item.itemrarity }}</div>
+                          <div *ngIf="showAmount(item)">Amount: {{ getItemAmount(item) }}</div>
+                          <div class="inventory-item-value" *ngIf="showValue(item)">Value: {{ item.itemvalue }} Gold</div>
+                        </div>
+                      </div>
+                    </ng-container>
+                  </div>
+                </ng-container>
+                <ng-template #noFoodItems>
+                  <p class="empty-message">No items in food pocket</p>
+                </ng-template>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </main>
+  <app-item-details-modal
+    *ngIf="selectedItem"
+    [item]="selectedItem"
+    [lootResult]="itemDetailsLootResult"
+    (close)="closeItemModal()"
+    (equip)="onEquip()"
+    (equipLeft)="onEquipLeft()"
+    (equipRight)="onEquipRight()"
+    (trade)="onTrade()"
+    (use)="onUse()"
+    (read)="onRead()"
+    (unlock)="onUnlock()"
+    (open)="onOpen()"
+    (openContainer)="openContainerModal($event)"
+    (unequip)="onUnequip()"
+  ></app-item-details-modal>
+
+  <app-container-modal
+    *ngIf="containerModalOpen && containerModalItem"
+    [item]="containerModalItem"
+    [hasKey]="containerModalHasKey"
+    [hasLockpick]="containerModalHasLockpick"
+    [foundItems]="containerModalFoundItems"
+    (close)="closeContainerModal()"
+    (open)="onContainerOpen()"
+    (lockpick)="onContainerLockpick()"
+  ></app-container-modal>
+</ion-content>

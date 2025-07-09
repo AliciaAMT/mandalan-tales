@@ -1,0 +1,95 @@
+a:6:{s:4:"room";a:1:{s:6:"ashari";s:9:"Main Room";}s:4:"user";a:1:{s:6:"ashari";d:1339915894.5648329257965087890625;}s:4:"pass";a:1:{s:6:"ashari";s:32:"279a6ccdff341a113ff2f746a6d6bc6a";}s:4:"data";a:44:{i:0;s:22:"+
+Main Room
+Lilliana";i:1;s:22:"-
+Main Room
+Lilliana";i:2;s:20:"+
+Main Room
+Alicia";i:3;a:5:{s:4:"time";i:1271366281;s:4:"room";s:9:"Main Room";s:4:"user";s:6:"Alicia";s:4:"priv";s:1:".";s:4:"data";s:63:"m
+#30b0b0
+Alicia
+.
+Oh Blah Di, Oh Blah Da, Life Goes On... ";}i:4;s:20:"-
+Main Room
+Alicia";i:5;s:19:"+
+Main Room
+Blake";i:6;s:19:"-
+Main Room
+Blake";i:7;s:19:"+
+Main Room
+Blake";i:8;s:19:"-
+Main Room
+Blake";i:9;s:16:"+
+Room 1
+Blake";i:10;s:16:"-
+Room 1
+Blake";i:11;s:16:"+
+Room 2
+Blake";i:12;s:16:"-
+Room 2
+Blake";i:13;s:19:"+
+Main Room
+Blake";i:14;s:19:"-
+Main Room
+Blake";i:15;s:19:"+
+Main Room
+Blake";i:16;s:19:"-
+Main Room
+Blake";i:17;s:25:"+
+Main Room
+BlakeTaylor";i:18;s:25:"-
+Main Room
+BlakeTaylor";i:19;s:22:"+
+Room 1
+BlakeTaylor";i:20;s:22:"-
+Room 1
+BlakeTaylor";i:21;s:22:"+
+Room 2
+BlakeTaylor";i:22;s:22:"-
+Room 2
+BlakeTaylor";i:23;s:25:"+
+Main Room
+BlakeTaylor";i:24;s:25:"-
+Main Room
+BlakeTaylor";i:25;s:20:"+
+Main Room
+Alicia";i:26;s:20:"-
+Main Room
+Alicia";i:27;s:17:"+
+Room 1
+Alicia";i:28;s:17:"-
+Room 1
+Alicia";i:29;s:17:"+
+Room 2
+Alicia";i:30;s:17:"-
+Room 2
+Alicia";i:31;s:20:"+
+Main Room
+Solita";i:32;s:20:"-
+Main Room
+Solita";i:33;s:22:"+
+Main Room
+Aliciana";i:34;s:22:"-
+Main Room
+Aliciana";i:35;s:19:"+
+Room 1
+Aliciana";i:36;s:19:"-
+Room 1
+Aliciana";i:37;s:19:"+
+Room 2
+Aliciana";i:38;s:19:"-
+Room 2
+Aliciana";i:39;s:22:"+
+Main Room
+Aliciana";i:40;s:22:"-
+Main Room
+Aliciana";i:41;s:20:"+
+Main Room
+ashari";i:42;a:5:{s:4:"time";i:1339915472;s:4:"room";s:9:"Main Room";s:4:"user";s:6:"ashari";s:4:"priv";s:1:".";s:4:"data";s:63:"m
+#d090d0
+ashari
+.
+could this game get anymore interesting?";}i:43;a:5:{s:4:"time";i:1339915884;s:4:"room";s:9:"Main Room";s:4:"user";s:6:"ashari";s:4:"priv";s:1:".";s:4:"data";s:101:"m
+#303030
+ashari
+.
+%%qqb002%% so i just died...back where i started...just great...(note sarcasm)";}}s:4:"kick";a:0:{}s:4:"mute";a:0:{}}

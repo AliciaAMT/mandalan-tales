@@ -1,16 +1,59 @@
-<ion-menu content-id="main-content" type="overlay">
+<ion-menu content-id="main-content" type="overlay" role="navigation" aria-label="Side menu">
   <ion-header>
     <ion-toolbar color="primary">
       <ion-title>Menu</ion-title>
     </ion-toolbar>
   </ion-header>
   <ion-content>
-    <ion-list>
-      <ion-item routerLink="/" routerDirection="root">Home</ion-item>
-      <ion-item routerLink="/about" routerDirection="forward">About</ion-item>
-      <ion-item routerLink="/contact" routerDirection="forward">Contact</ion-item>
-      <ion-item routerLink="/legal" routerDirection="forward">Legal</ion-item>
+    <ion-list role="menu">
+      <ion-menu-toggle auto-hide="true">
+        <ion-item routerLink="/" routerDirection="root" detail="false" role="menuitem">
+          <ion-icon name="" slot="start" aria-hidden="true"></ion-icon>
+          <ion-label>Home</ion-label>
+        </ion-item>
+      </ion-menu-toggle>
+
+      <ion-menu-toggle auto-hide="true">
+        <ion-item routerLink="/about" routerDirection="forward" detail="false" role="menuitem">
+          <ion-icon name="information-circle-outline" slot="start" aria-hidden="true"></ion-icon>
+          <ion-label>About</ion-label>
+        </ion-item>
+      </ion-menu-toggle>
+
+      <ion-menu-toggle auto-hide="true">
+        <ion-item routerLink="/contact" routerDirection="forward" detail="false" role="menuitem">
+          <ion-icon name="mail-outline" slot="start" aria-hidden="true"></ion-icon>
+          <ion-label>Contact</ion-label>
+        </ion-item>
+      </ion-menu-toggle>
+
+      <ion-menu-toggle auto-hide="true">
+        <ion-item routerLink="/legal" routerDirection="forward" detail="false" role="menuitem">
+          <ion-icon name="document-text-outline" slot="start" aria-hidden="true"></ion-icon>
+          <ion-label>Legal</ion-label>
+        </ion-item>
+      </ion-menu-toggle>
+
+      <ion-menu-toggle auto-hide="true" *ngIf="isLoggedIn()">
+        <ion-item routerLink="/dashboard" routerDirection="forward" detail="false" role="menuitem" button>
+          <ion-icon name="home-outline" slot="start" aria-hidden="true"></ion-icon>
+          <ion-label>Dashboard</ion-label>
+        </ion-item>
+      </ion-menu-toggle>
+
+      <ion-menu-toggle auto-hide="true" *ngIf="isLoggedIn()">
+        <ion-item (click)="logout()" detail="false" role="menuitem" aria-label="Logout from account" button>
+          <ion-icon name="log-out-outline" slot="start" aria-hidden="true"></ion-icon>
+          <ion-label>Logout</ion-label>
+        </ion-item>
+      </ion-menu-toggle>
+
+      <ion-menu-toggle auto-hide="true" *ngIf="!isLoggedIn()">
+        <ion-item routerLink="/login" routerDirection="forward" detail="false" role="menuitem" button>
+          <ion-icon name="person-outline" slot="start" aria-hidden="true"></ion-icon>
+          <ion-label>Login</ion-label>
+        </ion-item>
+      </ion-menu-toggle>
     </ion-list>
   </ion-content>
 </ion-menu>
-

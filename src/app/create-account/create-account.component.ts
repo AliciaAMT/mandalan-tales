@@ -1,70 +1,88 @@
-
 import { AppHeaderComponent } from "../shared/header/app-header.component";
-
 import { AppFooterComponent } from "../shared/footer/app-footer.component";
 import { FormsModule } from '@angular/forms';
-import { AfterViewInit, Component, OnInit } from '@angular/core';
-import { AuthService } from '../services/auth.service'; // update path if needed
+import { Component, ViewChild, ElementRef, inject, OnDestroy } from '@angular/core';
+import { AuthService } from '../services/auth.service';
+import { Firestore, doc, setDoc, serverTimestamp } from '@angular/fire/firestore';
 import { Router, RouterModule } from '@angular/router';
 import { NgIf } from "@angular/common";
 import { STANDALONE_IMPORTS } from '../shared/standalone-imports';
+// import { SkipLinkComponent } from "../shared/skip-link/skip-link.component";
+import { addIcons } from 'ionicons';
+import { eye, eyeOff } from 'ionicons/icons';
+import { ToastController } from '@ionic/angular';
 
+addIcons({
+  'eye': eye,
+  'eye-off': eyeOff
+});
 
+declare global {
+  interface Window {
+    grecaptcha: any;
+  }
+}
 
 @Component({
   selector: 'app-create-account',
   templateUrl: './create-account.component.html',
   styleUrls: ['./create-account.component.scss'],
   standalone: true,
-  imports: [ AppHeaderComponent, AppFooterComponent, FormsModule, NgIf, STANDALONE_IMPORTS, RouterModule],
+  imports: [
+    AppHeaderComponent,
+    AppFooterComponent,
+    RouterModule,
+    FormsModule,
+    NgIf,
+    STANDALONE_IMPORTS
+  ]
 })
+export class CreateAccountComponent implements OnDestroy {
+  private authService: AuthService = inject(AuthService);
+  private router: Router = inject(Router);
+  private toastCtrl: ToastController = inject(ToastController);
+  private timeouts: number[] = [];
 
-export class CreateAccountComponent implements OnInit, AfterViewInit {
-  email = '';
-  password = '';
+  email: string = '';
+  password: string = '';
   error: string | null = null;
-  currentYear: number = new Date().getFullYear();
-  recaptchaSiteKey = '6LfCQmYrAAAAAAW9jUsKIkBm8uAc41MGahUqSbpe';
-  private recaptchaWidgetId: any = null;
+  showPassword: boolean = false;
 
-  constructor(private authService: AuthService, private router: Router) {}
-
-  ngOnInit(): void {
-    (window as any).onRecaptchaSuccess = (token: string) => {
-      this.authService.register(this.email, this.password)
-        .then(() => {
-          alert('Verification email sent. Please check your inbox before logging in.');
-          this.router.navigate(['/login']);
-        })
-        .catch(err => {
-          console.error(err);
-          this.error = err.message || 'Failed to create account.';
-          (window as any).grecaptcha.reset(this.recaptchaWidgetId);
-        });
-    };
+  ngOnDestroy(): void {
+    // Clean up all timeouts to prevent memory leaks
+    this.timeouts.forEach(timeoutId => clearTimeout(timeoutId));
+    this.timeouts = [];
   }
 
-  ngAfterViewInit(): void {
-    const grecaptcha = (window as any).grecaptcha;
-    if (grecaptcha && grecaptcha.render) {
-      this.recaptchaWidgetId = grecaptcha.render('recaptcha-container', {
-        sitekey: this.recaptchaSiteKey,
-        size: 'invisible',
-        callback: (token: string) => {
-          (window as any).onRecaptchaSuccess(token);
-        }
-      });
-    }
-  }
-
-  createAccount(): void {
+  async createAccount() {
     this.error = null;
-    const grecaptcha = (window as any).grecaptcha;
-    if (!grecaptcha || this.recaptchaWidgetId == null) {
-      this.error = 'CAPTCHA failed to load.';
-      return;
-    }
+    try {
+      await this.authService.register(this.email, this.password);
+      await this.authService.logout();
 
-    grecaptcha.execute(this.recaptchaWidgetId);
+      const toast = await this.toastCtrl.create({
+        message: 'Account created! Please check your email and verify before logging in.',
+        duration: 4000,
+        color: 'success',
+        position: 'bottom'
+      });
+      toast.role = 'alert';
+      await toast.present();
+
+      this.router.navigate(['/login']);
+    } catch (err: any) {
+      console.error('Account creation error:', err);
+      this.error = err.message || 'An unknown error occurred.';
+    }
+  }
+
+  togglePasswordVisibility() {
+    this.showPassword = !this.showPassword;
+  }
+
+  submitFormIfValid(form: any) {
+    if (form.valid) {
+      this.createAccount();
+    }
   }
 }

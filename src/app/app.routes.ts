@@ -1,4 +1,6 @@
 import { Routes } from '@angular/router';
+import { AuthGuard } from './guards/auth.guard';
+
 
 export const routes: Routes = [
   {
@@ -32,9 +34,42 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./create-account/create-account.component').then(m => m.CreateAccountComponent)
   },
+
+  {
+    path: 'forgot-password',
+    loadComponent: () =>
+      import('./forgot-password/forgot-password.component').then(
+        m => m.ForgotPasswordComponent
+      )
+  },
   {
     path: 'dashboard',
+    canActivate: [AuthGuard],
     loadComponent: () =>
-      import('./dashboard/dashboard.component').then(m => m.DashboardComponent)
+      import('./dashboard/dashboard.component').then((m) => m.DashboardComponent),
+  },
+  {
+    path: 'create-character',
+    loadComponent: () =>
+      import('./dashboard/create-character/create-character.page').then((m) => m.CreateCharacterPage),
+  },
+  {
+    path: 'game/statistics',
+    canActivate: [AuthGuard],
+    loadComponent: () => import('./game/pages/statistics/statistics.page').then( m => m.StatisticsPage)
+  },
+  {
+    path: 'game/inventory',
+    canActivate: [AuthGuard],
+    loadComponent: () => import('./game/pages/inventory/inventory.page').then( m => m.InventoryPage)
+  },
+  {
+    path: 'game',
+    canActivate: [AuthGuard],
+    loadComponent: () => import('./game/pages/main/main.page').then( m => m.MainPage)
+  },
+  {
+    path: '**',
+    redirectTo: '',
   }
 ];

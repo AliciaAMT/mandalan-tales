@@ -1,12 +1,124 @@
-<a href="#main-content" class="skip-link">Skip to main content</a>
-<div class="flex-page">
-
 <app-app-header></app-app-header>
+<ion-content class="ion-padding" appFocusManager>
+  <ng-container *ngIf="characters().length > 0; else noCharacters">
+    <ion-grid>
+      <ion-row>
+        <ion-col
+          size="12"
+          size-sm="6"
+          size-md="4"
+          *ngFor="let char of characters()"
+        >
+          <ion-card
+            [class.selected-character]="char.id === selectedCharacterId"
+            class="character-card"
+            tabindex="0"
+            (click)="selectCharacter(char.id!)"
+            (keydown.enter)="selectCharacter(char.id!)"
+            (keydown.space)="selectCharacter(char.id!)"
+            [attr.aria-label]="'Character card for ' + char.name + ', ' + char.class + ' level ' + char.level"
+            [attr.aria-pressed]="char.id === selectedCharacterId"
+          >
+            <div class="character-card-content">
+              <img [src]="'/assets/portraits/transparent/' + char.portrait + '.png'" alt="{{ char.name }}" />
+              <ion-card-header>
+                <ion-card-title>{{ char.name }}</ion-card-title>
+                <ion-card-subtitle>
+                  {{ char.class }} - Level {{ char.level }}
+                </ion-card-subtitle>
+              </ion-card-header>
 
-<ion-content class="home-content fullscreen ion-padding">
+              <div class="character-actions">
+                <ion-button
+                  fill="clear"
+                  size="small"
+                  (click)="openCharacterDetails(char); $event.stopPropagation()"
+                  color="medium"
+                  class="expand-button"
+                  [attr.aria-label]="'View details for ' + char.name + ' character'">
+                  <ion-icon slot="icon-only" name="information-circle-outline"></ion-icon>
+                </ion-button>
+                <ion-button
+                  fill="clear"
+                  size="small"
+                  (click)="resetTestData(char); $event.stopPropagation()"
+                  color="warning"
+                  class="reset-button"
+                  [attr.aria-label]="'Reset ' + char.name + ' to brand new state'">
+                  <ion-icon slot="icon-only" name="refresh-circle-outline"></ion-icon>
+                </ion-button>
+              </div>
+            </div>
+          </ion-card>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </ng-container>
+
+  <ng-template #noCharacters>
+    <ion-card color="light" class="ion-text-center">
+      <ion-card-header>
+        <ion-card-title>No characters yet</ion-card-title>
+        <ion-card-subtitle>Create one to begin your adventure!</ion-card-subtitle>
+      </ion-card-header>
+    </ion-card>
+  </ng-template>
+
+  <ion-button
+    expand="block"
+    color="success"
+    [disabled]="!selectedCharacterId || !(user && user.emailVerified)"
+    (click)="startGame()"
+  >
+    Enter Game
+  </ion-button>
+
+  <ion-button
+    [routerLink]="['/create-character']"
+    expand="block"
+    color="medium"
+    *ngIf="characters().length < maxCharacters"
+  >
+    Create New Character
+  </ion-button>
+  <ion-button expand="block" color="danger" (click)="logout()">
+    <ion-icon slot="start" name="log-out-outline"></ion-icon>
+    Logout
+  </ion-button>
+
+  <!-- Theme Settings Section -->
+  <ion-card color="light" class="theme-settings">
+    <ion-card-header>
+      <ion-card-title>Theme Settings</ion-card-title>
+      <ion-card-subtitle>Customize your game interface</ion-card-subtitle>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-item>
+        <ion-label>Theme Color</ion-label>
+        <ion-input
+          type="color"
+          [(ngModel)]="selectedThemeColor"
+          (ionChange)="updateThemeColor()"
+          [value]="selectedThemeColor"
+          class="color-picker">
+        </ion-input>
+      </ion-item>
+
+      <div class="preset-colors">
+        <ion-button
+          *ngFor="let preset of presetColors"
+          [style.--background]="preset.color"
+          [style.--background-hover]="preset.color"
+          [style.--background-activated]="preset.color"
+          fill="solid"
+          size="small"
+          (click)="selectPresetColor(preset.color)"
+          [class.selected]="selectedThemeColor === preset.color">
+          {{ preset.name }}
+        </ion-button>
+      </div>
+    </ion-card-content>
+  </ion-card>
 
   <app-app-footer></app-app-footer>
 </ion-content>
-
-
-</div>

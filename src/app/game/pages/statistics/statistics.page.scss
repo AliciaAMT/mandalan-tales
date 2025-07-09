@@ -1,0 +1,451 @@
+.statistics-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0;
+}
+
+.back-button-container {
+  margin-bottom: 20px;
+}
+
+.back-button {
+  --color: #ffffff;
+  font-weight: 500;
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  text-align: center;
+
+  ion-spinner {
+    margin-bottom: 16px;
+    --color: var(--ion-color-primary);
+  }
+
+  p {
+    color: var(--header-text-color, #ccc);
+    margin: 0;
+  }
+}
+
+.statistics-content {
+  .page-title {
+    color: var(--ion-color-primary);
+    text-align: center;
+    margin-bottom: 24px;
+    font-size: 2rem;
+    font-weight: bold;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  }
+}
+
+// Character Info Card
+.character-info-card {
+  margin-bottom: 24px;
+  background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%);
+  border: 2px solid var(--theme-color, #8d6e36);
+  border-radius: 16px;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1);
+
+  ion-card-header {
+    background: linear-gradient(90deg, var(--theme-color, #8d6e36) 0%, color-mix(in srgb, var(--theme-color, #8d6e36) 80%, white) 100%);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 14px 14px 0 0;
+
+    ion-card-title {
+      color: #ffffff;
+      font-size: 1.3rem;
+      font-weight: bold;
+    }
+  }
+
+  ion-card-content {
+    padding: 20px;
+  }
+}
+
+.character-portrait-section {
+  display: flex;
+  align-items: flex-start;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.character-portrait {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  border: 3px solid var(--theme-color, #8d6e36);
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.character-details {
+  flex: 1;
+  min-width: 250px;
+}
+
+.character-name {
+  color: var(--header-text-color, #fff);
+  font-size: 1.8rem;
+  font-weight: bold;
+  margin: 0 0 8px 0;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.character-title {
+  color: #ffffff;
+  font-size: 1.1rem;
+  margin: 0 0 16px 0;
+  font-style: italic;
+}
+
+.character-basic-info {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  border-left: 3px solid var(--theme-color, #8d6e36);
+}
+
+.info-label {
+  color: var(--header-text-color, #ccc);
+  font-weight: 500;
+}
+
+.info-value {
+  color: var(--header-text-color, #fff);
+  font-weight: bold;
+}
+
+// Vital Stats Card
+.vital-stats-card {
+  margin-bottom: 24px;
+  background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%);
+  border: 2px solid var(--theme-color, #8d6e36);
+  border-radius: 16px;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1);
+
+  ion-card-header {
+    background: linear-gradient(90deg, var(--theme-color, #8d6e36) 0%, color-mix(in srgb, var(--theme-color, #8d6e36) 80%, white) 100%);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 14px 14px 0 0;
+
+    ion-card-title {
+      color: #ffffff;
+      font-size: 1.3rem;
+      font-weight: bold;
+    }
+  }
+}
+
+.vital-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.vital-stat {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  border-left: 4px solid var(--theme-color, #8d6e36);
+}
+
+.stat-icon-container {
+  flex-shrink: 0;
+}
+
+.stat-icon {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+}
+
+.stat-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.stat-label {
+  color: var(--header-text-color, #ccc);
+  font-size: 0.9rem;
+  margin-bottom: 4px;
+}
+
+.stat-value {
+  color: var(--header-text-color, #fff);
+  font-size: 1.1rem;
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.gold-amount {
+  color: #ffffff !important;
+}
+
+// Main Stats Card
+.main-stats-card {
+  margin-bottom: 24px;
+  background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%);
+  border: 2px solid var(--theme-color, #8d6e36);
+  border-radius: 16px;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1);
+
+  ion-card-header {
+    background: linear-gradient(90deg, var(--theme-color, #8d6e36) 0%, color-mix(in srgb, var(--theme-color, #8d6e36) 80%, white) 100%);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 14px 14px 0 0;
+
+    ion-card-title {
+      color: #ffffff;
+      font-size: 1.3rem;
+      font-weight: bold;
+    }
+  }
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 16px;
+}
+
+.stat-item {
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  border-left: 3px solid var(--theme-color, #8d6e36);
+}
+
+.stat-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.stat-name {
+  color: var(--header-text-color, #ccc);
+  font-weight: 500;
+}
+
+.stat-value {
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+// Skills Card
+.skills-card {
+  margin-bottom: 24px;
+  background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%);
+  border: 2px solid var(--theme-color, #8d6e36);
+  border-radius: 16px;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1);
+
+  ion-card-header {
+    background: linear-gradient(90deg, var(--theme-color, #8d6e36) 0%, color-mix(in srgb, var(--theme-color, #8d6e36) 80%, white) 100%);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 14px 14px 0 0;
+
+    ion-card-title {
+      color: #ffffff;
+      font-size: 1.3rem;
+      font-weight: bold;
+    }
+  }
+}
+
+.skills-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 16px;
+}
+
+.skill-item {
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  border-left: 3px solid var(--theme-color, #8d6e36);
+}
+
+.skill-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.skill-name {
+  color: var(--header-text-color, #ccc);
+  font-weight: 500;
+}
+
+.skill-value {
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+// Resistances Card
+.resistances-card {
+  margin-bottom: 24px;
+  background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%);
+  border: 2px solid var(--theme-color, #8d6e36);
+  border-radius: 16px;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1);
+
+  ion-card-header {
+    background: linear-gradient(90deg, var(--theme-color, #8d6e36) 0%, color-mix(in srgb, var(--theme-color, #8d6e36) 80%, white) 100%);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 14px 14px 0 0;
+
+    ion-card-title {
+      color: #ffffff;
+      font-size: 1.3rem;
+      font-weight: bold;
+    }
+  }
+}
+
+.resistances-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 16px;
+}
+
+.resistance-item {
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  border-left: 3px solid var(--theme-color, #8d6e36);
+}
+
+.resistance-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.resistance-name {
+  color: var(--header-text-color, #ccc);
+  font-weight: 500;
+}
+
+.resistance-value {
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+// No Character State
+.no-character {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  text-align: center;
+
+  .no-character-icon {
+    font-size: 4rem;
+    color: var(--ion-color-primary);
+    margin-bottom: 16px;
+  }
+
+  h2 {
+    color: var(--header-text-color, #fff);
+    margin: 0 0 12px 0;
+    font-size: 1.5rem;
+  }
+
+  p {
+    color: var(--header-text-color, #ccc);
+    margin: 0 0 24px 0;
+    font-size: 1rem;
+  }
+}
+
+// Progress Bar Customization
+ion-progress-bar {
+  --background: rgba(255, 255, 255, 0.1);
+  --progress-background: var(--ion-color-primary);
+  height: 6px;
+  border-radius: 3px;
+}
+
+// Responsive Design
+@media (max-width: 768px) {
+  .statistics-container {
+    padding: 0 8px;
+  }
+
+  .character-portrait-section {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .character-portrait {
+    width: 100px;
+    height: 100px;
+  }
+
+  .character-basic-info {
+    grid-template-columns: 1fr;
+  }
+
+  .vital-stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .stats-grid,
+  .skills-grid,
+  .resistances-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .page-title {
+    font-size: 1.5rem;
+  }
+
+  .character-name {
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .statistics-container {
+    padding: 0 4px;
+  }
+
+  .character-portrait {
+    width: 80px;
+    height: 80px;
+  }
+
+  .vital-stat {
+    flex-direction: column;
+    text-align: center;
+    gap: 12px;
+  }
+
+  .stat-icon {
+    width: 40px;
+    height: 40px;
+  }
+}

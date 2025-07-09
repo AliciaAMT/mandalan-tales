@@ -1,0 +1,5 @@
+[31-May-2019 01:58:04 Europe/London] PHP Fatal error:  Uncaught PDOException: SQLSTATE[HY000]: General error in /home/dp3ndfkah1ii/public_html/game/object.php:132
+Stack trace:
+#0 /home/dp3ndfkah1ii/public_html/game/object.php(132): PDOStatement->fetch()
+#1 {main}
+  thrown in /home/dp3ndfkah1ii/public_html/game/object.php on line 132
