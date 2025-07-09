@@ -295,6 +295,11 @@ export class InventoryPage implements OnInit {
   async onEquip() {
     if (!this.selectedItem) return;
     const item = this.selectedItem;
+
+    // Determine which pocket the item is from
+    const isFromTrade = item.trade > 0;
+    const isFromKeep = item.keep > 0;
+
     // Special case for rings (Finger): allow up to 4
     if (item.equiplocation === 'Finger') {
       const equippedRings = this.inventoryService.inventory.filter(
@@ -304,17 +309,43 @@ export class InventoryPage implements OnInit {
         alert('You already have 4 rings equipped. Unequip one before equipping another.');
         return;
       }
-      await this.inventoryService.updateItem({
-        ...item,
-        equip: 1,
-        keep: 0,
-        equiplh: 0,
-        equiprh: 0
-      });
+
+      // If from keep pocket and only 1 item, remove from keep
+      if (isFromKeep && item.keep === 1) {
+        await this.inventoryService.updateItem({
+          ...item,
+          equip: 1,
+          keep: 0,
+          trade: item.trade,
+          equiplh: 0,
+          equiprh: 0
+        });
+      } else if (isFromTrade && item.trade === 1) {
+        // If from trade pocket and only 1 item, remove from trade
+        await this.inventoryService.updateItem({
+          ...item,
+          equip: 1,
+          keep: item.keep,
+          trade: 0,
+          equiplh: 0,
+          equiprh: 0
+        });
+      } else {
+        // Subtract 1 from the source pocket
+        await this.inventoryService.updateItem({
+          ...item,
+          equip: 1,
+          keep: isFromKeep ? item.keep - 1 : item.keep,
+          trade: isFromTrade ? item.trade - 1 : item.trade,
+          equiplh: 0,
+          equiprh: 0
+        });
+      }
       await this.loadInventoryData();
       this.closeItemModal();
       return;
     }
+
     // Unequip any item in the same slot (not Finger)
     const equippedInSlot = this.inventoryService.inventory.filter(
       i => i.equiplocation === item.equiplocation && i.equip === 1 && i.id !== item.id
@@ -325,17 +356,43 @@ export class InventoryPage implements OnInit {
         equip: 0,
         equiplh: 0,
         equiprh: 0,
-        keep: 1
+        keep: equippedItem.keep + 1,
+        trade: equippedItem.trade
       });
     }
+
     // Equip the selected item
-    await this.inventoryService.updateItem({
-      ...item,
-      equip: 1,
-      keep: 0,
-      equiplh: 0,
-      equiprh: 0
-    });
+    if (isFromKeep && item.keep === 1) {
+      // If from keep pocket and only 1 item, remove from keep
+      await this.inventoryService.updateItem({
+        ...item,
+        equip: 1,
+        keep: 0,
+        trade: item.trade,
+        equiplh: 0,
+        equiprh: 0
+      });
+    } else if (isFromTrade && item.trade === 1) {
+      // If from trade pocket and only 1 item, remove from trade
+      await this.inventoryService.updateItem({
+        ...item,
+        equip: 1,
+        keep: item.keep,
+        trade: 0,
+        equiplh: 0,
+        equiprh: 0
+      });
+    } else {
+      // Subtract 1 from the source pocket
+      await this.inventoryService.updateItem({
+        ...item,
+        equip: 1,
+        keep: isFromKeep ? item.keep - 1 : item.keep,
+        trade: isFromTrade ? item.trade - 1 : item.trade,
+        equiplh: 0,
+        equiprh: 0
+      });
+    }
     await this.loadInventoryData();
     this.closeItemModal();
   }
@@ -343,6 +400,11 @@ export class InventoryPage implements OnInit {
   async onEquipLeft() {
     if (!this.selectedItem) return;
     const item = this.selectedItem;
+
+    // Determine which pocket the item is from
+    const isFromTrade = item.trade > 0;
+    const isFromKeep = item.keep > 0;
+
     // Unequip any left-hand equipped item
     const equippedLeft = this.inventoryService.inventory.filter(
       i => i.equiplh === 1 && i.equip === 1 && i.id !== item.id
@@ -353,16 +415,43 @@ export class InventoryPage implements OnInit {
         equip: 0,
         equiplh: 0,
         equiprh: 0,
-        keep: 1
+        keep: equippedItem.keep + 1,
+        trade: equippedItem.trade
       });
     }
-    await this.inventoryService.updateItem({
-      ...item,
-      equip: 1,
-      equiplh: 1,
-      equiprh: 0,
-      keep: 0
-    });
+
+    // Equip the selected item
+    if (isFromKeep && item.keep === 1) {
+      // If from keep pocket and only 1 item, remove from keep
+      await this.inventoryService.updateItem({
+        ...item,
+        equip: 1,
+        equiplh: 1,
+        equiprh: 0,
+        keep: 0,
+        trade: item.trade
+      });
+    } else if (isFromTrade && item.trade === 1) {
+      // If from trade pocket and only 1 item, remove from trade
+      await this.inventoryService.updateItem({
+        ...item,
+        equip: 1,
+        equiplh: 1,
+        equiprh: 0,
+        keep: item.keep,
+        trade: 0
+      });
+    } else {
+      // Subtract 1 from the source pocket
+      await this.inventoryService.updateItem({
+        ...item,
+        equip: 1,
+        equiplh: 1,
+        equiprh: 0,
+        keep: isFromKeep ? item.keep - 1 : item.keep,
+        trade: isFromTrade ? item.trade - 1 : item.trade
+      });
+    }
     await this.loadInventoryData();
     this.closeItemModal();
   }
@@ -370,6 +459,11 @@ export class InventoryPage implements OnInit {
   async onEquipRight() {
     if (!this.selectedItem) return;
     const item = this.selectedItem;
+
+    // Determine which pocket the item is from
+    const isFromTrade = item.trade > 0;
+    const isFromKeep = item.keep > 0;
+
     // Unequip any right-hand equipped item
     const equippedRight = this.inventoryService.inventory.filter(
       i => i.equiprh === 1 && i.equip === 1 && i.id !== item.id
@@ -380,16 +474,43 @@ export class InventoryPage implements OnInit {
         equip: 0,
         equiplh: 0,
         equiprh: 0,
-        keep: 1
+        keep: equippedItem.keep + 1,
+        trade: equippedItem.trade
       });
     }
-    await this.inventoryService.updateItem({
-      ...item,
-      equip: 1,
-      equiplh: 0,
-      equiprh: 1,
-      keep: 0
-    });
+
+    // Equip the selected item
+    if (isFromKeep && item.keep === 1) {
+      // If from keep pocket and only 1 item, remove from keep
+      await this.inventoryService.updateItem({
+        ...item,
+        equip: 1,
+        equiplh: 0,
+        equiprh: 1,
+        keep: 0,
+        trade: item.trade
+      });
+    } else if (isFromTrade && item.trade === 1) {
+      // If from trade pocket and only 1 item, remove from trade
+      await this.inventoryService.updateItem({
+        ...item,
+        equip: 1,
+        equiplh: 0,
+        equiprh: 1,
+        keep: item.keep,
+        trade: 0
+      });
+    } else {
+      // Subtract 1 from the source pocket
+      await this.inventoryService.updateItem({
+        ...item,
+        equip: 1,
+        equiplh: 0,
+        equiprh: 1,
+        keep: isFromKeep ? item.keep - 1 : item.keep,
+        trade: isFromTrade ? item.trade - 1 : item.trade
+      });
+    }
     await this.loadInventoryData();
     this.closeItemModal();
   }
@@ -398,15 +519,34 @@ export class InventoryPage implements OnInit {
     if (!this.selectedItem) return;
     const item = this.selectedItem;
 
+    // Only trade items from keep pocket
+    if (item.keep <= 0) {
+      alert('Can only trade items from keep pocket.');
+      return;
+    }
+
     // Move item from keep to trade pocket (following old PHP demo logic)
-    await this.inventoryService.updateItem({
-      ...item,
-      equip: 0,
-      equiplh: 0,
-      equiprh: 0,
-      keep: 0,
-      trade: 1
-    });
+    if (item.keep === 1) {
+      // If only 1 item in keep, remove from keep and add to trade
+      await this.inventoryService.updateItem({
+        ...item,
+        equip: 0,
+        equiplh: 0,
+        equiprh: 0,
+        keep: 0,
+        trade: item.trade + 1
+      });
+    } else {
+      // Subtract 1 from keep and add 1 to trade
+      await this.inventoryService.updateItem({
+        ...item,
+        equip: 0,
+        equiplh: 0,
+        equiprh: 0,
+        keep: item.keep - 1,
+        trade: item.trade + 1
+      });
+    }
 
     await this.loadInventoryData();
     this.closeItemModal();
@@ -437,8 +577,8 @@ export class InventoryPage implements OnInit {
       equip: 0,
       equiplh: 0,
       equiprh: 0,
-      keep: 1,
-      trade: 0
+      keep: item.keep + 1,
+      trade: item.trade
     });
 
     await this.loadInventoryData();

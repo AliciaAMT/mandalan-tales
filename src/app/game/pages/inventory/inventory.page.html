@@ -74,7 +74,7 @@
                 <button class="filter-btn" type="button" [class.active]="keepFilter==='All'" (click)="setKeepFilter('All')">All</button>
                 <button class="filter-btn" type="button" [class.active]="keepFilter==='Weapon'" (click)="setKeepFilter('Weapon')">Weapons</button>
                 <button class="filter-btn" type="button" [class.active]="keepFilter==='Armor'" (click)="setKeepFilter('Armor')">Armor</button>
-                <button class="filter-btn" type="button" [class.active]="keepFilter==='Accessories'" (click)="setKeepFilter('Accessories')">Accessories</button>
+                <button class="filter-btn" type="button" [class.active]="keepFilter==='Accessory'" (click)="setKeepFilter('Accessory')">Accessories</button>
                 <button class="filter-btn" type="button" [class.active]="keepFilter==='Other'" (click)="setKeepFilter('Other')">Other</button>
               </div>
               <div class="pocket-items">
@@ -87,7 +87,6 @@
                         <div class="inventory-item-details">
                           <div>Level {{ item.itemlevel }} {{ item.itemrarity }}</div>
                           <div>Amount: {{ getItemAmount(item) }}</div>
-                          <div class="inventory-item-desc">{{ item.itemdescription }}</div>
                         </div>
                       </div>
                     </ng-container>
@@ -110,7 +109,7 @@
                 <button class="filter-btn" type="button" [class.active]="tradeFilter==='All'" (click)="setTradeFilter('All')">All</button>
                 <button class="filter-btn" type="button" [class.active]="tradeFilter==='Weapon'" (click)="setTradeFilter('Weapon')">Weapons</button>
                 <button class="filter-btn" type="button" [class.active]="tradeFilter==='Armor'" (click)="setTradeFilter('Armor')">Armor</button>
-                <button class="filter-btn" type="button" [class.active]="tradeFilter==='Accessories'" (click)="setTradeFilter('Accessories')">Accessories</button>
+                <button class="filter-btn" type="button" [class.active]="tradeFilter==='Accessory'" (click)="setTradeFilter('Accessory')">Accessories</button>
                 <button class="filter-btn" type="button" [class.active]="tradeFilter==='Other'" (click)="setTradeFilter('Other')">Other</button>
               </div>
               <div class="pocket-items">
@@ -123,7 +122,6 @@
                         <div class="inventory-item-details">
                           <div>Level {{ item.itemlevel }} | {{ item.itemrarity }}</div>
                           <div *ngIf="showAmount(item)">Amount: {{ getItemAmount(item) }}</div>
-                          <div class="inventory-item-desc">{{ item.itemdescription }}</div>
                           <div class="inventory-item-value" *ngIf="showValue(item)">Value: {{ item.itemvalue }} Gold</div>
                         </div>
                       </div>
@@ -160,7 +158,6 @@
                         <div class="inventory-item-details">
                           <div>Level {{ item.itemlevel }} | {{ item.itemrarity }}</div>
                           <div *ngIf="showAmount(item)">Amount: {{ getItemAmount(item) }}</div>
-                          <div class="inventory-item-desc">{{ item.itemdescription }}</div>
                           <div class="inventory-item-value" *ngIf="showValue(item)">Value: {{ item.itemvalue }} Gold</div>
                         </div>
                       </div>

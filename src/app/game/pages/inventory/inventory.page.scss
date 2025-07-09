@@ -133,6 +133,15 @@
     transition: all 0.3s ease;
     width: 100%;
 
+    .inventory-item-name {
+      text-align: center;
+      font-weight: bold;
+      font-size: 0.9rem;
+      margin-top: 0.5rem;
+      word-wrap: break-word;
+      max-width: 100%;
+    }
+
     &.clickable {
       cursor: pointer;
 
