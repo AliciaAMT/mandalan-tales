@@ -413,4 +413,18 @@ export class InventoryService {
     // New characters start with no inventory items
     // Items must be found through gameplay
   }
+
+  /**
+   * Update an item in Firestore by its ID
+   */
+  async updateItem(item: Inventory): Promise<void> {
+    if (!item.id) throw new Error('Item must have an id to update');
+    const docRef = doc(this.firestore, 'inventory', item.id);
+    await runInInjectionContext(this.injector, () => updateDoc(docRef, { ...item }));
+    // Update local signal
+    const updatedInventory = this.inventory.map(i =>
+      i.id === item.id ? { ...item } : i
+    );
+    this.inventorySignal.set(updatedInventory);
+  }
 }
