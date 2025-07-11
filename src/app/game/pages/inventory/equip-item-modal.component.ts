@@ -1,14 +1,15 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Inventory } from '../../../game/models/inventory.model';
+import { FocusTrapDirective } from '../../../shared/focus-trap.directive';
 
 @Component({
   selector: 'app-equip-item-modal',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FocusTrapDirective],
   template: `
     <div class="custom-modal-backdrop" (click)="closeModal()"></div>
-    <div class="custom-modal">
+    <div class="custom-modal" appFocusTrap tabindex="-1">
       <div class="custom-modal-header">
         <h2>Equip Item to {{ slot }}</h2>
         <button class="close-btn" (click)="closeModal()">&times;</button>
@@ -18,7 +19,7 @@ import { Inventory } from '../../../game/models/inventory.model';
           No equippable items available for this slot.
         </div>
         <div class="inventory-items-grid" *ngIf="items.length > 0">
-          <div class="inventory-item-card" *ngFor="let item of items" (click)="selectItem(item)" tabindex="0">
+          <div class="inventory-item-card" *ngFor="let item of items" (click)="selectItem(item)" tabindex="0" (keydown)="onItemKeydown($event, item)">
             <img [src]="getItemImage(item)" [alt]="item.itemname" class="inventory-item-image" />
             <div class="inventory-item-name">{{ item.itemname }}</div>
             <div class="inventory-item-details">
@@ -158,5 +159,12 @@ export class EquipItemModalComponent {
 
   closeModal() {
     this.close.emit();
+  }
+
+  onItemKeydown(event: KeyboardEvent, item: Inventory) {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      this.selectItem(item);
+    }
   }
 }

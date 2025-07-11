@@ -2,14 +2,15 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Inventory } from '../../models/inventory.model';
 import { IonicModule } from '@ionic/angular';
+import { FocusTrapDirective } from '../../../shared/focus-trap.directive';
 
 @Component({
   selector: 'app-container-modal',
   standalone: true,
-  imports: [CommonModule, IonicModule],
+  imports: [CommonModule, IonicModule, FocusTrapDirective],
   template: `
     <div class="custom-modal-backdrop" (click)="closeModal()"></div>
-    <div class="custom-modal">
+    <div class="custom-modal" appFocusTrap tabindex="-1">
       <div class="custom-modal-header">
         <h2>{{ item.itemname }}</h2>
         <button class="close-btn" (click)="closeModal()">&times;</button>
@@ -53,7 +54,7 @@ import { IonicModule } from '@ionic/angular';
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0, 0, 0, 0.5);
+      background-color: rgba(0, 0, 0, 0.5);
       z-index: 1000;
     }
 
@@ -62,92 +63,119 @@ import { IonicModule } from '@ionic/angular';
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      background: #141414;
-      border: 2px solid #333;
+      background: white;
       border-radius: 8px;
-      padding: 20px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
       z-index: 1001;
+      max-width: 90vw;
+      max-height: 90vh;
+      overflow-y: auto;
       min-width: 300px;
-      max-width: 500px;
     }
 
     .custom-modal-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 20px;
-      border-bottom: 1px solid #333;
-      padding-bottom: 10px;
+      padding: 16px 20px;
+      border-bottom: 1px solid #e0e0e0;
+      background: #f8f9fa;
+      border-radius: 8px 8px 0 0;
     }
 
     .custom-modal-header h2 {
       margin: 0;
-      color: #fff;
+      font-size: 1.2rem;
+      color: #333;
     }
 
     .close-btn {
       background: none;
       border: none;
-      color: #fff;
       font-size: 24px;
       cursor: pointer;
+      color: #666;
       padding: 0;
       width: 30px;
       height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      transition: background-color 0.2s;
+    }
+
+    .close-btn:hover {
+      background-color: #e0e0e0;
     }
 
     .custom-modal-content {
-      color: #fff;
+      padding: 20px;
+    }
+
+    .custom-modal-content p {
+      margin: 0 0 16px 0;
+      color: #333;
+      line-height: 1.5;
     }
 
     .custom-modal-content button {
-      background: #333;
-      color: #fff;
-      border: 1px solid #555;
+      background: #007bff;
+      color: white;
+      border: none;
       padding: 8px 16px;
       border-radius: 4px;
       cursor: pointer;
-      margin: 5px;
+      margin-right: 8px;
+      margin-bottom: 8px;
+      font-size: 14px;
+      transition: background-color 0.2s;
     }
 
     .custom-modal-content button:hover {
-      background: #555;
+      background: #0056b3;
     }
 
     .custom-modal-content button:disabled {
-      background: #222;
-      color: #666;
+      background: #ccc;
       cursor: not-allowed;
     }
 
-    .custom-modal-content button:disabled:hover {
-      background: #222;
-    }
-
     .custom-modal-content ul {
-      margin: 10px 0;
+      margin: 16px 0;
       padding-left: 20px;
     }
 
     .custom-modal-content li {
-      margin: 5px 0;
+      margin-bottom: 4px;
+      color: #333;
     }
   `]
 })
 export class ContainerModalComponent {
   @Input() item!: Inventory;
-  @Input() hasKey = false;
-  @Input() hasLockpick = false;
+  @Input() hasKey: boolean = false;
+  @Input() hasLockpick: boolean = false;
   @Input() foundItems: string[] = [];
-  @Output() close = new EventEmitter<void>();
+
   @Output() unlock = new EventEmitter<void>();
   @Output() lockpick = new EventEmitter<void>();
   @Output() open = new EventEmitter<void>();
+  @Output() close = new EventEmitter<void>();
 
-  closeModal() { this.close.emit(); }
-  onUnlock() { this.unlock.emit(); }
-  onLockpick() { this.lockpick.emit(); }
-  onOpen() {
+  onUnlock(): void {
+    this.unlock.emit();
+  }
+
+  onLockpick(): void {
+    this.lockpick.emit();
+  }
+
+  onOpen(): void {
     this.open.emit();
+  }
+
+  closeModal(): void {
+    this.close.emit();
   }
 }

@@ -1,14 +1,15 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonicModule, ModalController } from '@ionic/angular';
+import { FocusTrapDirective } from '../../../shared/focus-trap.directive';
 
 @Component({
   selector: 'app-result-modal',
   standalone: true,
-  imports: [CommonModule, IonicModule],
+  imports: [CommonModule, IonicModule, FocusTrapDirective],
   template: `
     <div class="custom-modal-backdrop" (click)="closeModal()"></div>
-    <div class="custom-modal">
+    <div class="custom-modal" appFocusTrap tabindex="-1">
       <div class="custom-modal-header">
         <h2>{{ title }}</h2>
         <button class="close-btn" (click)="closeModal()">&times;</button>
