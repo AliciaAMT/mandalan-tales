@@ -1,22 +1,22 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IonicModule } from '@ionic/angular';
+import { IonicModule, ModalController } from '@ionic/angular';
 import { Router, RouterModule } from '@angular/router';
+import { AuthService } from '../../../services/auth.service';
+import { SettingsService } from '../../../game/services/settings.service';
+import { InventoryService } from '../../../game/services/inventory.service';
+import { CharacterService } from '../../../game/services/character.service';
+import { Inventory } from '../../../game/models/inventory.model';
 import { FocusManagerDirective } from '../../../shared/focus-manager.directive';
 import { ItemDetailsModalComponent } from './item-details-modal.component';
 import { ContainerModalComponent } from './container-modal.component';
-import { AuthService } from '../../../services/auth.service';
-import { SettingsService } from '../../services/settings.service';
-import { InventoryService } from '../../services/inventory.service';
-import { Inventory } from '../../models/inventory.model';
-import { ModalController } from '@ionic/angular/standalone';
-import { rollLoot, LootItem } from '../../services/loot-tables';
-import { CharacterService } from '../../services/character.service';
+import { ResultModalComponent } from './result-modal.component';
+import { rollLoot, LootItem } from '../../../game/services/loot-tables';
 
 @Component({
   selector: 'app-inventory',
   standalone: true,
-  imports: [CommonModule, IonicModule, RouterModule, FocusManagerDirective, ItemDetailsModalComponent, ContainerModalComponent],
+  imports: [CommonModule, IonicModule, RouterModule, FocusManagerDirective, ItemDetailsModalComponent, ContainerModalComponent, ResultModalComponent],
   templateUrl: './inventory.page.html',
   styleUrls: ['./inventory.page.scss']
 })
@@ -73,8 +73,19 @@ export class InventoryPage implements OnInit {
 
     // For locked containers, open the container modal
     this.containerModalItem = item;
-    this.containerModalHasKey = false; // TODO: check inventory for key
-    this.containerModalHasLockpick = true; // TODO: check inventory for lockpick
+
+    // Check for keys based on container type
+    let hasKey = false;
+    if (item.itemname === 'Locked Box') {
+      hasKey = this.inventoryService.hasKey('Small Rusty Key');
+    } else if (item.itemname === 'Chest') {
+      hasKey = this.inventoryService.hasKey('Chest Key') || this.inventoryService.hasKey('Key');
+    } else {
+      hasKey = this.inventoryService.hasKey('Key') || this.inventoryService.hasKey('Generic Key');
+    }
+
+    this.containerModalHasKey = hasKey;
+    this.containerModalHasLockpick = this.inventoryService.hasLockpick();
     this.containerModalFoundItems = [];
     this.containerModalOpen = true;
   }
@@ -166,91 +177,39 @@ export class InventoryPage implements OnInit {
 
   async onContainerUnlock() {
     if (!this.containerModalItem || this.containerModalOpened) return;
-    // Use the same loot logic as openContainerModal for unlocking
     const item = this.containerModalItem;
     this.containerModalOpened = true; // Prevent multiple opens
-    if (item.othertype === 'Container') {
-      if (item.contentType === 'gold') {
-        const gold = rollLoot('gold');
-        console.log('[Unlock Gold Roll]', gold);
-        if (typeof gold === 'number' && gold > 0) {
-          const char = this.characterService.getCurrentCharacter();
-          if (char) {
-            await this.characterService.updateCharacter(char.id!, { gold: (char.gold || 0) + gold });
-            this.containerModalFoundItems = [`You found ${gold} gold coins!`];
-            // Remove the container after successful loot
-            await this.inventoryService.removeItem(item.itemname, 1);
-          } else {
-            this.containerModalFoundItems = ['No character found to add gold.'];
-          }
-        } else {
-          this.containerModalFoundItems = ['No gold found.'];
-          // Remove the container even if empty
-          await this.inventoryService.removeItem(item.itemname, 1);
-        }
-      } else if (item.contentType === 'random') {
-        const loot = rollLoot('random');
-        console.log('[Unlock Random Loot Roll]', loot);
-        if (loot && typeof loot === 'object') {
-          await this.inventoryService.addItem({
-            itemname: loot.name,
-            itemdescription: loot.description,
-            itemtype: loot.type,
-            itemimage: loot.image,
-            itemlevel: loot.level,
-            itemrarity: loot.rarity,
-            itemvalue: loot.value,
-            keep: 1,
-            ['equipable']: loot['equipable'] || 0,
-            ['equiplocation']: loot['equiplocation'] || '',
-            ['weapontype']: loot['weapontype'] || '',
-            ['armortype']: loot['armortype'] || '',
-            ['acctype']: loot['acctype'] || '',
-            ['enhancement1']: loot['enhancement1'] || '',
-            ['enhancement2']: loot['enhancement2'] || '',
-            ['enhancement3']: loot['enhancement3'] || '',
-            ['legendary']: loot['legendary'] || 0
-          });
-          this.containerModalFoundItems = [`You found: ${loot.name} (Level ${loot.level} ${loot.rarity})`];
-          // Remove the container after successful loot
-          await this.inventoryService.removeItem(item.itemname, 1);
-        } else {
-          this.containerModalFoundItems = ['The container is empty.'];
-          // Remove the container even if empty
-          await this.inventoryService.removeItem(item.itemname, 1);
-        }
-      } else if (item.contentType === 'fixed' && item.fixedContent) {
-        await this.inventoryService.addItem({
-          itemname: item.fixedContent,
-          itemdescription: 'A special item found in a fixed-content container.',
-          itemtype: 'Other',
-          itemimage: '',
-          itemlevel: 1,
-          itemrarity: 'Relic',
-          itemvalue: 0,
-          keep: 1
-        });
-        this.containerModalFoundItems = [item.fixedContent];
-        // Remove the container after successful loot
-        await this.inventoryService.removeItem(item.itemname, 1);
-      } else {
-        this.containerModalFoundItems = ['The container is empty.'];
-        // Remove the container even if empty
-        await this.inventoryService.removeItem(item.itemname, 1);
-      }
+
+    // Check for specific keys based on container type
+    let keyName = '';
+    if (item.itemname === 'Locked Box') {
+      keyName = 'Small Rusty Key';
+    } else if (item.itemname === 'Chest') {
+      keyName = 'Chest Key';
+    } else {
+      keyName = 'Key';
     }
-    // Mark the container as unlocked
-    item.keylock = 0;
+
+    const result = await this.inventoryService.unlockWithKey(item, keyName);
+    if (result.success) {
+      this.containerModalFoundItems = result.items?.map(item => item.name) || [];
+      await this.loadInventoryData();
+    } else {
+      this.containerModalFoundItems = [result.message];
+    }
   }
 
-  onContainerLockpick() {
-    // Placeholder: lockpick logic (random success)
-    const success = Math.random() > 0.5;
-    if (success) {
-      this.containerModalFoundItems = ['Gemstone', 'Scroll'];
-      this.containerModalItem!.keylock = 0;
+  async onContainerLockpick() {
+    if (!this.containerModalItem || this.containerModalOpened) return;
+    const item = this.containerModalItem;
+    this.containerModalOpened = true; // Prevent multiple opens
+
+    const result = await this.inventoryService.lockpickContainer(item);
+    if (result.success) {
+      this.containerModalFoundItems = result.items?.map(item => item.name) || [];
+      await this.loadInventoryData();
     } else {
-      this.containerModalFoundItems = [];
+      this.containerModalFoundItems = [result.message];
     }
   }
 
@@ -269,7 +228,7 @@ export class InventoryPage implements OnInit {
   private async loadUserSettings(): Promise<void> {
     const user = this.authService.getCurrentUser();
     if (user) {
-      const settings = await this.settingsService.getUserSettings(user.uid);
+      const settings = await this.settingsService.getUserSettings(user.uid) as any;
       if (settings) {
         document.documentElement.style.setProperty('--theme-color', settings.themeColor);
         document.documentElement.style.setProperty('--ion-color-primary', settings.themeColor);
@@ -798,8 +757,120 @@ export class InventoryPage implements OnInit {
     this.closeItemModal();
   }
   onUnlock() {
-    alert('Unlock action not implemented.');
+    if (!this.selectedItem) return;
+
+    const item = this.selectedItem;
+
+    // Check if this is a locked container
+    if (item.keylock > 0) {
+      this.handleLockedContainer(item);
+    } else {
+      alert('This item cannot be unlocked.');
+    }
+
     this.closeItemModal();
+  }
+
+  /**
+   * Handle unlocking a locked container
+   */
+  private async handleLockedContainer(item: Inventory) {
+    // Check for specific keys based on container type
+    let hasKey = false;
+    let keyName = '';
+
+    if (item.itemname === 'Locked Box') {
+      keyName = 'Small Rusty Key';
+      hasKey = this.inventoryService.hasKey(keyName);
+    } else if (item.itemname === 'Chest') {
+      // Chest can be lockpicked or might have a specific key
+      hasKey = this.inventoryService.hasKey('Chest Key') || this.inventoryService.hasKey('Key');
+      keyName = 'Chest Key';
+    } else {
+      // Generic locked container
+      hasKey = this.inventoryService.hasKey('Key') || this.inventoryService.hasKey('Generic Key');
+      keyName = 'Key';
+    }
+
+    const hasLockpick = this.inventoryService.hasLockpick();
+
+    if (hasKey) {
+      // Try to unlock with key
+      const result = await this.inventoryService.unlockWithKey(item, keyName);
+      if (result.success) {
+        // Show success message and items found
+        this.itemDetailsLootResult = result.items?.map(item => item.name) || [];
+        await this.loadInventoryData();
+
+        // Show result modal
+        const modal = await this.modalCtrl.create({
+          component: ResultModalComponent,
+          componentProps: {
+            title: 'Container Unlocked',
+            message: result.message,
+            items: result.items?.map(item => item.name) || [],
+            experience: 5 // Based on old demo
+          }
+        });
+        await modal.present();
+      } else {
+        // Show error message
+        const modal = await this.modalCtrl.create({
+          component: ResultModalComponent,
+          componentProps: {
+            title: 'Cannot Unlock',
+            message: result.message,
+            items: [],
+            experience: 0
+          }
+        });
+        await modal.present();
+      }
+    } else if (hasLockpick) {
+      // Try to lockpick
+      const result = await this.inventoryService.lockpickContainer(item);
+      if (result.success) {
+        // Show success message and items found
+        this.itemDetailsLootResult = result.items?.map(item => item.name) || [];
+        await this.loadInventoryData();
+
+        // Show result modal
+        const modal = await this.modalCtrl.create({
+          component: ResultModalComponent,
+          componentProps: {
+            title: 'Lockpick Successful',
+            message: result.message,
+            items: result.items?.map(item => item.name) || [],
+            experience: 5 // Based on old demo
+          }
+        });
+        await modal.present();
+      } else {
+        // Show failure message
+        const modal = await this.modalCtrl.create({
+          component: ResultModalComponent,
+          componentProps: {
+            title: 'Lockpick Failed',
+            message: result.message,
+            items: [],
+            experience: 0
+          }
+        });
+        await modal.present();
+      }
+    } else {
+      // No key or lockpick available
+      const modal = await this.modalCtrl.create({
+        component: ResultModalComponent,
+        componentProps: {
+          title: 'Cannot Unlock',
+          message: 'You need a key or lockpick to unlock this container.',
+          items: [],
+          experience: 0
+        }
+      });
+      await modal.present();
+    }
   }
   onOpen() {
     alert('Open action not implemented.');

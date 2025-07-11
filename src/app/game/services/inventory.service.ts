@@ -464,4 +464,232 @@ export class InventoryService {
     );
     this.inventorySignal.set(updatedInventory);
   }
+
+  /**
+   * Check if player has a specific key
+   */
+  hasKey(keyName: string): boolean {
+    return this.inventory.some(item =>
+      item.itemname === keyName && item.keep > 0
+    );
+  }
+
+  /**
+   * Check if player has lockpicks
+   */
+  hasLockpick(): boolean {
+    return this.inventory.some(item =>
+      item.itemname === 'Lockpick' && item.keep > 0
+    );
+  }
+
+  /**
+   * Get lockpicking skill from character stats
+   */
+  private getLockpickingSkill(): number {
+    const currentCharacter = this.getCurrentCharacter();
+    if (!currentCharacter) return 0;
+
+    // Based on old demo logic: lockpicking + blockpicking + level + luck + bluck + bthieving
+    return (currentCharacter.lockpicking || 0) +
+           (currentCharacter.blockpicking || 0) +
+           (currentCharacter.level || 0) +
+           (currentCharacter.luck || 0) +
+           (currentCharacter.bluck || 0) +
+           (currentCharacter.bthieving || 0);
+  }
+
+  /**
+   * Attempt to unlock a container with a key
+   */
+  async unlockWithKey(containerItem: Inventory, keyName: string): Promise<{ success: boolean; message: string; items?: any[] }> {
+    if (!this.hasKey(keyName)) {
+      return {
+        success: false,
+        message: `You do not have the ${keyName}. You cannot unlock this container.`
+      };
+    }
+
+    // Remove the key
+    await this.removeItem(keyName, 1);
+
+    // Handle specific container types based on old demo
+    if (containerItem.itemname === 'Locked Box') {
+      return await this.handleLockedBoxUnlock(containerItem);
+    }
+
+    // Generic container unlock
+    return await this.handleGenericContainerUnlock(containerItem);
+  }
+
+  /**
+   * Attempt to lockpick a container
+   */
+  async lockpickContainer(containerItem: Inventory): Promise<{ success: boolean; message: string; items?: any[] }> {
+    if (!this.hasLockpick()) {
+      return {
+        success: false,
+        message: 'You do not have a lockpick.'
+      };
+    }
+
+    const lockpickingSkill = this.getLockpickingSkill();
+    const randomRoll = Math.floor(Math.random() * 20) + 1; // 1-20 like old demo
+
+    if (lockpickingSkill < randomRoll) {
+      // Failed lockpick attempt - break the lockpick
+      await this.removeItem('Lockpick', 1);
+      return {
+        success: false,
+        message: 'You attempt to pick the lock, but your lockpick broke.'
+      };
+    }
+
+    // Successful lockpick
+    await this.removeItem('Lockpick', 1);
+
+    // Handle specific container types
+    if (containerItem.itemname === 'Chest' && containerItem.locklevel > 0) {
+      return await this.handleChestLockpick(containerItem);
+    }
+
+    // Generic container lockpick
+    return await this.handleGenericContainerUnlock(containerItem);
+  }
+
+  /**
+   * Handle unlocking the specific "Locked Box" from the old demo
+   */
+  private async handleLockedBoxUnlock(containerItem: Inventory): Promise<{ success: boolean; message: string; items?: any[] }> {
+    const currentCharacter = this.getCurrentCharacter();
+    if (!currentCharacter) {
+      return { success: false, message: 'No character found.' };
+    }
+
+    // Add the Sharpened Bone Dagger (based on old demo)
+    const daggerItem = this.createBasicItem(
+      'Sharpened Bone Dagger',
+      'This dagger appears to be particularly deadly.',
+      'Weapon',
+      'sharpdagger',
+      1,
+      {
+        itemrarity: 'Relic',
+        equipable: 1,
+        equiplocation: 'Weapon',
+        weapontype: 'Dagger',
+        relic: 1,
+        criticalhit: 25,
+        duality: 1,
+        sharpened: 2,
+        itemrange: 0,
+        itemspeed: 20,
+        weaponbase: 4,
+        itemvalue: 3 * 1 * 5, // 3 * level * 5
+        damage: (4 * 1) + 2 // (weaponbase * level) + sharpened
+      }
+    );
+
+    const success = await this.addItem(daggerItem);
+    if (!success) {
+      return { success: false, message: 'Your inventory is full.' };
+    }
+
+    // Remove the locked box
+    await this.removeItem(containerItem.itemname, 1);
+
+    // Give experience (based on old demo)
+    await this.characterService.updateCharacter(currentCharacter.id!, {
+      experience: (currentCharacter.experience || 0) + 5
+    });
+
+    return {
+      success: true,
+      message: 'You unlock the box with the key and find: Sharpened Bone Dagger (Level 1 Relic)',
+      items: [{
+        name: 'Sharpened Bone Dagger',
+        description: 'This dagger appears to be particularly deadly.',
+        image: 'sharpdagger',
+        quantity: 1
+      }]
+    };
+  }
+
+  /**
+   * Handle lockpicking the chest (based on old demo)
+   */
+  private async handleChestLockpick(containerItem: Inventory): Promise<{ success: boolean; message: string; items?: any[] }> {
+    const currentCharacter = this.getCurrentCharacter();
+    if (!currentCharacter) {
+      return { success: false, message: 'No character found.' };
+    }
+
+    // Add the Family Crest Amulet (based on old demo)
+    const amuletItem = this.createBasicItem(
+      'Family Crest Amulet',
+      'This Family Crest Amulet is decorated with precious gems and a carving of a dragon. It has a mystical glow and you can feel the magic radiating from it.',
+      'Accessory',
+      'familycrest',
+      1,
+      {
+        itemrarity: 'Relic',
+        itemvalue: 10000,
+        equipable: 1,
+        equiplocation: 'Neck',
+        acctype: 'Amulet',
+        accbase: 1,
+        legendary: 1,
+        relic: 1,
+        defense: 1,
+        lightsource: 1
+      }
+    );
+
+    const success = await this.addItem(amuletItem);
+    if (!success) {
+      return { success: false, message: 'Your inventory is full.' };
+    }
+
+    // Give experience (based on old demo)
+    await this.characterService.updateCharacter(currentCharacter.id!, {
+      experience: (currentCharacter.experience || 0) + 5
+    });
+
+    return {
+      success: true,
+      message: 'You successfully pick the lock and find: Family Crest Amulet (Level 1 Relic)',
+      items: [{
+        name: 'Family Crest Amulet',
+        description: 'This Family Crest Amulet is decorated with precious gems and a carving of a dragon.',
+        image: 'familycrest',
+        quantity: 1
+      }]
+    };
+  }
+
+  /**
+   * Handle generic container unlock (for containers without specific logic)
+   */
+  private async handleGenericContainerUnlock(containerItem: Inventory): Promise<{ success: boolean; message: string; items?: any[] }> {
+    // Use the existing container loot logic
+    const loot = await this.generateContainerLoot(containerItem);
+
+    // Remove the container
+    await this.removeItem(containerItem.itemname, 1);
+
+    return {
+      success: true,
+      message: 'You successfully unlock the container.',
+      items: loot
+    };
+  }
+
+  /**
+   * Generate loot for a container (reuse existing logic)
+   */
+  private async generateContainerLoot(containerItem: Inventory): Promise<any[]> {
+    // This would reuse the existing loot generation logic from handleContainerLoot
+    // For now, return empty array - the actual loot logic is in the inventory page
+    return [];
+  }
 }

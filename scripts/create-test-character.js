@@ -24,6 +24,10 @@ function createTestCharacter() {
     intelligence: 10,
     vitality: 10,
     luck: 10,
+    lockpicking: 5, // Add lockpicking skill for testing
+    blockpicking: 2,
+    bthieving: 3,
+    bluck: 1,
     created: new Date().toISOString()
   };
 
@@ -47,6 +51,44 @@ function createTestCharacter() {
       quantity: 1,
       othertype: 'Container',
       contentType: 'gold'
+    },
+    {
+      itemname: 'Locked Box',
+      description: 'You remember hiding your most valued possession in this lockbox. It requires a special key.',
+      type: 'Other',
+      image: 'lockedbox',
+      quantity: 1,
+      keylock: 1,
+      othertype: 'Container',
+      contentType: 'fixed',
+      fixedContent: 'Sharpened Bone Dagger'
+    },
+    {
+      itemname: 'Small Rusty Key',
+      description: 'A small rusty key that might unlock something.',
+      type: 'Other',
+      image: 'smallrustykey',
+      quantity: 1,
+      othertype: 'Tool'
+    },
+    {
+      itemname: 'Lockpick',
+      description: 'A tool for picking locks.',
+      type: 'Other',
+      image: 'lockpick',
+      quantity: 2,
+      othertype: 'Tool'
+    },
+    {
+      itemname: 'Chest',
+      description: 'A sturdy wooden chest.',
+      type: 'Other',
+      image: 'chest',
+      quantity: 1,
+      keylock: 1,
+      locklevel: 15,
+      othertype: 'Container',
+      contentType: 'random'
     }
   ];
 
@@ -59,6 +101,11 @@ function createTestCharacter() {
   console.log('1. Set up Firebase Admin SDK');
   console.log('2. Use admin.firestore().collection("characters").add(testCharacter)');
   console.log('3. Use admin.firestore().collection("inventories").add(testInventory)');
+
+  console.log('\nTest Scenarios:');
+  console.log('- Locked Box + Small Rusty Key: Should unlock and give Sharpened Bone Dagger');
+  console.log('- Chest + Lockpick: Should attempt lockpicking with skill check');
+  console.log('- Locked Box without key: Should show "need key or lockpick" message');
 }
 
 createTestCharacter();
