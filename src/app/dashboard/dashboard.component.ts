@@ -268,6 +268,12 @@ export class DashboardComponent implements OnInit {
       // 5. Reset character stats to default (optional - uncomment if you want this)
       // await this.characterService.resetCharacterStats(character.id);
 
+      // 6. Reset character level to 1 (leave other stats alone)
+      if (character.id) {
+        await this.characterService.updateCharacter(character.id, { level: 1 });
+        console.log('Reset character level to 1');
+      }
+
       console.log('Complete character reset finished for:', character.name);
 
       // Show success message

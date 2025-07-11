@@ -391,13 +391,26 @@ export class DialogueService {
     const currentNode = this.currentNode();
     if (!currentNode) return [];
 
-    return currentNode.options.filter(option => {
-      // Check requirements
-      if (option.requirements) {
-        return this.checkRequirements(option.requirements);
+    // Filter by requirements
+    const filtered = currentNode.options.filter(option => {
+      const result = option.requirements ? this.checkRequirements(option.requirements) : true;
+      if (!result) {
+        console.log('[Dialogue Debug] Option filtered out:', option.id, option.text, option.requirements);
+      } else {
+        console.log('[Dialogue Debug] Option PASSES:', option.id, option.text, option.requirements);
       }
+      return result;
+    });
+
+    // Deduplicate by text (show only the first matching option for each text)
+    const seen = new Set<string>();
+    const deduped = filtered.filter(option => {
+      if (seen.has(option.text)) return false;
+      seen.add(option.text);
       return true;
     });
+    console.log('[Dialogue Debug] Final available options:', deduped.map(o => o.id));
+    return deduped;
   }
 
   /**
@@ -408,19 +421,22 @@ export class DialogueService {
     if (!character) return false;
 
     for (const requirement of requirements) {
+      let pass = true;
       switch (requirement.type) {
         case 'level':
           if (requirement.operator === 'greater') {
-            if (character.level <= requirement.value) return false;
+            pass = character.level > requirement.value;
+          } else if (requirement.operator === 'equals') {
+            pass = character.level === requirement.value;
           } else {
-            if (character.level < requirement.value) return false;
+            pass = character.level === requirement.value;
           }
           break;
         case 'experience':
           if (requirement.operator === 'less') {
-            if (character.experience >= requirement.value) return false;
+            pass = character.experience < requirement.value;
           } else {
-            if (character.experience < requirement.value) return false;
+            pass = character.experience >= requirement.value;
           }
           break;
         case 'flag':
@@ -430,6 +446,8 @@ export class DialogueService {
           // This would need to be implemented with inventory checking
           break;
       }
+      console.log('[Dialogue Debug] Requirement check:', requirement, 'Character:', { level: character.level, experience: character.experience }, 'Result:', pass);
+      if (!pass) return false;
     }
     return true;
   }
