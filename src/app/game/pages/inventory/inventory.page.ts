@@ -16,7 +16,7 @@ import { rollLoot, LootItem } from '../../../game/services/loot-tables';
 @Component({
   selector: 'app-inventory',
   standalone: true,
-  imports: [CommonModule, IonicModule, RouterModule, FocusManagerDirective, ItemDetailsModalComponent, ContainerModalComponent, ResultModalComponent],
+  imports: [CommonModule, IonicModule, RouterModule, FocusManagerDirective, ItemDetailsModalComponent, ContainerModalComponent],
   templateUrl: './inventory.page.html',
   styleUrls: ['./inventory.page.scss']
 })

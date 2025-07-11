@@ -253,6 +253,8 @@
 }
 
 .inventory-item-card {
+  cursor: pointer;
+  transition: background 0.2s, box-shadow 0.2s;
   background: #111;
   color: #fff;
   border-radius: 0.75rem;
@@ -267,6 +269,13 @@
   flex-direction: column;
   align-items: center;
   text-align: center;
+}
+
+.inventory-item-card:hover,
+.inventory-item-card:focus {
+  background: rgba(200, 180, 120, 0.12);
+  box-shadow: 0 0 0 2px var(--theme-color, #c9a682);
+  outline: none;
 }
 
 .inventory-item-image {
