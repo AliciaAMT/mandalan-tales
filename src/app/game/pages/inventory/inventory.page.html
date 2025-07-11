@@ -39,7 +39,9 @@
                   </ng-container>
                   <ng-template #emptySlot>
                     <div class="slot-content empty">
-                      <ion-icon name="add-circle-outline" aria-hidden="true"></ion-icon>
+                      <button class="add-btn" (click)="openEquipModal(slot)" attr.aria-label="Equip item to {{ slot }}">
+                        <ion-icon name="add-circle-outline" aria-hidden="true"></ion-icon>
+                      </button>
                       <span>Empty</span>
                     </div>
                   </ng-template>
@@ -55,7 +57,9 @@
                   </ng-container>
                   <ng-template #emptyRingSlot>
                     <div class="slot-content empty">
-                      <ion-icon name="add-circle-outline" aria-hidden="true"></ion-icon>
+                      <button class="add-btn" (click)="openEquipModal('Finger')" attr.aria-label="Equip ring">
+                        <ion-icon name="add-circle-outline" aria-hidden="true"></ion-icon>
+                      </button>
                       <span>Empty</span>
                     </div>
                   </ng-template>
@@ -191,6 +195,14 @@
     (openContainer)="openContainerModal($event)"
     (unequip)="onUnequip()"
   ></app-item-details-modal>
+
+  <app-equip-item-modal
+    *ngIf="equipModalOpen"
+    [slot]="equipModalSlot || ''"
+    [items]="equipModalItems"
+    (itemSelected)="onEquipItemSelected($event)"
+    (close)="closeEquipModal()"
+  ></app-equip-item-modal>
 
   <app-container-modal
     *ngIf="containerModalOpen && containerModalItem"

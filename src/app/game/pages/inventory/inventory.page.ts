@@ -12,11 +12,12 @@ import { ItemDetailsModalComponent } from './item-details-modal.component';
 import { ContainerModalComponent } from './container-modal.component';
 import { ResultModalComponent } from './result-modal.component';
 import { rollLoot, LootItem } from '../../../game/services/loot-tables';
+import { EquipItemModalComponent } from './equip-item-modal.component';
 
 @Component({
   selector: 'app-inventory',
   standalone: true,
-  imports: [CommonModule, IonicModule, RouterModule, FocusManagerDirective, ItemDetailsModalComponent, ContainerModalComponent],
+  imports: [CommonModule, IonicModule, RouterModule, FocusManagerDirective, ItemDetailsModalComponent, ContainerModalComponent, EquipItemModalComponent],
   templateUrl: './inventory.page.html',
   styleUrls: ['./inventory.page.scss']
 })
@@ -57,6 +58,10 @@ export class InventoryPage implements OnInit {
   containerModalFoundItems: string[] = [];
   containerModalOpened = false; // Track if container has been opened
   itemDetailsLootResult: string[] = []; // Track loot result for item details modal
+
+  equipModalOpen = false;
+  equipModalSlot: string | null = null;
+  equipModalItems: Inventory[] = [];
 
   async openContainerModal(item: Inventory) {
     console.log('openContainerModal called', item);
@@ -879,5 +884,89 @@ export class InventoryPage implements OnInit {
 
   goBack() {
     this.router.navigate(['/game']);
+  }
+
+  openEquipModal(slot: string) {
+    this.equipModalSlot = slot;
+    // Filter keep pocket items for those that can be equipped in this slot
+    this.equipModalItems = this.keepPocketItems.filter(item =>
+      item.equipable === 1 && item.equiplocation === slot
+    );
+    this.equipModalOpen = true;
+  }
+
+  closeEquipModal() {
+    this.equipModalOpen = false;
+    this.equipModalSlot = null;
+    this.equipModalItems = [];
+  }
+
+  async onEquipItemSelected(item: Inventory) {
+    if (!item || !this.equipModalSlot) return;
+    const slot = this.equipModalSlot;
+    const isRing = slot === 'Finger';
+    const isFromKeep = item.keep > 0;
+    const isFromTrade = item.trade > 0;
+
+    // For rings, allow up to 4
+    if (isRing) {
+      const equippedRings = this.inventoryService.inventory.filter(
+        i => i.equiplocation === 'Finger' && i.equip === 1
+      );
+      if (equippedRings.length >= 4) {
+        this.closeEquipModal();
+        return;
+      }
+    } else {
+      // Unequip any item in the same slot (not Finger)
+      const equippedInSlot = this.inventoryService.inventory.filter(
+        i => i.equiplocation === slot && i.equip === 1 && i.id !== item.id
+      );
+      for (const equippedItem of equippedInSlot) {
+        await this.inventoryService.updateItem({
+          ...equippedItem,
+          equip: 0,
+          equiplh: 0,
+          equiprh: 0,
+          keep: equippedItem.keep + 1,
+          trade: equippedItem.trade
+        });
+      }
+    }
+
+    // Equip the selected item
+    if (isFromKeep && item.keep === 1) {
+      await this.inventoryService.updateItem({
+        ...item,
+        equip: 1,
+        equiplocation: slot,
+        keep: 0,
+        trade: item.trade,
+        equiplh: 0,
+        equiprh: 0
+      });
+    } else if (isFromTrade && item.trade === 1) {
+      await this.inventoryService.updateItem({
+        ...item,
+        equip: 1,
+        equiplocation: slot,
+        keep: item.keep,
+        trade: 0,
+        equiplh: 0,
+        equiprh: 0
+      });
+    } else {
+      await this.inventoryService.updateItem({
+        ...item,
+        equip: 1,
+        equiplocation: slot,
+        keep: isFromKeep ? item.keep - 1 : item.keep,
+        trade: isFromTrade ? item.trade - 1 : item.trade,
+        equiplh: 0,
+        equiprh: 0
+      });
+    }
+    await this.loadInventoryData();
+    this.closeEquipModal();
   }
 }
