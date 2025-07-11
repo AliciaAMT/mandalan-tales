@@ -4,6 +4,8 @@ import { DialogueTree, DialogueNode, DialogueOption, DialogueState, NPC_DIALOGUE
 import { Flags } from '../models/flags.model';
 import { CharStats } from '../models/charstats.model';
 
+const DEBUG_DIALOGUE = false;
+
 @Injectable({
   providedIn: 'root'
 })
@@ -394,10 +396,12 @@ export class DialogueService {
     // Filter by requirements
     const filtered = currentNode.options.filter(option => {
       const result = option.requirements ? this.checkRequirements(option.requirements) : true;
-      if (!result) {
-        console.log('[Dialogue Debug] Option filtered out:', option.id, option.text, option.requirements);
-      } else {
-        console.log('[Dialogue Debug] Option PASSES:', option.id, option.text, option.requirements);
+      if (DEBUG_DIALOGUE) {
+        if (!result) {
+          console.log('[Dialogue Debug] Option filtered out:', option.id, option.text, option.requirements);
+        } else {
+          console.log('[Dialogue Debug] Option PASSES:', option.id, option.text, option.requirements);
+        }
       }
       return result;
     });
@@ -409,7 +413,9 @@ export class DialogueService {
       seen.add(option.text);
       return true;
     });
-    console.log('[Dialogue Debug] Final available options:', deduped.map(o => o.id));
+    if (DEBUG_DIALOGUE) {
+      console.log('[Dialogue Debug] Final available options:', deduped.map(o => o.id));
+    }
     return deduped;
   }
 
@@ -446,7 +452,9 @@ export class DialogueService {
           // This would need to be implemented with inventory checking
           break;
       }
-      console.log('[Dialogue Debug] Requirement check:', requirement, 'Character:', { level: character.level, experience: character.experience }, 'Result:', pass);
+      if (DEBUG_DIALOGUE) {
+        console.log('[Dialogue Debug] Requirement check:', requirement, 'Character:', { level: character.level, experience: character.experience }, 'Result:', pass);
+      }
       if (!pass) return false;
     }
     return true;

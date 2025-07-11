@@ -52,6 +52,8 @@ interface Portal {
   action: string;
 }
 
+const DEBUG_MAIN = false;
+
 @Component({
   selector: 'app-main',
   templateUrl: './main.page.html',
@@ -159,7 +161,7 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
   }
 
   async ngOnInit() {
-    console.log('MainPage ngOnInit');
+    if (DEBUG_MAIN) { console.log('MainPage ngOnInit'); }
 
     // Load saved state
     const savedState = localStorage.getItem(STORAGE_KEY);
@@ -171,16 +173,16 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
         this.isTileActionsOpen = state.isTileActionsOpen ?? true;
         this.isMenuOpen = state.isMenuOpen ?? true;
       } catch (error) {
-        console.warn('Failed to load saved state:', error);
+        if (DEBUG_MAIN) { console.warn('Failed to load saved state:', error); }
       }
     }
 
     await this.loadUserSettings();
-    console.log('MainPage ngOnInit, currentCharacter:', this.currentCharacter);
+    if (DEBUG_MAIN) { console.log('MainPage ngOnInit, currentCharacter:', this.currentCharacter); }
 
         // Load inventory for current character
     await this.inventoryService.loadInventory();
-    console.log('Current inventory:', this.inventoryService.inventory);
+    if (DEBUG_MAIN) { console.log('Current inventory:', this.inventoryService.inventory); }
 
     // Initialize replenishable items for current character
     if (
@@ -197,7 +199,7 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
       );
       this.replenishmentInitialized = true;
     } else if (!this.currentCharacter?.name || !this.currentCharacter?.userId) {
-      console.error('currentCharacter.name or userId is undefined!');
+      if (DEBUG_MAIN) { console.error('currentCharacter.name or userId is undefined!'); }
     }
 
     // Generate initial map
@@ -206,7 +208,7 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
     this.ngZone.run(() => {
       this.isLoading = false;
       this.cdr.detectChanges();
-      console.log('isLoading set to', this.isLoading);
+      if (DEBUG_MAIN) { console.log('isLoading set to', this.isLoading); }
     });
   }
 
@@ -298,7 +300,7 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
       } else {
         // Only log warning if dimensions are consistently zero after initialization
         if (this.isInitialized) {
-        console.warn('Parent element has zero dimensions:', { width, height });
+        if (DEBUG_MAIN) { console.warn('Parent element has zero dimensions:', { width, height }); }
         }
         // Fallback to a reasonable size
         this.mapGridRef.nativeElement.style.width = '300px';
@@ -307,7 +309,7 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
     } catch (error) {
       // Only log error if it's not a normal initialization timing issue
       if (this.isInitialized) {
-      console.warn('Error resizing map grid:', error);
+      if (DEBUG_MAIN) { console.warn('Error resizing map grid:', error); }
       }
       // Fallback to a reasonable size
       try {
@@ -315,14 +317,14 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
         this.mapGridRef.nativeElement.style.height = '300px';
       } catch (fallbackError) {
         if (this.isInitialized) {
-        console.error('Failed to set fallback size:', fallbackError);
+        if (DEBUG_MAIN) { console.error('Failed to set fallback size:', fallbackError); }
         }
       }
     }
   }
 
   generateMap() {
-    console.log('generateMap called, currentCharacter:', this.currentCharacter);
+    if (DEBUG_MAIN) { console.log('generateMap called, currentCharacter:', this.currentCharacter); }
     if (!this.currentCharacter) {
       return;
     }
@@ -459,7 +461,7 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
         this.exploreTile(tile);
         break;
       default:
-        console.log('Unknown action:', tile.action);
+        if (DEBUG_MAIN) { console.log('Unknown action:', tile.action); }
     }
   }
 
@@ -526,12 +528,12 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
 
   onTileImageError(event: any, tile: MapTile) {
     try {
-      console.warn(`Failed to load tile image at (${tile.x}, ${tile.y})`);
+      if (DEBUG_MAIN) { console.warn(`Failed to load tile image at (${tile.x}, ${tile.y})`); }
       if (event?.target) {
         event.target.style.display = 'none';
       }
     } catch (error) {
-      console.warn('Error handling tile image error:', error);
+      if (DEBUG_MAIN) { console.warn('Error handling tile image error:', error); }
     }
   }
 
@@ -781,12 +783,12 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
       return this._cachedObjects || [];
     }
 
-    console.log(`Getting objects for position: ${map} (${xaxis}, ${yaxis})`);
+    if (DEBUG_MAIN) { console.log(`Getting objects for position: ${map} (${xaxis}, ${yaxis})`); }
     const objects: GameObject[] = [];
 
     // Fallback for unknown maps
     if (!map) {
-      console.warn('No map available for current character');
+      if (DEBUG_MAIN) { console.warn('No map available for current character'); }
       return [];
     }
 
@@ -1027,7 +1029,7 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
       });
     }
 
-    console.log('Returning objects:', objects);
+    if (DEBUG_MAIN) { console.log('Returning objects:', objects); }
 
     // Update cache
     this._lastObjectPosition = positionKey;
@@ -1138,7 +1140,7 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
 
     // Interaction methods
   async interactWithNPC(npc: NPC) {
-    console.log(`Interacting with ${npc.name}: ${npc.action}`);
+    if (DEBUG_MAIN) { console.log(`Interacting with ${npc.name}: ${npc.action}`); }
 
     return runInInjectionContext(this.injector, async () => {
       // Map NPC names to dialogue IDs
@@ -1149,7 +1151,7 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
 
       const dialogueId = npcDialogueMap[npc.name];
       if (dialogueId) {
-        console.log('Starting dialogue for', npc.name);
+        if (DEBUG_MAIN) { console.log('Starting dialogue for', npc.name); }
         await this.dialogueService.startDialogue(dialogueId);
       } else {
         // Fallback for NPCs without dialogue
@@ -1165,7 +1167,7 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
   debugNPCs() {
     const npcs = this.getCurrentNPCs();
     const isMobile = this.isMobile;
-    console.log('Debug NPCs:', {
+    if (DEBUG_MAIN) { console.log('Debug NPCs:', {
       npcs,
       isMobile,
       shouldShow: !isMobile && npcs.length > 0,
@@ -1175,13 +1177,13 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
         xaxis: this.currentCharacter.xaxis,
         yaxis: this.currentCharacter.yaxis
       } : null
-    });
+    }); }
   }
 
   async interactWithObject(object: GameObject) {
-    console.log(`Interacting with ${object.name}: ${object.action}`);
-    console.log('Object details:', object);
-    console.log('Current inventory:', this.inventoryService.inventory);
+    if (DEBUG_MAIN) { console.log(`Interacting with ${object.name}: ${object.action}`); }
+    if (DEBUG_MAIN) { console.log('Object details:', object); }
+    if (DEBUG_MAIN) { console.log('Current inventory:', this.inventoryService.inventory); }
 
     // Handle different object types based on the old PHP demo
     switch (object.name.toLowerCase()) {
@@ -1500,8 +1502,8 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
    * Handle rug interaction
    */
   private async handleRug() {
-    console.log('Handling rug interaction');
-    console.log('Current inventory:', this.inventoryService.inventory);
+    if (DEBUG_MAIN) { console.log('Handling rug interaction'); }
+    if (DEBUG_MAIN) { console.log('Current inventory:', this.inventoryService.inventory); }
 
     // Check if the rug has already been interacted with
     const rugKey = `rug_${this.currentCharacter?.name}_${this.currentCharacter?.map}_${this.currentCharacter?.xaxis}_${this.currentCharacter?.yaxis}`;
@@ -1539,7 +1541,7 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
       );
       // Mark rug as empty to prevent re-interaction
       localStorage.setItem(rugKey, 'empty');
-      console.log('Rug flag set to empty:', rugKey);
+      if (DEBUG_MAIN) { console.log('Rug flag set to empty:', rugKey); }
     } else {
       await this.openItemModal(
         [],
@@ -1549,10 +1551,10 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
   }
 
   async usePortal(portal: Portal) {
-    console.log(`Using portal to ${portal.destination}: ${portal.action}`);
+    if (DEBUG_MAIN) { console.log(`Using portal to ${portal.destination}: ${portal.action}`); }
 
     if (!this.currentCharacter) {
-      console.error('No current character found');
+      if (DEBUG_MAIN) { console.error('No current character found'); }
       return;
     }
 
@@ -1564,7 +1566,7 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
     );
 
     if (!portalAction) {
-      console.error('No portal action found for current location');
+      if (DEBUG_MAIN) { console.error('No portal action found for current location'); }
       return;
     }
 
@@ -1646,34 +1648,34 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
   // Error handling for images
   onPortraitError(event: any, npc: NPC) {
     try {
-      console.warn(`Failed to load portrait for ${npc.name}`);
+      if (DEBUG_MAIN) { console.warn(`Failed to load portrait for ${npc.name}`); }
       if (event?.target) {
         event.target.style.display = 'none';
       }
     } catch (error) {
-      console.warn('Error handling portrait error:', error);
+      if (DEBUG_MAIN) { console.warn('Error handling portrait error:', error); }
     }
   }
 
   onObjectImageError(event: any, object: GameObject) {
     try {
-      console.warn(`Failed to load image for ${object.name}`);
+      if (DEBUG_MAIN) { console.warn(`Failed to load image for ${object.name}`); }
       if (event?.target) {
         event.target.style.display = 'none';
       }
     } catch (error) {
-      console.warn('Error handling object image error:', error);
+      if (DEBUG_MAIN) { console.warn('Error handling object image error:', error); }
     }
   }
 
   onPortalImageError(event: any, portal: Portal) {
     try {
-      console.warn(`Failed to load image for ${portal.name}`);
+      if (DEBUG_MAIN) { console.warn(`Failed to load image for ${portal.name}`); }
       if (event?.target) {
         event.target.style.display = 'none';
       }
     } catch (error) {
-      console.warn('Error handling portal image error:', error);
+      if (DEBUG_MAIN) { console.warn('Error handling portal image error:', error); }
     }
   }
 
@@ -1685,7 +1687,7 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
   }
 
   openInfoModal(action: any) {
-    console.log('Opening info modal for:', action);
+    if (DEBUG_MAIN) { console.log('Opening info modal for:', action); }
     this.infoModalAction = action;
     this.infoModalOpen = true;
     setTimeout(() => {
@@ -1778,7 +1780,7 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
    * Call this from browser console: window.mainPage.resetTestData()
    */
   resetTestData() {
-    console.log('Resetting test data...');
+    if (DEBUG_MAIN) { console.log('Resetting test data...'); }
 
     // Clear all game-related localStorage flags
     const keysToRemove = [];
@@ -1791,11 +1793,11 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
 
     keysToRemove.forEach(key => {
       localStorage.removeItem(key);
-      console.log(`Removed: ${key}`);
+      if (DEBUG_MAIN) { console.log(`Removed: ${key}`); }
     });
 
-    console.log('Test data reset complete!');
-    console.log('Create a new character or reload the page for fresh testing.');
+    if (DEBUG_MAIN) { console.log('Test data reset complete!'); }
+    if (DEBUG_MAIN) { console.log('Create a new character or reload the page for fresh testing.'); }
 
     // Make it available globally for console access
     (window as any).mainPage = this;

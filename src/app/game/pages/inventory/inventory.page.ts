@@ -14,6 +14,8 @@ import { ResultModalComponent } from './result-modal.component';
 import { rollLoot, LootItem } from '../../../game/services/loot-tables';
 import { EquipItemModalComponent } from './equip-item-modal.component';
 
+const DEBUG_INVENTORY = false;
+
 @Component({
   selector: 'app-inventory',
   standalone: true,
@@ -64,10 +66,10 @@ export class InventoryPage implements OnInit {
   equipModalItems: Inventory[] = [];
 
   async openContainerModal(item: Inventory) {
-    console.log('openContainerModal called', item);
-    console.log('item.keylock:', item.keylock);
-    console.log('item.othertype:', item.othertype);
-    console.log('item.contentType:', item.contentType);
+    if (DEBUG_INVENTORY) { console.log('openContainerModal called', item); }
+    if (DEBUG_INVENTORY) { console.log('item.keylock:', item.keylock); }
+    if (DEBUG_INVENTORY) { console.log('item.othertype:', item.othertype); }
+    if (DEBUG_INVENTORY) { console.log('item.contentType:', item.contentType); }
 
     // Handle container opening directly in the item details modal
     if (item.keylock === 0 && item.othertype === 'Container') {
@@ -100,7 +102,7 @@ export class InventoryPage implements OnInit {
     if (item.keylock === 0 && item.othertype === 'Container') {
       if (item.contentType === 'gold') {
         const gold = rollLoot('gold');
-        console.log('[Container Gold Roll]', gold);
+        if (DEBUG_INVENTORY) { console.log('[Container Gold Roll]', gold); }
         if (typeof gold === 'number' && gold > 0) {
           const char = this.characterService.getCurrentCharacter();
           if (char) {
@@ -116,7 +118,7 @@ export class InventoryPage implements OnInit {
         }
       } else if (item.contentType === 'random') {
         const loot = rollLoot('random');
-        console.log('[Container Random Loot Roll]', loot);
+        if (DEBUG_INVENTORY) { console.log('[Container Random Loot Roll]', loot); }
         if (loot && typeof loot === 'object') {
           await this.inventoryService.addItem({
             itemname: loot.name,
@@ -219,13 +221,13 @@ export class InventoryPage implements OnInit {
   }
 
   ngOnInit() {
-    console.log('InventoryPage ngOnInit called');
+    if (DEBUG_INVENTORY) { console.log('InventoryPage ngOnInit called'); }
     this.loadUserSettings();
     this.loadInventoryData();
   }
 
   ionViewWillEnter() {
-    console.log('InventoryPage ionViewWillEnter called');
+    if (DEBUG_INVENTORY) { console.log('InventoryPage ionViewWillEnter called'); }
     this.loadUserSettings();
     this.loadInventoryData();
   }
@@ -287,12 +289,12 @@ export class InventoryPage implements OnInit {
       this.tradePocketItems = this.filterTradeItems(allItems);
       this.foodPocketItems = this.filterFoodItems(allItems);
 
-      console.log(`Loaded inventory: ${allItems.length} total items`);
-      console.log(`Keep pocket: ${this.keepPocketItems.length} items`);
-      console.log(`Trade pocket: ${this.tradePocketItems.length} items`);
-      console.log(`Food pocket: ${this.foodPocketItems.length} items`);
+      if (DEBUG_INVENTORY) { console.log(`Loaded inventory: ${allItems.length} total items`); }
+      if (DEBUG_INVENTORY) { console.log(`Keep pocket: ${this.keepPocketItems.length} items`); }
+      if (DEBUG_INVENTORY) { console.log(`Trade pocket: ${this.tradePocketItems.length} items`); }
+      if (DEBUG_INVENTORY) { console.log(`Food pocket: ${this.foodPocketItems.length} items`); }
     } catch (error) {
-      console.error('Error loading inventory data:', error);
+      if (DEBUG_INVENTORY) { console.error('Error loading inventory data:', error); }
     }
   }
 
