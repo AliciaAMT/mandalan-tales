@@ -8,7 +8,7 @@ export interface DialogueOption {
 }
 
 export interface DialogueRequirement {
-  type: 'flag' | 'item' | 'level' | 'quest';
+  type: 'flag' | 'item' | 'level' | 'quest' | 'experience';
   key: string;
   value: any;
   operator?: 'equals' | 'greater' | 'less' | 'exists' | 'not_exists';
@@ -91,9 +91,174 @@ export const FATHER_DIALOGUE: DialogueTree = {
           action: 'close'
         },
         {
-          id: 'learn_more',
+          id: 'learn_more_level1_success',
           text: 'I would like to learn more and level up.',
-          nextDialogueId: 'level_up_check'
+          nextDialogueId: 'level_up_success',
+          requirements: [
+            { type: 'level', key: 'level', value: 1 },
+            { type: 'experience', key: 'experience', value: 100 }
+          ]
+        },
+        {
+          id: 'learn_more_level1_fail',
+          text: 'I would like to learn more and level up.',
+          nextDialogueId: 'level_up_check_100',
+          requirements: [
+            { type: 'level', key: 'level', value: 1 },
+            { type: 'experience', key: 'experience', value: 100, operator: 'less' }
+          ]
+        },
+        {
+          id: 'learn_more_level2_success',
+          text: 'I would like to learn more and level up.',
+          nextDialogueId: 'level_up_success',
+          requirements: [
+            { type: 'level', key: 'level', value: 2 },
+            { type: 'experience', key: 'experience', value: 250 }
+          ]
+        },
+        {
+          id: 'learn_more_level2_fail',
+          text: 'I would like to learn more and level up.',
+          nextDialogueId: 'level_up_check_250',
+          requirements: [
+            { type: 'level', key: 'level', value: 2 },
+            { type: 'experience', key: 'experience', value: 250, operator: 'less' }
+          ]
+        },
+        {
+          id: 'learn_more_level3_success',
+          text: 'I would like to learn more and level up.',
+          nextDialogueId: 'level_up_success',
+          requirements: [
+            { type: 'level', key: 'level', value: 3 },
+            { type: 'experience', key: 'experience', value: 500 }
+          ]
+        },
+        {
+          id: 'learn_more_level3_fail',
+          text: 'I would like to learn more and level up.',
+          nextDialogueId: 'level_up_check_500',
+          requirements: [
+            { type: 'level', key: 'level', value: 3 },
+            { type: 'experience', key: 'experience', value: 500, operator: 'less' }
+          ]
+        },
+        {
+          id: 'learn_more_level4_success',
+          text: 'I would like to learn more and level up.',
+          nextDialogueId: 'level_up_success',
+          requirements: [
+            { type: 'level', key: 'level', value: 4 },
+            { type: 'experience', key: 'experience', value: 1000 }
+          ]
+        },
+        {
+          id: 'learn_more_level4_fail',
+          text: 'I would like to learn more and level up.',
+          nextDialogueId: 'level_up_check_1000',
+          requirements: [
+            { type: 'level', key: 'level', value: 4 },
+            { type: 'experience', key: 'experience', value: 1000, operator: 'less' }
+          ]
+        },
+        {
+          id: 'learn_more_level5_success',
+          text: 'I would like to learn more and level up.',
+          nextDialogueId: 'level_up_success',
+          requirements: [
+            { type: 'level', key: 'level', value: 5 },
+            { type: 'experience', key: 'experience', value: 2000 }
+          ]
+        },
+        {
+          id: 'learn_more_level5_fail',
+          text: 'I would like to learn more and level up.',
+          nextDialogueId: 'level_up_check_2000',
+          requirements: [
+            { type: 'level', key: 'level', value: 5 },
+            { type: 'experience', key: 'experience', value: 2000, operator: 'less' }
+          ]
+        },
+        {
+          id: 'learn_more_level6_success',
+          text: 'I would like to learn more and level up.',
+          nextDialogueId: 'level_up_success',
+          requirements: [
+            { type: 'level', key: 'level', value: 6 },
+            { type: 'experience', key: 'experience', value: 4000 }
+          ]
+        },
+        {
+          id: 'learn_more_level6_fail',
+          text: 'I would like to learn more and level up.',
+          nextDialogueId: 'level_up_check_4000',
+          requirements: [
+            { type: 'level', key: 'level', value: 6 },
+            { type: 'experience', key: 'experience', value: 4000, operator: 'less' }
+          ]
+        },
+        {
+          id: 'learn_more_level7_success',
+          text: 'I would like to learn more and level up.',
+          nextDialogueId: 'level_up_success',
+          requirements: [
+            { type: 'level', key: 'level', value: 7 },
+            { type: 'experience', key: 'experience', value: 8000 }
+          ]
+        },
+        {
+          id: 'learn_more_level7_fail',
+          text: 'I would like to learn more and level up.',
+          nextDialogueId: 'level_up_check_8000',
+          requirements: [
+            { type: 'level', key: 'level', value: 7 },
+            { type: 'experience', key: 'experience', value: 8000, operator: 'less' }
+          ]
+        },
+        {
+          id: 'learn_more_level8_success',
+          text: 'I would like to learn more and level up.',
+          nextDialogueId: 'level_up_success',
+          requirements: [
+            { type: 'level', key: 'level', value: 8 },
+            { type: 'experience', key: 'experience', value: 15000 }
+          ]
+        },
+        {
+          id: 'learn_more_level8_fail',
+          text: 'I would like to learn more and level up.',
+          nextDialogueId: 'level_up_check_15000',
+          requirements: [
+            { type: 'level', key: 'level', value: 8 },
+            { type: 'experience', key: 'experience', value: 15000, operator: 'less' }
+          ]
+        },
+        {
+          id: 'learn_more_level9_success',
+          text: 'I would like to learn more and level up.',
+          nextDialogueId: 'level_up_success',
+          requirements: [
+            { type: 'level', key: 'level', value: 9 },
+            { type: 'experience', key: 'experience', value: 20000 }
+          ]
+        },
+        {
+          id: 'learn_more_level9_fail',
+          text: 'I would like to learn more and level up.',
+          nextDialogueId: 'level_up_check_20000',
+          requirements: [
+            { type: 'level', key: 'level', value: 9 },
+            { type: 'experience', key: 'experience', value: 20000, operator: 'less' }
+          ]
+        },
+        {
+          id: 'learn_more_max_level',
+          text: 'I would like to learn more and level up.',
+          nextDialogueId: 'max_level_reached',
+          requirements: [
+            { type: 'level', key: 'level', value: 10, operator: 'greater' }
+          ]
         }
       ]
     },
@@ -125,9 +290,174 @@ export const FATHER_DIALOGUE: DialogueTree = {
           action: 'close'
         },
         {
-          id: 'learn_more',
+          id: 'learn_more_level1_success',
           text: 'I would like to learn more and level up.',
-          nextDialogueId: 'level_up_check'
+          nextDialogueId: 'level_up_success',
+          requirements: [
+            { type: 'level', key: 'level', value: 1 },
+            { type: 'experience', key: 'experience', value: 100 }
+          ]
+        },
+        {
+          id: 'learn_more_level1_fail',
+          text: 'I would like to learn more and level up.',
+          nextDialogueId: 'level_up_check_100',
+          requirements: [
+            { type: 'level', key: 'level', value: 1 },
+            { type: 'experience', key: 'experience', value: 100, operator: 'less' }
+          ]
+        },
+        {
+          id: 'learn_more_level2_success',
+          text: 'I would like to learn more and level up.',
+          nextDialogueId: 'level_up_success',
+          requirements: [
+            { type: 'level', key: 'level', value: 2 },
+            { type: 'experience', key: 'experience', value: 250 }
+          ]
+        },
+        {
+          id: 'learn_more_level2_fail',
+          text: 'I would like to learn more and level up.',
+          nextDialogueId: 'level_up_check_250',
+          requirements: [
+            { type: 'level', key: 'level', value: 2 },
+            { type: 'experience', key: 'experience', value: 250, operator: 'less' }
+          ]
+        },
+        {
+          id: 'learn_more_level3_success',
+          text: 'I would like to learn more and level up.',
+          nextDialogueId: 'level_up_success',
+          requirements: [
+            { type: 'level', key: 'level', value: 3 },
+            { type: 'experience', key: 'experience', value: 500 }
+          ]
+        },
+        {
+          id: 'learn_more_level3_fail',
+          text: 'I would like to learn more and level up.',
+          nextDialogueId: 'level_up_check_500',
+          requirements: [
+            { type: 'level', key: 'level', value: 3 },
+            { type: 'experience', key: 'experience', value: 500, operator: 'less' }
+          ]
+        },
+        {
+          id: 'learn_more_level4_success',
+          text: 'I would like to learn more and level up.',
+          nextDialogueId: 'level_up_success',
+          requirements: [
+            { type: 'level', key: 'level', value: 4 },
+            { type: 'experience', key: 'experience', value: 1000 }
+          ]
+        },
+        {
+          id: 'learn_more_level4_fail',
+          text: 'I would like to learn more and level up.',
+          nextDialogueId: 'level_up_check_1000',
+          requirements: [
+            { type: 'level', key: 'level', value: 4 },
+            { type: 'experience', key: 'experience', value: 1000, operator: 'less' }
+          ]
+        },
+        {
+          id: 'learn_more_level5_success',
+          text: 'I would like to learn more and level up.',
+          nextDialogueId: 'level_up_success',
+          requirements: [
+            { type: 'level', key: 'level', value: 5 },
+            { type: 'experience', key: 'experience', value: 2000 }
+          ]
+        },
+        {
+          id: 'learn_more_level5_fail',
+          text: 'I would like to learn more and level up.',
+          nextDialogueId: 'level_up_check_2000',
+          requirements: [
+            { type: 'level', key: 'level', value: 5 },
+            { type: 'experience', key: 'experience', value: 2000, operator: 'less' }
+          ]
+        },
+        {
+          id: 'learn_more_level6_success',
+          text: 'I would like to learn more and level up.',
+          nextDialogueId: 'level_up_success',
+          requirements: [
+            { type: 'level', key: 'level', value: 6 },
+            { type: 'experience', key: 'experience', value: 4000 }
+          ]
+        },
+        {
+          id: 'learn_more_level6_fail',
+          text: 'I would like to learn more and level up.',
+          nextDialogueId: 'level_up_check_4000',
+          requirements: [
+            { type: 'level', key: 'level', value: 6 },
+            { type: 'experience', key: 'experience', value: 4000, operator: 'less' }
+          ]
+        },
+        {
+          id: 'learn_more_level7_success',
+          text: 'I would like to learn more and level up.',
+          nextDialogueId: 'level_up_success',
+          requirements: [
+            { type: 'level', key: 'level', value: 7 },
+            { type: 'experience', key: 'experience', value: 8000 }
+          ]
+        },
+        {
+          id: 'learn_more_level7_fail',
+          text: 'I would like to learn more and level up.',
+          nextDialogueId: 'level_up_check_8000',
+          requirements: [
+            { type: 'level', key: 'level', value: 7 },
+            { type: 'experience', key: 'experience', value: 8000, operator: 'less' }
+          ]
+        },
+        {
+          id: 'learn_more_level8_success',
+          text: 'I would like to learn more and level up.',
+          nextDialogueId: 'level_up_success',
+          requirements: [
+            { type: 'level', key: 'level', value: 8 },
+            { type: 'experience', key: 'experience', value: 15000 }
+          ]
+        },
+        {
+          id: 'learn_more_level8_fail',
+          text: 'I would like to learn more and level up.',
+          nextDialogueId: 'level_up_check_15000',
+          requirements: [
+            { type: 'level', key: 'level', value: 8 },
+            { type: 'experience', key: 'experience', value: 15000, operator: 'less' }
+          ]
+        },
+        {
+          id: 'learn_more_level9_success',
+          text: 'I would like to learn more and level up.',
+          nextDialogueId: 'level_up_success',
+          requirements: [
+            { type: 'level', key: 'level', value: 9 },
+            { type: 'experience', key: 'experience', value: 20000 }
+          ]
+        },
+        {
+          id: 'learn_more_level9_fail',
+          text: 'I would like to learn more and level up.',
+          nextDialogueId: 'level_up_check_20000',
+          requirements: [
+            { type: 'level', key: 'level', value: 9 },
+            { type: 'experience', key: 'experience', value: 20000, operator: 'less' }
+          ]
+        },
+        {
+          id: 'learn_more_max_level',
+          text: 'I would like to learn more and level up.',
+          nextDialogueId: 'max_level_reached',
+          requirements: [
+            { type: 'level', key: 'level', value: 10, operator: 'greater' }
+          ]
         }
       ]
     },
@@ -150,8 +480,131 @@ export const FATHER_DIALOGUE: DialogueTree = {
       ]
     },
     {
-      id: 'level_up_check',
+      id: 'level_up_success',
+      npcText: 'Yes, my child, I think you are ready to learn more. You are now level 2. Congratulations! You have gained 2 strength, 2 agility, and 2 speed. Don\'t forget to use your 3 new skill points either!',
+      npcName: 'Father',
+      options: [
+        {
+          id: 'thank_you',
+          text: 'Thank you, Father.',
+          action: 'close',
+          consequences: [
+            { type: 'level_up', key: 'level', value: 1 }
+          ]
+        }
+      ]
+    },
+    {
+      id: 'level_up_check_100',
       npcText: 'I\'m sorry, you need more experience to level up. But I\'m sure you will be ready in no time. Check back with me when your experience reaches 100.',
+      npcName: 'Father',
+      options: [
+        {
+          id: 'thank_you',
+          text: 'Thank you, Father.',
+          action: 'close'
+        }
+      ]
+    },
+    {
+      id: 'level_up_check_250',
+      npcText: 'I\'m sorry, you need more experience to level up. But I\'m sure you will be ready in no time. Check back with me when your experience reaches 250.',
+      npcName: 'Father',
+      options: [
+        {
+          id: 'thank_you',
+          text: 'Thank you, Father.',
+          action: 'close'
+        }
+      ]
+    },
+    {
+      id: 'level_up_check_500',
+      npcText: 'I\'m sorry, you need more experience to level up. But I\'m sure you will be ready in no time. Check back with me when your experience reaches 500.',
+      npcName: 'Father',
+      options: [
+        {
+          id: 'thank_you',
+          text: 'Thank you, Father.',
+          action: 'close'
+        }
+      ]
+    },
+    {
+      id: 'level_up_check_1000',
+      npcText: 'I\'m sorry, you need more experience to level up. But I\'m sure you will be ready in no time. Check back with me when your experience reaches 1000.',
+      npcName: 'Father',
+      options: [
+        {
+          id: 'thank_you',
+          text: 'Thank you, Father.',
+          action: 'close'
+        }
+      ]
+    },
+    {
+      id: 'level_up_check_2000',
+      npcText: 'I\'m sorry, you need more experience to level up. But I\'m sure you will be ready in no time. Check back with me when your experience reaches 2000.',
+      npcName: 'Father',
+      options: [
+        {
+          id: 'thank_you',
+          text: 'Thank you, Father.',
+          action: 'close'
+        }
+      ]
+    },
+    {
+      id: 'level_up_check_4000',
+      npcText: 'I\'m sorry, you need more experience to level up. But I\'m sure you will be ready in no time. Check back with me when your experience reaches 4000.',
+      npcName: 'Father',
+      options: [
+        {
+          id: 'thank_you',
+          text: 'Thank you, Father.',
+          action: 'close'
+        }
+      ]
+    },
+    {
+      id: 'level_up_check_8000',
+      npcText: 'I\'m sorry, you need more experience to level up. But I\'m sure you will be ready in no time. Check back with me when your experience reaches 8000.',
+      npcName: 'Father',
+      options: [
+        {
+          id: 'thank_you',
+          text: 'Thank you, Father.',
+          action: 'close'
+        }
+      ]
+    },
+    {
+      id: 'level_up_check_15000',
+      npcText: 'I\'m sorry, you need more experience to level up. But I\'m sure you will be ready in no time. Check back with me when your experience reaches 15000.',
+      npcName: 'Father',
+      options: [
+        {
+          id: 'thank_you',
+          text: 'Thank you, Father.',
+          action: 'close'
+        }
+      ]
+    },
+    {
+      id: 'level_up_check_20000',
+      npcText: 'I\'m sorry, you need more experience to level up. But I\'m sure you will be ready in no time. Check back with me when your experience reaches 20000.',
+      npcName: 'Father',
+      options: [
+        {
+          id: 'thank_you',
+          text: 'Thank you, Father.',
+          action: 'close'
+        }
+      ]
+    },
+    {
+      id: 'max_level_reached',
+      npcText: 'I\'m sorry, you need to seek out Solias. I can teach you no further.',
       npcName: 'Father',
       options: [
         {

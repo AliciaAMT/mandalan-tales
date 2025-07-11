@@ -68,9 +68,24 @@ export class DialogueService {
     const option = currentNode.options.find(opt => opt.id === optionId);
     if (!option) return;
 
+    // Track if a level up will occur
+    let willLevelUp = false;
+    if (option.consequences) {
+      willLevelUp = option.consequences.some(c => c.type === 'level_up');
+    }
+
     // Process consequences
     if (option.consequences) {
-      this.processConsequences(option.consequences);
+      this.processConsequences(option.consequences).then(() => {
+        // After processing, if a level up occurred, re-evaluate the node
+        if (willLevelUp) {
+          // Force update by resetting currentNodeId to itself
+          this.dialogueState.update(state => ({
+            ...state,
+            currentNodeId: state.currentNodeId
+          }));
+        }
+      });
     }
 
     // Handle action
@@ -86,6 +101,20 @@ export class DialogueService {
         const randomAdviceNode = dialogue.nodes.find(node => node.id === 'random_advice');
         if (randomAdviceNode) {
           randomAdviceNode.npcText = this.getRandomAdvice();
+        }
+      }
+    }
+
+    // Handle level up success message
+    if (option.nextDialogueId === 'level_up_success') {
+      const character = this.characterService.getCurrentCharacter();
+      if (character) {
+        const dialogue = this.currentDialogue();
+        if (dialogue) {
+          const levelUpNode = dialogue.nodes.find(node => node.id === 'level_up_success');
+          if (levelUpNode) {
+            levelUpNode.npcText = this.getLevelUpMessage(character.level);
+          }
         }
       }
     }
@@ -300,14 +329,55 @@ export class DialogueService {
     if (!character) return;
 
     try {
-      // Simple level up logic - you might want to make this more sophisticated
-      const newLevel = character.level + 1;
-      const newSkillPoints = character.skillPoints + 3;
+      const currentLevel = character.level;
+      const newLevel = currentLevel + 1;
 
-      await this.characterService.updateCharacter(characterId, {
+      // Base stat increases for all levels
+      const baseUpdates: any = {
         level: newLevel,
-        skillPoints: newSkillPoints
-      });
+        skillPoints: character.skillPoints + 3,
+        maxLife: character.maxLife + 3,
+        life: character.maxLife + 3, // Heal to full on level up
+        maxMana: character.maxMana + 3,
+        mana: character.maxMana + 3 // Restore mana to full on level up
+      };
+
+      // Level-specific stat increases based on original demo
+      switch (currentLevel) {
+        case 1: // Level 1 -> 2
+          baseUpdates.strength = character.strength + 2;
+          baseUpdates.agility = character.agility + 2;
+          baseUpdates.speed = character.speed + 2;
+          break;
+        case 2: // Level 2 -> 3
+          baseUpdates.accuracy = character.accuracy + 2;
+          baseUpdates.wisdom = character.wisdom + 2;
+          baseUpdates.luck = character.luck + 2;
+          break;
+        case 3: // Level 3 -> 4
+          // Only skill points, life, and mana (no stat increases)
+          break;
+        case 4: // Level 4 -> 5
+        case 5: // Level 5 -> 6
+        case 6: // Level 6 -> 7
+        case 7: // Level 7 -> 8
+        case 8: // Level 8 -> 9
+        case 9: // Level 9 -> 10
+          // +1 to all stats
+          baseUpdates.strength = character.strength + 1;
+          baseUpdates.agility = character.agility + 1;
+          baseUpdates.speed = character.speed + 1;
+          baseUpdates.accuracy = character.accuracy + 1;
+          baseUpdates.wisdom = character.wisdom + 1;
+          baseUpdates.luck = character.luck + 1;
+          break;
+        default:
+          // Level 10+ - no more level ups from Father
+          console.warn(`Character is already at maximum level (${currentLevel})`);
+          return;
+      }
+
+      await this.characterService.updateCharacter(characterId, baseUpdates);
     } catch (error) {
       console.error('Error leveling up character:', error);
       throw error; // Re-throw to let the calling method handle it
@@ -340,7 +410,18 @@ export class DialogueService {
     for (const requirement of requirements) {
       switch (requirement.type) {
         case 'level':
-          if (character.level < requirement.value) return false;
+          if (requirement.operator === 'greater') {
+            if (character.level <= requirement.value) return false;
+          } else {
+            if (character.level < requirement.value) return false;
+          }
+          break;
+        case 'experience':
+          if (requirement.operator === 'less') {
+            if (character.experience >= requirement.value) return false;
+          } else {
+            if (character.experience < requirement.value) return false;
+          }
           break;
         case 'flag':
           // This would need to be implemented with actual flag checking
@@ -367,5 +448,30 @@ export class DialogueService {
     ];
 
     return advice[Math.floor(Math.random() * advice.length)];
+  }
+
+  /**
+   * Get level up success message based on current level
+   */
+  private getLevelUpMessage(currentLevel: number): string {
+    const newLevel = currentLevel + 1;
+    switch (currentLevel) {
+      case 1: // Level 1 -> 2
+        return `Yes, my child, I think you are ready to learn more. You are now level ${newLevel}. Congratulations! You have gained 2 strength, 2 agility, and 2 speed. Don't forget to use your 3 new skill points either!`;
+      case 2: // Level 2 -> 3
+        return `Yes, my child, I think you are ready to learn more. You are now level ${newLevel}. Congratulations! You have gained 2 accuracy, 2 wisdom, and 2 luck. Don't forget to use your 3 new skill points either!`;
+      case 3: // Level 3 -> 4
+        return `Yes, my child, I think you are ready to learn more. You are now level ${newLevel}. Congratulations! You have gained 3 skillpoints.`;
+      case 4: // Level 4 -> 5
+        return `Yes, my child, I think you are ready to learn more. You are now level ${newLevel}. Congratulations! You have gained 1 to all stats and 3 skillpoints.`;
+      case 5: // Level 5 -> 6
+      case 6: // Level 6 -> 7
+      case 7: // Level 7 -> 8
+      case 8: // Level 8 -> 9
+      case 9: // Level 9 -> 10
+        return `Yes, my child, I think you are ready to learn more. You are now level ${newLevel}. Congratulations!`;
+      default:
+        return `Yes, my child, I think you are ready to learn more. You are now level ${newLevel}. Congratulations!`;
+    }
   }
 }
