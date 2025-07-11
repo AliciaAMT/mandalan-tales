@@ -20,7 +20,7 @@
     >
       <!-- Player Stats (Left/Top) -->
       <div class="main-section player-stats" role="region" aria-label="Player Stats" [ngClass]="{'collapsed': !isPlayerStatsOpen}" [style.grid-area]="playerStatsArea">
-        <h2 class="collapsible-header" (click)="togglePlayerStats()" tabindex="0" role="button" [attr.aria-expanded]="isPlayerStatsOpen" aria-controls="player-stats-content">
+        <h2 class="collapsible-header" (click)="togglePlayerStats()" (keydown)="onHeaderKeydown($event, togglePlayerStats.bind(this))" tabindex="0" role="button" [attr.aria-expanded]="isPlayerStatsOpen" aria-controls="player-stats-content">
           Player Stats
         </h2>
         <div id="player-stats-content" class="section-content" *ngIf="isPlayerStatsOpen">
@@ -96,7 +96,7 @@
 
       <!-- Map (Center/Second) -->
       <div class="main-section map" role="region" aria-label="Map" [ngClass]="{'collapsed': !isMapOpen}" [style.grid-area]="mapArea">
-        <h2 class="collapsible-header" (click)="toggleMap()" tabindex="0" role="button" [attr.aria-expanded]="isMapOpen" aria-controls="map-content">
+        <h2 class="collapsible-header" (click)="toggleMap()" (keydown)="onHeaderKeydown($event, toggleMap.bind(this))" tabindex="0" role="button" [attr.aria-expanded]="isMapOpen" aria-controls="map-content">
           {{ getCurrentMapDisplayName() }}
         </h2>
         <div id="map-content" class="section-content" *ngIf="isMapOpen">
@@ -140,7 +140,7 @@
 
       <!-- Tile Actions (Right/Third) -->
       <div class="main-section tile-actions" role="region" aria-label="Tile Actions" [ngClass]="{'collapsed': !isTileActionsOpen}" [style.grid-area]="tileActionsArea">
-        <h2 class="collapsible-header" (click)="toggleTileActions()" tabindex="0" role="button" [attr.aria-expanded]="isTileActionsOpen" aria-controls="tile-actions-content">
+        <h2 class="collapsible-header" (click)="toggleTileActions()" (keydown)="onHeaderKeydown($event, toggleTileActions.bind(this))" tabindex="0" role="button" [attr.aria-expanded]="isTileActionsOpen" aria-controls="tile-actions-content">
           Tile Actions
         </h2>
         <div id="tile-actions-content" class="section-content" *ngIf="isTileActionsOpen">
@@ -335,7 +335,7 @@
 
       <!-- Menu (Bottom/Last) -->
       <div class="main-section menu" role="navigation" aria-label="Game Menu" [ngClass]="{'collapsed': !isMenuOpen}" [style.grid-area]="menuArea">
-        <h2 class="collapsible-header" (click)="toggleMenu()" tabindex="0" role="button" [attr.aria-expanded]="isMenuOpen" aria-controls="menu-content">
+        <h2 class="collapsible-header" (click)="toggleMenu()" (keydown)="onHeaderKeydown($event, toggleMenu.bind(this))" tabindex="0" role="button" [attr.aria-expanded]="isMenuOpen" aria-controls="menu-content">
           Menu
         </h2>
         <div id="menu-content" class="section-content" *ngIf="isMenuOpen">

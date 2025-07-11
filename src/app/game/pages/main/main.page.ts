@@ -609,6 +609,13 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
     setTimeout(() => this.resizeMapGrid(), 100);
   }
 
+  onHeaderKeydown(event: KeyboardEvent, action: () => void) {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      action();
+    }
+  }
+
   @HostListener('document:keydown', ['$event'])
   handleHeaderKeydown(event: KeyboardEvent) {
     // Handle Enter and Space for collapsible headers
@@ -653,11 +660,10 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
 
   get gridTemplateRows() {
     if (this.isMobile) {
-      // Stack all sections vertically
       return 'auto auto auto auto';
     }
-    // If menu is open, bottom row is 1fr, else just header (auto)
-    return this.isMenuOpen ? '3fr 1fr' : '1fr auto';
+    // Use minmax to keep menu visible but proportional
+    return this.isMenuOpen ? '3fr minmax(80px, 1fr)' : '1fr auto';
   }
   get gridTemplateColumns() {
     if (this.isMobile) {
