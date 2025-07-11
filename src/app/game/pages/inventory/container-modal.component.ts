@@ -13,7 +13,7 @@ import { FocusTrapDirective } from '../../../shared/focus-trap.directive';
     <div class="custom-modal" appFocusTrap tabindex="-1">
       <div class="custom-modal-header">
         <h2>{{ item.itemname }}</h2>
-        <button class="close-btn" (click)="closeModal()">&times;</button>
+        <button class="close-btn" (click)="closeModal()" aria-label="Close">&times;</button>
       </div>
       <div class="custom-modal-content">
         <ng-container *ngIf="item.keylock > 0">
@@ -33,7 +33,7 @@ import { FocusTrapDirective } from '../../../shared/focus-trap.directive';
         </ng-container>
         <ng-container *ngIf="item.keylock === 0 && item.othertype === 'Container'">
           <div *ngIf="foundItems.length === 0">
-            <button (click)="closeModal()">Cancel</button>
+            <button (click)="closeModal()" aria-label="Cancel">Cancel</button>
             <button (click)="onOpen()" [disabled]="foundItems.length > 0">Open</button>
           </div>
           <div *ngIf="foundItems.length > 0">

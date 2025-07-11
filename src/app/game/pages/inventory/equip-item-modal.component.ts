@@ -12,7 +12,7 @@ import { FocusTrapDirective } from '../../../shared/focus-trap.directive';
     <div class="custom-modal" appFocusTrap tabindex="-1">
       <div class="custom-modal-header">
         <h2>Equip Item to {{ slot }}</h2>
-        <button class="close-btn" (click)="closeModal()">&times;</button>
+        <button class="close-btn" (click)="closeModal()" aria-label="Close">&times;</button>
       </div>
       <div class="custom-modal-content">
         <div *ngIf="items.length === 0" class="empty-message">
@@ -30,7 +30,7 @@ import { FocusTrapDirective } from '../../../shared/focus-trap.directive';
           </div>
         </div>
         <div class="custom-modal-actions">
-          <button (click)="closeModal()">Cancel</button>
+          <button (click)="closeModal()" aria-label="Cancel">Cancel</button>
         </div>
       </div>
     </div>

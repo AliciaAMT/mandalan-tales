@@ -66,7 +66,7 @@ export interface FoundItem {
           class="close-item-found-btn"
           (click)="close()"
           tabindex="0"
-          aria-label="Close dialog"
+          aria-label="Close"
         >
           ×
         </button>

@@ -30,10 +30,8 @@
                 <div class="equipment-slot" *ngFor="let slot of getEquipmentSlots()">
                   <div class="slot-label">{{ slot }}</div>
                   <ng-container *ngIf="hasEquippedItem(slot); else emptySlot">
-                    <div class="slot-content clickable" (click)="openEquippedItemModal(slot)">
-                      <img [src]="getEquippedItemImage(slot)"
-                           [alt]="getEquippedItemName(slot)"
-                           class="inventory-item-image" />
+                    <div class="slot-content clickable" (click)="openEquippedItemModal(slot)" [attr.aria-label]="'Equipped: ' + getEquippedItemName(slot)">
+                      <img [src]="getEquippedItemImage(slot)" alt="" class="inventory-item-image" />
                       <div class="inventory-item-name">{{ getEquippedItemName(slot) }}</div>
                     </div>
                   </ng-container>
@@ -50,8 +48,8 @@
                 <div class="equipment-slot" *ngFor="let ring of getRingIndices()">
                   <div class="slot-label">Ring {{ ring + 1 }}</div>
                   <ng-container *ngIf="hasRingItem(ring); else emptyRingSlot">
-                    <div class="slot-content clickable" (click)="openRingItemModal(ring)">
-                      <img [src]="getRingImage(ring)" [alt]="getRingName(ring)" class="inventory-item-image" />
+                    <div class="slot-content clickable" (click)="openRingItemModal(ring)" [attr.aria-label]="'Equipped: ' + getRingName(ring)">
+                      <img [src]="getRingImage(ring)" alt="" class="inventory-item-image" />
                       <div class="inventory-item-name">{{ getRingName(ring) }}</div>
                     </div>
                   </ng-container>
@@ -85,8 +83,8 @@
                 <ng-container *ngIf="keepPocketItems.length > 0; else noKeepItems">
                   <div class="inventory-items-grid">
                     <ng-container *ngFor="let item of keepPocketItems">
-                      <div class="inventory-item-card" (click)="openItemModal(item)" tabindex="0" (keydown)="onItemKeydown($event, item)">
-                        <img [src]="getItemImage(item)" [alt]="item.itemname" class="inventory-item-image" />
+                      <div class="inventory-item-card" (click)="openItemModal(item)" tabindex="0" (keydown)="onItemKeydown($event, item)" [attr.aria-label]="'Item: ' + item.itemname">
+                        <img [src]="getItemImage(item)" alt="" class="inventory-item-image" />
                         <div class="inventory-item-name">{{ item.itemname }}</div>
                         <div class="inventory-item-details">
                           <div>Level {{ item.itemlevel }} {{ item.itemrarity }}</div>
@@ -120,8 +118,8 @@
                 <ng-container *ngIf="tradePocketItems.length > 0; else noTradeItems">
                   <div class="inventory-items-grid">
                     <ng-container *ngFor="let item of tradePocketItems">
-                      <div class="inventory-item-card" (click)="openItemModal(item)" tabindex="0" (keydown)="onItemKeydown($event, item)">
-                        <img [src]="getItemImage(item)" [alt]="item.itemname" class="inventory-item-image" />
+                      <div class="inventory-item-card" (click)="openItemModal(item)" tabindex="0" (keydown)="onItemKeydown($event, item)" [attr.aria-label]="'Item: ' + item.itemname">
+                        <img [src]="getItemImage(item)" alt="" class="inventory-item-image" />
                         <div class="inventory-item-name">{{ item.itemname }}</div>
                         <div class="inventory-item-details">
                           <div>Level {{ item.itemlevel }} | {{ item.itemrarity }}</div>
@@ -156,8 +154,8 @@
                 <ng-container *ngIf="foodPocketItems.length > 0; else noFoodItems">
                   <div class="inventory-items-grid">
                     <ng-container *ngFor="let item of foodPocketItems">
-                      <div class="inventory-item-card" (click)="openItemModal(item)" tabindex="0" (keydown)="onItemKeydown($event, item)">
-                        <img [src]="getItemImage(item)" [alt]="item.itemname" class="inventory-item-image" />
+                      <div class="inventory-item-card" (click)="openItemModal(item)" tabindex="0" (keydown)="onItemKeydown($event, item)" [attr.aria-label]="'Item: ' + item.itemname">
+                        <img [src]="getItemImage(item)" alt="" class="inventory-item-image" />
                         <div class="inventory-item-name">{{ item.itemname }}</div>
                         <div class="inventory-item-details">
                           <div>Level {{ item.itemlevel }} | {{ item.itemrarity }}</div>

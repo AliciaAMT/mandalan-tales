@@ -12,7 +12,7 @@ import { FocusTrapDirective } from '../../../shared/focus-trap.directive';
     <div class="custom-modal" appFocusTrap tabindex="-1">
       <div class="custom-modal-header">
         <h2>{{ title }}</h2>
-        <button class="close-btn" (click)="closeModal()">&times;</button>
+        <button class="close-btn" (click)="closeModal()" aria-label="Close">&times;</button>
       </div>
       <div class="custom-modal-content">
         <p>{{ message }}</p>

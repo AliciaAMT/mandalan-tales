@@ -62,7 +62,7 @@ import { FocusTrapDirective } from '../../../shared/focus-trap.directive';
           class="close-dialogue-btn"
           (click)="closeDialogue()"
           tabindex="0"
-          aria-label="Close dialogue"
+          aria-label="Close"
         >
           ×
         </button>
