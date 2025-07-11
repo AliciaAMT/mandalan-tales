@@ -1,6 +1,7 @@
 import { Component, Input, Output, EventEmitter, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonicModule } from '@ionic/angular';
+import { FocusTrapDirective } from '../../../shared/focus-trap.directive';
 
 export interface FoundItem {
   image: string;
@@ -13,7 +14,7 @@ export interface FoundItem {
   selector: 'app-item-found-modal',
   template: `
     <div class="item-found-overlay" *ngIf="open" (click)="close()">
-      <div class="item-found-modal" (click)="$event.stopPropagation()">
+      <div class="item-found-modal" appFocusTrap tabindex="-1" (click)="$event.stopPropagation()">
         <!-- Event Message Section -->
         <div *ngIf="eventMessage" class="event-section">
           <div class="event-icon">
@@ -74,7 +75,7 @@ export interface FoundItem {
   `,
   styleUrls: ['./item-found-modal.component.scss'],
   standalone: true,
-  imports: [CommonModule, IonicModule]
+  imports: [CommonModule, IonicModule, FocusTrapDirective]
 })
 export class ItemFoundModalComponent {
   @Input() open = false;

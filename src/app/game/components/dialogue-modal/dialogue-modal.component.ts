@@ -4,18 +4,19 @@ import { IonicModule } from '@ionic/angular';
 import { DialogueService } from '../../services/dialogue.service';
 import { CharacterService } from '../../services/character.service';
 import { DialogueOption } from '../../models/dialogue.model';
+import { FocusTrapDirective } from '../../../shared/focus-trap.directive';
 
 @Component({
   selector: 'app-dialogue-modal',
   standalone: true,
-  imports: [CommonModule, IonicModule],
+  imports: [CommonModule, IonicModule, FocusTrapDirective],
   template: `
     <!--
       NPC section uses green border/accent and white font for name.
       Player section uses blue border/accent (Ionic default) and white font.
     -->
     <div class="dialogue-overlay" *ngIf="isDialogueOpen()" (click)="closeDialogue()">
-      <div class="dialogue-modal" (click)="$event.stopPropagation()">
+      <div class="dialogue-modal" appFocusTrap tabindex="-1" (click)="$event.stopPropagation()">
         <!-- NPC Section -->
         <div class="npc-section">
           <div class="npc-portrait">
