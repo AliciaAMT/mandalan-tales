@@ -444,6 +444,13 @@ export class InventoryPage implements OnInit {
     this.selectedItem = item;
   }
 
+  onItemKeydown(event: KeyboardEvent, item: Inventory) {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      this.openItemModal(item);
+    }
+  }
+
   openEquippedItemModal(slot: string) {
     const item = this.getEquippedItem(slot);
     if (item) {

@@ -57,7 +57,7 @@
                   </ng-container>
                   <ng-template #emptyRingSlot>
                     <div class="slot-content empty">
-                      <button class="add-btn" (click)="openEquipModal('Finger')" attr.aria-label="Equip ring">
+                      <button class="add-btn" (click)="openEquipModal('Finger')" aria-label="Equip ring">
                         <ion-icon name="add-circle-outline" aria-hidden="true"></ion-icon>
                       </button>
                       <span>Empty</span>
@@ -85,7 +85,7 @@
                 <ng-container *ngIf="keepPocketItems.length > 0; else noKeepItems">
                   <div class="inventory-items-grid">
                     <ng-container *ngFor="let item of keepPocketItems">
-                      <div class="inventory-item-card" (click)="openItemModal(item)">
+                      <div class="inventory-item-card" (click)="openItemModal(item)" tabindex="0" (keydown)="onItemKeydown($event, item)">
                         <img [src]="getItemImage(item)" [alt]="item.itemname" class="inventory-item-image" />
                         <div class="inventory-item-name">{{ item.itemname }}</div>
                         <div class="inventory-item-details">
@@ -120,7 +120,7 @@
                 <ng-container *ngIf="tradePocketItems.length > 0; else noTradeItems">
                   <div class="inventory-items-grid">
                     <ng-container *ngFor="let item of tradePocketItems">
-                      <div class="inventory-item-card" (click)="openItemModal(item)">
+                      <div class="inventory-item-card" (click)="openItemModal(item)" tabindex="0" (keydown)="onItemKeydown($event, item)">
                         <img [src]="getItemImage(item)" [alt]="item.itemname" class="inventory-item-image" />
                         <div class="inventory-item-name">{{ item.itemname }}</div>
                         <div class="inventory-item-details">
@@ -156,7 +156,7 @@
                 <ng-container *ngIf="foodPocketItems.length > 0; else noFoodItems">
                   <div class="inventory-items-grid">
                     <ng-container *ngFor="let item of foodPocketItems">
-                      <div class="inventory-item-card" (click)="openItemModal(item)">
+                      <div class="inventory-item-card" (click)="openItemModal(item)" tabindex="0" (keydown)="onItemKeydown($event, item)">
                         <img [src]="getItemImage(item)" [alt]="item.itemname" class="inventory-item-image" />
                         <div class="inventory-item-name">{{ item.itemname }}</div>
                         <div class="inventory-item-details">
