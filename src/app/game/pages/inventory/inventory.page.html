@@ -22,7 +22,7 @@
 
           <!-- Equipped Items Section -->
           <div class="inventory-section equipped-items" role="region" aria-label="Equipped Items" [ngClass]="{'collapsed': !isEquippedItemsOpen}">
-            <h2 class="collapsible-header" (click)="toggleEquippedItems()" tabindex="0" role="button" [attr.aria-expanded]="isEquippedItemsOpen" aria-controls="equipped-items-content">
+            <h2 class="collapsible-header" (click)="toggleEquippedItems()" (keydown)="onHeaderKeydown($event, toggleEquippedItems.bind(this))" tabindex="0" role="button" [attr.aria-expanded]="isEquippedItemsOpen" aria-controls="equipped-items-content">
               Equipped Items
             </h2>
             <div id="equipped-items-content" class="section-content" *ngIf="isEquippedItemsOpen">
@@ -70,7 +70,7 @@
 
           <!-- Keep Pocket Section -->
           <div class="inventory-section keep-pocket" role="region" aria-label="Keep Pocket" [ngClass]="{'collapsed': !isKeepPocketOpen}">
-            <h2 class="collapsible-header" (click)="toggleKeepPocket()" tabindex="0" role="button" [attr.aria-expanded]="isKeepPocketOpen" aria-controls="keep-pocket-content">
+            <h2 class="collapsible-header" (click)="toggleKeepPocket()" (keydown)="onHeaderKeydown($event, toggleKeepPocket.bind(this))" tabindex="0" role="button" [attr.aria-expanded]="isKeepPocketOpen" aria-controls="keep-pocket-content">
               Keep Pocket
             </h2>
             <div id="keep-pocket-content" class="section-content" *ngIf="isKeepPocketOpen">
@@ -105,7 +105,7 @@
 
           <!-- Trade Pocket Section -->
           <div class="inventory-section trade-pocket" role="region" aria-label="Trade Pocket" [ngClass]="{'collapsed': !isTradePocketOpen}">
-            <h2 class="collapsible-header" (click)="toggleTradePocket()" tabindex="0" role="button" [attr.aria-expanded]="isTradePocketOpen" aria-controls="trade-pocket-content">
+            <h2 class="collapsible-header" (click)="toggleTradePocket()" (keydown)="onHeaderKeydown($event, toggleTradePocket.bind(this))" tabindex="0" role="button" [attr.aria-expanded]="isTradePocketOpen" aria-controls="trade-pocket-content">
               Trade Pocket
             </h2>
             <div id="trade-pocket-content" class="section-content" *ngIf="isTradePocketOpen">
@@ -141,7 +141,7 @@
 
           <!-- Food Pocket Section -->
           <div class="inventory-section food-pocket" role="region" aria-label="Food Pocket" [ngClass]="{'collapsed': !isFoodPocketOpen}">
-            <h2 class="collapsible-header" (click)="toggleFoodPocket()" tabindex="0" role="button" [attr.aria-expanded]="isFoodPocketOpen" aria-controls="food-pocket-content">
+            <h2 class="collapsible-header" (click)="toggleFoodPocket()" (keydown)="onHeaderKeydown($event, toggleFoodPocket.bind(this))" tabindex="0" role="button" [attr.aria-expanded]="isFoodPocketOpen" aria-controls="food-pocket-content">
               Food Pocket
             </h2>
             <div id="food-pocket-content" class="section-content" *ngIf="isFoodPocketOpen">

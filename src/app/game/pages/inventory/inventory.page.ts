@@ -451,6 +451,13 @@ export class InventoryPage implements OnInit {
     }
   }
 
+  onHeaderKeydown(event: KeyboardEvent, action: () => void) {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      action();
+    }
+  }
+
   openEquippedItemModal(slot: string) {
     const item = this.getEquippedItem(slot);
     if (item) {
