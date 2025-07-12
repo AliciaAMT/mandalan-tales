@@ -359,6 +359,136 @@ export class CharacterService {
     });
   }
 
+  // Method to clear skills for a character
+  async clearCharacterSkills(characterName: string): Promise<void> {
+    return runInInjectionContext(this.injector, async () => {
+      const firestore = inject(Firestore);
+      const currentUser = this.authService.getCurrentUser();
+      if (!currentUser) {
+        throw new Error('User not authenticated');
+      }
+
+      // Delete skills for this character
+      const skillsQuery = query(
+        collection(firestore, 'skills'),
+        where('charname', '==', characterName)
+      );
+      const skillsSnapshot = await getDocs(skillsQuery);
+
+      const batch = writeBatch(firestore);
+      skillsSnapshot.docs.forEach(doc => {
+        batch.delete(doc.ref);
+      });
+
+      await batch.commit();
+      console.log(`Cleared ${skillsSnapshot.docs.length} skills for character: ${characterName}`);
+    });
+  }
+
+  // Method to clear spellbook for a character
+  async clearCharacterSpellbook(characterName: string): Promise<void> {
+    return runInInjectionContext(this.injector, async () => {
+      const firestore = inject(Firestore);
+      const currentUser = this.authService.getCurrentUser();
+      if (!currentUser) {
+        throw new Error('User not authenticated');
+      }
+
+      // Delete spellbook for this character
+      const spellbookQuery = query(
+        collection(firestore, 'spellbook'),
+        where('charname', '==', characterName)
+      );
+      const spellbookSnapshot = await getDocs(spellbookQuery);
+
+      const batch = writeBatch(firestore);
+      spellbookSnapshot.docs.forEach(doc => {
+        batch.delete(doc.ref);
+      });
+
+      await batch.commit();
+      console.log(`Cleared ${spellbookSnapshot.docs.length} spellbook entries for character: ${characterName}`);
+    });
+  }
+
+  // Method to clear cookbook for a character
+  async clearCharacterCookbook(characterName: string): Promise<void> {
+    return runInInjectionContext(this.injector, async () => {
+      const firestore = inject(Firestore);
+      const currentUser = this.authService.getCurrentUser();
+      if (!currentUser) {
+        throw new Error('User not authenticated');
+      }
+
+      // Delete cookbook for this character
+      const cookbookQuery = query(
+        collection(firestore, 'cookbook'),
+        where('charname', '==', characterName)
+      );
+      const cookbookSnapshot = await getDocs(cookbookQuery);
+
+      const batch = writeBatch(firestore);
+      cookbookSnapshot.docs.forEach(doc => {
+        batch.delete(doc.ref);
+      });
+
+      await batch.commit();
+      console.log(`Cleared ${cookbookSnapshot.docs.length} cookbook entries for character: ${characterName}`);
+    });
+  }
+
+  // Method to clear enemy data for a character
+  async clearCharacterEnemyData(characterName: string): Promise<void> {
+    return runInInjectionContext(this.injector, async () => {
+      const firestore = inject(Firestore);
+      const currentUser = this.authService.getCurrentUser();
+      if (!currentUser) {
+        throw new Error('User not authenticated');
+      }
+
+      // Delete enemy data for this character
+      const enemyQuery = query(
+        collection(firestore, 'enemy'),
+        where('charname', '==', characterName)
+      );
+      const enemySnapshot = await getDocs(enemyQuery);
+
+      const batch = writeBatch(firestore);
+      enemySnapshot.docs.forEach(doc => {
+        batch.delete(doc.ref);
+      });
+
+      await batch.commit();
+      console.log(`Cleared ${enemySnapshot.docs.length} enemy data entries for character: ${characterName}`);
+    });
+  }
+
+  // Method to clear counters for a character
+  async clearCharacterCounters(characterName: string): Promise<void> {
+    return runInInjectionContext(this.injector, async () => {
+      const firestore = inject(Firestore);
+      const currentUser = this.authService.getCurrentUser();
+      if (!currentUser) {
+        throw new Error('User not authenticated');
+      }
+
+      // Delete counters for this character
+      const countersQuery = query(
+        collection(firestore, 'counters'),
+        where('charname', '==', characterName)
+      );
+      const countersSnapshot = await getDocs(countersQuery);
+
+      const batch = writeBatch(firestore);
+      countersSnapshot.docs.forEach(doc => {
+        batch.delete(doc.ref);
+      });
+
+      await batch.commit();
+      console.log(`Cleared ${countersSnapshot.docs.length} counters for character: ${characterName}`);
+    });
+  }
+
   /**
    * Reset all character flags to 0 (useful for character reset without deletion)
    */
@@ -407,6 +537,7 @@ export class CharacterService {
           quest4: 0,
           quest5: 0,
           shepfeed: 0,
+          sheppet: 0,
           thehiddenkey: 0,
           familycrest: 0,
           tutorial_completed: 0,
@@ -438,7 +569,7 @@ export class CharacterService {
         'homeshelf', 'homeshelf2', 'hometable', 'homerug', 'bedroomrug',
         'bedroomwardrobe', 'bedroomdesk', 'bedroomcoatrack', 'bedroomshelf',
         'bedroomchest', 'bedroombed', 'quest1', 'quest2', 'quest3', 'quest4',
-        'quest5', 'shepfeed', 'thehiddenkey', 'familycrest'
+        'quest5', 'shepfeed', 'sheppet', 'thehiddenkey', 'familycrest'
       ];
 
       for (const flag of requiredFlags) {

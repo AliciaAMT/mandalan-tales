@@ -1143,6 +1143,12 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
     if (DEBUG_MAIN) { console.log(`Interacting with ${npc.name}: ${npc.action}`); }
 
     return runInInjectionContext(this.injector, async () => {
+      // Special handling for Old Shep feeding
+      if (npc.name === 'Old Shep') {
+        await this.handleOldShepInteraction();
+        return;
+      }
+
       // Map NPC names to dialogue IDs
       const npcDialogueMap: Record<string, string> = {
         'Father': 'father',
@@ -1161,6 +1167,112 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
         );
       }
     });
+  }
+
+  /**
+   * Handle Old Shep feeding interaction
+   */
+  private async handleOldShepInteraction() {
+    if (!this.currentCharacter) return;
+
+    // Ensure inventory is loaded
+    if (this.inventoryService.inventory.length === 0) {
+      await this.inventoryService.loadInventory();
+    }
+
+    // Check if player has raw meat
+    const hasRawMeat = this.inventoryService.hasItem('Raw Meat');
+
+    // Check current shepfeed state
+    const flags = await this.characterService.getCharacterFlags(this.currentCharacter.name);
+    const shepfeedState = flags?.shepfeed || 0;
+    const sheppetState = flags?.sheppet || 0;
+
+    console.log('[DEBUG] Old Shep Interaction:', {
+      hasRawMeat,
+      shepfeedState,
+      sheppetState,
+      inventory: this.inventoryService.inventory,
+      inventoryLength: this.inventoryService.inventory.length,
+      rawMeatItems: this.inventoryService.inventory.filter(item => item.itemname === 'Raw Meat')
+    });
+
+    // Create action options based on state
+    const actions = [];
+
+    if (hasRawMeat && shepfeedState === 0) {
+      actions.push({ label: 'Feed Old Shep Raw Meat', value: 'feed' });
+    }
+
+    // Always show pet option, but behavior will differ based on feeding state
+    actions.push({ label: 'Pet Old Shep', value: 'pet' });
+    actions.push({ label: 'Cancel', value: 'cancel' });
+
+    console.log('[DEBUG] Available actions:', actions);
+
+    const action = await this.openItemModal(
+      [],
+      'Old Shep looks at you with interest. What would you like to do?',
+      actions
+    );
+
+    if (action === 'feed') {
+      // Feed Old Shep
+      await this.inventoryService.removeItem('Raw Meat', 1);
+      await this.characterService.setCharacterFlag(this.currentCharacter.name, 'shepfeed', 1);
+
+      await this.openItemModal(
+        [],
+        'You feed Old Shep some raw meat. He happily devours it and wags his tail. He seems much friendlier now!'
+      );
+    } else if (action === 'pet') {
+      // Pet Old Shep - behavior depends on feeding state
+      if (shepfeedState === 0) {
+        // Try to pet without feeding first - Old Shep bites you!
+        const characters = this.characterService.getCharacters();
+        const character = characters.find(c => c.name === this.currentCharacter!.name);
+        if (character && character.id) {
+          const newLife = Math.max(0, character.life - 5);
+          await this.characterService.updateCharacter(character.id, {
+            life: newLife
+          });
+        }
+
+        await this.openItemModal(
+          [],
+          'You try to pet Old Shep, but he snarls and bites you! Maybe Old Shep is hungry. He sure took a bite out of your arm! -5 Life'
+        );
+      } else {
+        // Pet after feeding - safe to pet
+        if (sheppetState === 0) {
+          await this.characterService.setCharacterFlag(this.currentCharacter.name, 'sheppet', 1);
+          await this.openItemModal(
+            [],
+            'You pet Old Shep gently. He wags his tail and seems very happy with the attention!'
+          );
+        } else {
+          await this.openItemModal(
+            [],
+            'You pet Old Shep again. He enjoys the attention and wags his tail contentedly.'
+          );
+        }
+      }
+    } else if (action === 'cancel') {
+      // Do nothing, modal will close
+    } else {
+      // No raw meat or other state
+      if (!hasRawMeat && shepfeedState === 0) {
+        await this.openItemModal(
+          [],
+          'Old Shep looks hungry and whimpers. You need raw meat to feed him.'
+        );
+      } else if (shepfeedState >= 1) {
+        await this.openItemModal(
+          [],
+          'Old Shep looks at you with gratitude. He seems content and well-fed.'
+        );
+      }
+    }
   }
 
   // Debug method to check NPC visibility

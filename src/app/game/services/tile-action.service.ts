@@ -412,7 +412,7 @@ export class TileActionService {
       itemDescription: 'This key appears to be made out of Bone, and is shaped like a bone as well.',
       itemImage: 'bonekey', itemType: 'Other',
       itemOptions: { itemrarity: 'Unique', itemlevel: 2, othertype: 'Key' },
-      flagKey: 'shepfeed', experience: 5,
+      experience: 5,
       message: 'You search Shep\'s dog house and find a bone key.',
       alreadyFoundMessage: 'You search Shep\'s Dog House but find nothing.'
     },
@@ -837,6 +837,12 @@ export class TileActionService {
     if (!tileAction) {
       return { message: 'There is nothing to find here.', items: [], success: false };
     }
+
+    // Special handling for dog house (yard, 3, 3)
+    if (map === 'yard' && x === 3 && y === 3) {
+      return await this.handleDogHouseInteraction(characterName);
+    }
+
     const alreadyFound = await this.isItemAlreadyFound(tileAction, characterName);
     if (alreadyFound) {
       return { message: tileAction.alreadyFoundMessage || 'You find nothing new.', items: [], success: false };
@@ -868,5 +874,80 @@ export class TileActionService {
     }
 
     return { message: tileAction.message, items, success: true };
+  }
+
+  /**
+   * Handle dog house interaction based on Old Shep's feeding state
+   */
+  private async handleDogHouseInteraction(characterName: string): Promise<TileActionResult> {
+    const flags = await this.characterService.getCharacterFlags(characterName);
+    const shepfeedState = flags?.shepfeed || 0;
+
+    if (shepfeedState === 0) {
+      // Old Shep bites you - lose 5 life
+      const characters = this.characterService.getCharacters();
+      const character = characters.find(c => c.name === characterName);
+      if (character && character.id) {
+        const newLife = Math.max(0, character.life - 5);
+        await this.characterService.updateCharacter(character.id, {
+          life: newLife
+        });
+      }
+
+      return {
+        message: 'You search the dog house and notice something strange in Shep\'s food bowl. You reach into the little house to get the strange item when Old Shep snarls and bites you! Maybe Old Shep is hungry. He sure took a bite out of your arm! -5 Life',
+        items: [],
+        success: false
+      };
+    } else if (shepfeedState === 1) {
+      // Get the bone key
+      const boneKeyItem = this.inventoryService.createBasicItem(
+        'Bone Key',
+        'This key appears to be made out of Bone, and is shaped like a bone as well.',
+        'Other',
+        'bonekey',
+        1,
+        { itemrarity: 'Unique', itemlevel: 2, othertype: 'Key' }
+      );
+
+      const itemSuccess = await this.inventoryService.addItem(boneKeyItem);
+      if (!itemSuccess) {
+        return {
+          message: 'Your inventory is full. Cannot add the bone key.',
+          items: [],
+          success: false
+        };
+      }
+
+      // Set shepfeed to 2 (key found)
+      await this.characterService.setCharacterFlag(characterName, 'shepfeed', 2);
+
+      // Give experience
+      const characters = this.characterService.getCharacters();
+      const character = characters.find(c => c.name === characterName);
+      if (character && character.id) {
+        await this.characterService.updateCharacter(character.id, {
+          experience: character.experience + 5
+        });
+      }
+
+      return {
+        message: 'You search the dog house and notice something strange in Shep\'s food bowl. You reach into the little house to get the strange item and find a bone key!',
+        items: [{
+          name: 'Bone Key',
+          description: 'This key appears to be made out of Bone, and is shaped like a bone as well.',
+          image: 'bonekey',
+          quantity: 1
+        }],
+        success: true
+      };
+    } else {
+      // Already found the key (shepfeed === 2)
+      return {
+        message: 'You search Shep\'s Dog House but find nothing.',
+        items: [],
+        success: false
+      };
+    }
   }
 }

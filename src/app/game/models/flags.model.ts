@@ -33,6 +33,7 @@ export interface Flags {
 
   // NPC interaction flags
   shepfeed: number; // Old Shep feeding state (0-3)
+  sheppet: number; // Old Shep petting state (0-1)
 
   // Item flags
   thehiddenkey: number; // Hidden key state (0-3)
@@ -74,6 +75,7 @@ export const DEFAULT_FLAGS: Omit<Flags, 'charname'> = {
   quest4: 0,
   quest5: 0,
   shepfeed: 0,
+  sheppet: 0,
   thehiddenkey: 0,
   familycrest: 0,
   tutorial_completed: 0,

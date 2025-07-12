@@ -229,7 +229,23 @@ export class DashboardComponent implements OnInit {
       const keysToRemove = [];
       for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
-        if (key && key.includes(`_${character.name}_`)) {
+        if (key && (
+          key.includes(`_${character.name}_`) ||
+          key.includes('rug_') ||
+          key.includes('chest_') ||
+          key.includes('pantry_') ||
+          key.includes('herbrack_') ||
+          key.includes('shelf_') ||
+          key.includes('drawer_') ||
+          key.includes('table_') ||
+          key.includes('wardrobe_') ||
+          key.includes('desk_') ||
+          key.includes('coatrack_') ||
+          key.includes('bed_') ||
+          key.includes('fireplace_') ||
+          key.includes('rack_') ||
+          key.includes('contentcollapse')
+        )) {
           keysToRemove.push(key);
         }
       }
@@ -257,7 +273,47 @@ export class DashboardComponent implements OnInit {
         console.error('Error clearing replenishment data:', error);
       }
 
-      // 4. Reset all character flags to 0 (like a new character)
+      // 4. Clear skills for this character from Firestore
+      try {
+        await this.characterService.clearCharacterSkills(character.name);
+        console.log('Cleared skills from Firestore');
+      } catch (error) {
+        console.error('Error clearing skills:', error);
+      }
+
+      // 5. Clear spellbook for this character from Firestore
+      try {
+        await this.characterService.clearCharacterSpellbook(character.name);
+        console.log('Cleared spellbook from Firestore');
+      } catch (error) {
+        console.error('Error clearing spellbook:', error);
+      }
+
+      // 6. Clear cookbook for this character from Firestore
+      try {
+        await this.characterService.clearCharacterCookbook(character.name);
+        console.log('Cleared cookbook from Firestore');
+      } catch (error) {
+        console.error('Error clearing cookbook:', error);
+      }
+
+      // 7. Clear enemy data for this character from Firestore
+      try {
+        await this.characterService.clearCharacterEnemyData(character.name);
+        console.log('Cleared enemy data from Firestore');
+      } catch (error) {
+        console.error('Error clearing enemy data:', error);
+      }
+
+      // 8. Clear counters for this character from Firestore
+      try {
+        await this.characterService.clearCharacterCounters(character.name);
+        console.log('Cleared counters from Firestore');
+      } catch (error) {
+        console.error('Error clearing counters:', error);
+      }
+
+      // 9. Reset all character flags to 0 (like a new character)
       try {
         await this.characterService.resetCharacterFlags(character.name);
         console.log('Reset all character flags to 0');
@@ -265,10 +321,7 @@ export class DashboardComponent implements OnInit {
         console.error('Error resetting character flags:', error);
       }
 
-      // 5. Reset character stats to default (optional - uncomment if you want this)
-      // await this.characterService.resetCharacterStats(character.id);
-
-      // 6. Reset character level to 1 (leave other stats alone)
+      // 10. Reset character level to 1 (leave other stats alone)
       if (character.id) {
         await this.characterService.updateCharacter(character.id, { level: 1 });
         console.log('Reset character level to 1');
