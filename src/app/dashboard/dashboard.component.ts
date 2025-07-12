@@ -8,7 +8,7 @@ import { CommonModule } from '@angular/common';
 import { User } from '@angular/fire/auth';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../services/auth.service';
-import { ModalController, AlertController } from '@ionic/angular/standalone';
+import { ModalController, AlertController, ToastController } from '@ionic/angular/standalone';
 import { CharacterDetailsModalComponent } from './character-details-modal/character-details-modal.component';
 import { SettingsService } from '../game/services/settings.service';
 import { DEFAULT_THEME_COLOR } from '../game/models/settings.model';
@@ -32,6 +32,7 @@ export class DashboardComponent implements OnInit {
   private modalCtrl: ModalController = inject(ModalController);
   private settingsService: SettingsService = inject(SettingsService);
   private alertCtrl: AlertController = inject(AlertController);
+  private toastCtrl: ToastController = inject(ToastController);
 
   // Expose the character service signal directly
   characters = this.characterService.characters;
@@ -163,16 +164,33 @@ export class DashboardComponent implements OnInit {
       if (this.selectedCharacterId === character.id) {
         this.selectedCharacterId = null;
       }
-      // Show success alert at dashboard level
-      const successAlert = await this.alertCtrl.create({
-        header: 'Character Deleted',
-        message: `"${character.name}" and all associated data have been permanently removed.`,
-        buttons: ['OK'],
-        backdropDismiss: false,
-        keyboardClose: true
+
+      // Show success toast instead of alert
+      const toast = await this.toastCtrl.create({
+        message: `Character "${character.name}" and all associated data have been permanently removed.`,
+        duration: 3000,
+        position: 'top',
+        color: 'success'
       });
-      await successAlert.present();
-      await successAlert.onDidDismiss();
+      toast.role = 'alert';
+      await toast.present();
+
+      // Focus management: move focus to create character button or beginning of page
+      setTimeout(() => {
+        // Try to find the create character button first
+        const createButton = document.querySelector('ion-button[routerlink="/create-account"]') as HTMLElement;
+        if (createButton && document.contains(createButton)) {
+          createButton.focus();
+          console.log('Focus moved to create character button');
+        } else {
+          // Fallback: focus the dashboard focus anchor at the top
+          const anchor = document.getElementById('dashboard-focus-anchor') as HTMLElement;
+          if (anchor) {
+            anchor.focus();
+            console.log('Focus moved to dashboard anchor');
+          }
+        }
+      }, 100);
     }
   }
 
@@ -198,19 +216,36 @@ export class DashboardComponent implements OnInit {
   }
 
   async resetTestData(character: CharStats): Promise<void> {
+    // Store the currently focused element before showing the alert
+    const focusedElement = document.activeElement as HTMLElement;
+    console.log('Initial focused element:', focusedElement);
+
     const alert = await this.alertCtrl.create({
       header: 'Reset Character',
       message: `This will completely reset "${character.name}" to a brand new state. This will delete ALL inventory items, clear ALL game progress, and reset ALL flags. This action cannot be undone.`,
       buttons: [
         {
           text: 'Cancel',
-          role: 'cancel'
+          role: 'cancel',
+          handler: () => {
+            console.log('Cancel clicked, restoring focus to:', focusedElement);
+            // Restore focus when user cancels
+            if (focusedElement && document.contains(focusedElement)) {
+              setTimeout(() => {
+                if (document.contains(focusedElement)) {
+                  focusedElement.focus();
+                  console.log('Focus restored after cancel to:', focusedElement);
+                }
+              }, 100);
+            }
+          }
         },
         {
           text: 'Reset Character',
           role: 'destructive',
           handler: () => {
-            this.performCharacterReset(character);
+            console.log('Reset clicked, proceeding with reset for element:', focusedElement);
+            this.performCharacterReset(character, focusedElement);
           }
         }
       ],
@@ -221,7 +256,7 @@ export class DashboardComponent implements OnInit {
     await alert.present();
   }
 
-  private async performCharacterReset(character: CharStats): Promise<void> {
+  private async performCharacterReset(character: CharStats, focusedElement: HTMLElement | null): Promise<void> {
     console.log('Performing complete reset for character:', character.name);
 
     try {
@@ -329,15 +364,75 @@ export class DashboardComponent implements OnInit {
 
       console.log('Complete character reset finished for:', character.name);
 
-      // Show success message
-      const successAlert = await this.alertCtrl.create({
-        header: 'Character Reset Complete',
-        message: `"${character.name}" has been completely reset to a brand new state. All inventory, progress, and flags have been cleared.`,
-        buttons: ['OK'],
-        backdropDismiss: false,
-        keyboardClose: true
+      // Show success message as a toast instead of an alert
+      const toast = await this.toastCtrl.create({
+        message: `Character "${character.name}" has been completely reset to a brand new state. All inventory, progress, and flags have been cleared.`,
+        duration: 3000,
+        position: 'top',
+        color: 'success'
       });
-      await successAlert.present();
+      toast.role = 'alert';
+      await toast.present();
+
+      // Focus restoration happens immediately after reset completes
+      console.log('About to restore focus to:', focusedElement);
+
+      // Focus back to the character card for this specific character
+      const characterCards = Array.from(document.querySelectorAll('ion-card'));
+      for (const card of characterCards) {
+        const cardElement = card as HTMLElement;
+        const cardText = cardElement.textContent || '';
+        if (cardText.includes(character.name) && document.contains(cardElement)) {
+          // Try to find a focusable element within this card
+          const focusableElements = Array.from(cardElement.querySelectorAll('ion-button, ion-item, [tabindex], button, a'));
+          for (const element of focusableElements) {
+            const focusableElement = element as HTMLElement;
+            if (document.contains(focusableElement) && focusableElement.offsetParent !== null) {
+              FocusManagerDirective.removeFocusFromNonAlertElements();
+              requestAnimationFrame(() => {
+                focusableElement.focus({ preventScroll: true });
+                console.log('Focus restored to element in character card:', focusableElement);
+              });
+              return;
+            }
+          }
+          // If no focusable element found, make the card itself focusable and focus it
+          cardElement.setAttribute('tabindex', '-1');
+          FocusManagerDirective.removeFocusFromNonAlertElements();
+          requestAnimationFrame(() => {
+            cardElement.focus({ preventScroll: true });
+            console.log('Focus restored to character card:', cardElement);
+          });
+          return;
+        }
+      }
+      // If we can't find the specific character card, try any card
+      const anyCard = document.querySelector('ion-card') as HTMLElement;
+      if (anyCard && document.contains(anyCard)) {
+        const focusableElements = Array.from(anyCard.querySelectorAll('ion-button, ion-item, [tabindex], button, a'));
+        for (const element of focusableElements) {
+          const focusableElement = element as HTMLElement;
+          if (document.contains(focusableElement) && focusableElement.offsetParent !== null) {
+            FocusManagerDirective.removeFocusFromNonAlertElements();
+            requestAnimationFrame(() => {
+              focusableElement.focus({ preventScroll: true });
+              console.log('Focus restored to element in any card:', focusableElement);
+            });
+            return;
+          }
+        }
+      }
+      // Fallback: focus a hidden anchor at the top of the dashboard
+      const anchor = document.getElementById('dashboard-focus-anchor') as HTMLElement;
+      if (anchor) {
+        anchor.setAttribute('tabindex', '-1');
+        requestAnimationFrame(() => {
+          anchor.focus({ preventScroll: true });
+          console.log('Focus restored to dashboard anchor:', anchor);
+        });
+        return;
+      }
+      console.log('No character card or fallback anchor found');
 
     } catch (error) {
       console.error('Error during character reset:', error);
@@ -350,6 +445,35 @@ export class DashboardComponent implements OnInit {
         keyboardClose: true
       });
       await errorAlert.present();
+      await errorAlert.onDidDismiss();
+
+      // Restore focus to the original element after error
+      if (focusedElement && document.contains(focusedElement)) {
+        // First, remove focus from any non-alert elements
+        FocusManagerDirective.removeFocusFromNonAlertElements();
+
+        // Then restore focus to the original element with multiple attempts
+        setTimeout(() => {
+          if (document.contains(focusedElement)) {
+            focusedElement.focus();
+            console.log('Focus restored to:', focusedElement);
+          }
+        }, 100);
+
+        setTimeout(() => {
+          if (document.contains(focusedElement)) {
+            focusedElement.focus();
+            console.log('Second focus attempt to:', focusedElement);
+          }
+        }, 300);
+
+        setTimeout(() => {
+          if (document.contains(focusedElement)) {
+            focusedElement.focus();
+            console.log('Third focus attempt to:', focusedElement);
+          }
+        }, 600);
+      }
     }
   }
 }
