@@ -24,6 +24,12 @@ export interface Flags {
   bedroomchest: number; // Bedroom chest discovered
   bedroombed: number; // Bedroom bed discovered
 
+  // Yard flags
+  yardgarden: number; // Garden harvest state (0-2)
+  yardmelon: number; // Melon plants harvest state (0-2)
+  yardtrees: number; // Fruit tree harvest state (0-2)
+  yardcoop: number; // Chicken coop harvest state (0-2)
+
   // Quest flags
   quest1: number; // Quest 1 completion
   quest2: number; // Quest 2 completion
@@ -69,6 +75,10 @@ export const DEFAULT_FLAGS: Omit<Flags, 'charname'> = {
   bedroomshelf: 0,
   bedroomchest: 0,
   bedroombed: 0,
+  yardgarden: 0,
+  yardmelon: 0,
+  yardtrees: 0,
+  yardcoop: 0,
   quest1: 0,
   quest2: 0,
   quest3: 0,

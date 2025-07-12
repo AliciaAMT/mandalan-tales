@@ -425,8 +425,11 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private isTileClickable(char: CharStats, x: number, y: number): boolean {
-    // Check if tile is adjacent to player
-    const isAdjacent = Math.abs(x - char.xaxis) <= 1 && Math.abs(y - char.yaxis) <= 1;
+    // Check if tile is adjacent to player (only north, south, east, west - no diagonals)
+    const isAdjacent = (
+      (Math.abs(x - char.xaxis) === 1 && y === char.yaxis) || // East/West
+      (Math.abs(y - char.yaxis) === 1 && x === char.xaxis)    // North/South
+    );
 
     // Check if tile is valid and not the player's current position
     return isAdjacent && this.isValidTile(char.map, x, y) && !(x === char.xaxis && y === char.yaxis);
@@ -435,18 +438,23 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
   private getTileAction(char: CharStats, x: number, y: number): string | undefined {
     if (!this.isTileClickable(char, x, y)) return undefined;
 
-    // Determine movement direction
+    // Determine movement direction (only cardinal directions)
     if (x === char.xaxis - 1 && y === char.yaxis) return 'movewest';
     if (x === char.xaxis + 1 && y === char.yaxis) return 'moveeast';
     if (x === char.xaxis && y === char.yaxis + 1) return 'movenorth';
     if (x === char.xaxis && y === char.yaxis - 1) return 'movesouth';
 
-    // Check for special locations that might trigger events
-    // This would be expanded based on the old game logic
-    return 'explore';
+    // No diagonal movement allowed
+    return undefined;
   }
 
   onTileClick(tile: MapTile) {
+    // Handle player tile click for coordinate announcement
+    if (tile.isPlayer) {
+      this.announceToScreenReader(`You are at coordinates ${tile.x}, ${tile.y}`);
+      return;
+    }
+
     if (!tile.isClickable || !tile.action) return;
 
     // Handle different actions
@@ -456,9 +464,6 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
       case 'movenorth':
       case 'movesouth':
         this.movePlayer(tile.action);
-        break;
-      case 'explore':
-        this.exploreTile(tile);
         break;
       default:
         if (DEBUG_MAIN) { console.log('Unknown action:', tile.action); }
@@ -504,19 +509,16 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  private exploreTile(tile: MapTile) {
-    // This would trigger events, encounters, etc.
-    // For now, just log the action
-  }
+
 
   getTileAriaLabel(tile: MapTile): string {
     if (tile.isPlayer) {
-      return `You are here at position ${tile.x}, ${tile.y}`;
+      return `You are here at coordinates ${tile.x}, ${tile.y}. Press Enter or Space to hear your current position.`;
     }
     if (tile.isClickable) {
-      return `Move to ${tile.action} at position ${tile.x}, ${tile.y}`;
+      return `Move ${tile.action} to coordinates ${tile.x}, ${tile.y}`;
     }
-    return `Map tile at position ${tile.x}, ${tile.y}`;
+    return `Map tile at coordinates ${tile.x}, ${tile.y} - not accessible`;
   }
 
   getTileAltText(tile: MapTile): string {

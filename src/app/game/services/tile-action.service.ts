@@ -597,7 +597,15 @@ export class TileActionService {
       flagValue,
       flags
     });
-    // Check if flag is greater than 0 (meaning item has been found)
+
+    // Special handling for yard items that can be collected twice (like old demo)
+    if (tileAction.flagKey === 'yardgarden' || tileAction.flagKey === 'yardmelon' ||
+        tileAction.flagKey === 'yardtrees' || tileAction.flagKey === 'yardcoop') {
+      // Allow collection when flag is 0 or 1, stop at 2
+      return typeof flagValue === 'number' && flagValue >= 2;
+    }
+
+    // For other items, check if flag is greater than 0 (meaning item has been found)
     // This matches the old demo logic where flags were set to 1, 2, etc.
     return typeof flagValue === 'number' && flagValue > 0;
   }
@@ -690,7 +698,17 @@ export class TileActionService {
   private async setItemFlags(tileAction: TileAction, characterName: string): Promise<void> {
     // Set the main flag to prevent finding the item again
     if (tileAction.flagKey) {
-      await this.characterService.setCharacterFlag(characterName, tileAction.flagKey as any, 1);
+      // Special handling for yard items that can be collected twice (like old demo)
+      if (tileAction.flagKey === 'yardgarden' || tileAction.flagKey === 'yardmelon' ||
+          tileAction.flagKey === 'yardtrees' || tileAction.flagKey === 'yardcoop') {
+        const flags = await this.characterService.getCharacterFlags(characterName);
+        const currentFlagValue = flags?.[tileAction.flagKey as keyof typeof flags] || 0;
+        // Increment the flag: 0 -> 1, 1 -> 2
+        await this.characterService.setCharacterFlag(characterName, tileAction.flagKey as any, currentFlagValue + 1);
+      } else {
+        // For other items, just set to 1
+        await this.characterService.setCharacterFlag(characterName, tileAction.flagKey as any, 1);
+      }
     }
 
     // Update quest flag if this action advances a quest

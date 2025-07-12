@@ -531,6 +531,10 @@ export class CharacterService {
           bedroomshelf: 0,
           bedroomchest: 0,
           bedroombed: 0,
+          yardgarden: 0,
+          yardmelon: 0,
+          yardtrees: 0,
+          yardcoop: 0,
           quest1: 0,
           quest2: 0,
           quest3: 0,
@@ -568,8 +572,9 @@ export class CharacterService {
         'homechest', 'homefireplace', 'homepantry', 'homerack', 'homedrawer',
         'homeshelf', 'homeshelf2', 'hometable', 'homerug', 'bedroomrug',
         'bedroomwardrobe', 'bedroomdesk', 'bedroomcoatrack', 'bedroomshelf',
-        'bedroomchest', 'bedroombed', 'quest1', 'quest2', 'quest3', 'quest4',
-        'quest5', 'shepfeed', 'sheppet', 'thehiddenkey', 'familycrest'
+        'bedroomchest', 'bedroombed', 'yardgarden', 'yardmelon', 'yardtrees', 'yardcoop',
+        'quest1', 'quest2', 'quest3', 'quest4', 'quest5', 'shepfeed', 'sheppet',
+        'thehiddenkey', 'familycrest'
       ];
 
       for (const flag of requiredFlags) {

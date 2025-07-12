@@ -116,7 +116,7 @@
                   (keydown.enter)="onTileClick(tile)"
                   (keydown.space)="onTileClick(tile)"
                   [attr.aria-label]="getTileAriaLabel(tile)"
-                  [tabindex]="tile.isClickable ? 0 : -1"
+                  [tabindex]="tile.isClickable || tile.isPlayer ? 0 : -1"
                   role="button"
                 >
                   <img
