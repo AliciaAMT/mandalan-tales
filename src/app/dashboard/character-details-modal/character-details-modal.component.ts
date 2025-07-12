@@ -2,6 +2,7 @@ import { Component, Input, inject } from '@angular/core';
 import {
   ModalController,
   AlertController,
+  LoadingController,
   IonHeader,
   IonToolbar,
   IonTitle,
@@ -337,6 +338,7 @@ export class CharacterDetailsModalComponent {
   private modalCtrl: ModalController = inject(ModalController);
   private alertCtrl: AlertController = inject(AlertController);
   private characterDeletionService: CharacterDeletionService = inject(CharacterDeletionService);
+  private loadingCtrl: LoadingController = inject(LoadingController);
 
   dismiss() {
     this.modalCtrl.dismiss();
@@ -377,47 +379,31 @@ export class CharacterDetailsModalComponent {
     try {
       FocusManagerDirective.removeFocusFromNonAlertElements();
 
-      console.log('Showing loading alert...');
-      const loadingAlert = await this.alertCtrl.create({
-        header: 'Deleting Character',
-        message: 'Removing character and all associated data...',
+      // Use LoadingController for spinner
+      const loading = await this.loadingCtrl.create({
+        message: 'Removing character and all associated data... This may take a few moments',
+        spinner: 'crescent',
         backdropDismiss: false,
         keyboardClose: false
       });
-      await loadingAlert.present();
-      console.log('Loading alert presented.');
+      await loading.present();
 
-      console.log('Calling deleteCharacterCompletely...');
       await this.characterDeletionService.deleteCharacterCompletely(
         this.character.id!,
         this.character.name
       );
-      console.log('deleteCharacterCompletely finished.');
 
-      console.log('Dismissing loading alert...');
-      await loadingAlert.dismiss();
-      console.log('Loading alert dismissed.');
+      await loading.dismiss();
 
-      console.log('About to dismiss modal after successful deletion');
       this.modalCtrl.dismiss({ deleted: true });
-      console.log('Modal dismiss called');
     } catch (error) {
-      console.error('Error deleting character:', error);
-
-      // Dismiss loading alert if it's still showing
+      // Dismiss loading if error occurs
       try {
-        const loadingAlert = document.querySelector('ion-alert');
-        if (loadingAlert) {
-          await this.alertCtrl.dismiss();
-        }
-      } catch (dismissError) {
-        console.warn('Could not dismiss loading alert:', dismissError);
-      }
+        await this.loadingCtrl.dismiss();
+      } catch {}
 
-      // Remove focus from non-alert elements before showing error alert
       FocusManagerDirective.removeFocusFromNonAlertElements();
 
-      // Show error alert
       const errorAlert = await this.alertCtrl.create({
         header: 'Deletion Failed',
         message: `Failed to delete character: ${error}. Please try again or contact support.`,
