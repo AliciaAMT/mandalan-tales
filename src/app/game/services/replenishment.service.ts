@@ -46,27 +46,7 @@ export class ReplenishmentService {
     if (snapshot.empty) {
       // Create initial replenishable items as separate docs
       const initialItems: Omit<ReplenishableItem, 'id'>[] = [
-        {
-          userId,
-          charname: characterName,
-          name: 'Apple Tree',
-          type: 'fruit',
-          location: 'yard',
-          x: 3,
-          y: 1,
-          lastHarvested: 0,
-          respawnTime: 5 * 60 * 1000, // 5 minutes
-          maxQuantity: 3,
-          currentQuantity: 3,
-          itemData: {
-            name: 'Apple',
-            description: 'A ripe apple from the tree.',
-            type: 'Food',
-            image: 'apple',
-            quantity: 1,
-            options: { consumable: 1 }
-          }
-        },
+        // Apple Tree removed - now handled by tile action service
         {
           userId,
           charname: characterName,
@@ -139,11 +119,26 @@ export class ReplenishmentService {
     } else {
       // Load existing items
       const items: ReplenishableItem[] = snapshot.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() } as ReplenishableItem));
+
+      // Filter out Apple Tree items that conflict with tile action service
+      const filteredItems = items.filter(item => !(item.name === 'Apple Tree' && item.location === 'yard' && item.x === 3 && item.y === 1));
+
       // Check for respawns
-      const updatedItems = items.map(item => this.checkRespawn(item));
+      const updatedItems = filteredItems.map(item => this.checkRespawn(item));
       this.replenishableItems.set(updatedItems);
-      // Optionally update respawned items in Firestore
-      // (left as an exercise for batch update)
+
+      // If we filtered out any Apple Tree items, delete them from Firestore
+      const itemsToDelete = items.filter(item => item.name === 'Apple Tree' && item.location === 'yard' && item.x === 3 && item.y === 1);
+      if (itemsToDelete.length > 0) {
+        console.log('Removing conflicting Apple Tree items from database');
+        const { deleteDoc } = await import('@angular/fire/firestore');
+        for (const item of itemsToDelete) {
+          if (item.id) {
+            const docRef = doc(this.firestore, 'replenishableItems', item.id);
+            await deleteDoc(docRef);
+          }
+        }
+      }
     }
   }
 

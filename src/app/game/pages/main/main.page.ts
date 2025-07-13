@@ -67,14 +67,14 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
   isTileActionsOpen = true;
   isMenuOpen = true;
   isLoading = true;
-  private replenishmentInitialized = false;
+  // private replenishmentInitialized = false; // Not used yet - future feature
 
   characterService = inject(CharacterService);
   settingsService = inject(SettingsService);
   authService = inject(AuthService);
   inventoryService = inject(InventoryService);
   dialogueService = inject(DialogueService);
-  replenishmentService = inject(ReplenishmentService);
+  // replenishmentService = inject(ReplenishmentService); // Not used yet - future feature
   // objectInteractionService = inject(ObjectInteractionService);
   tileActionService = inject(TileActionService);
   private injector = inject(Injector);
@@ -149,15 +149,23 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
           this.lastCharacterY = currentChar.yaxis;
           this.lastCharacterMap = currentChar.map;
           // Reset replenishment flag when character changes
-          this.resetReplenishmentInitialization();
+          // this.resetReplenishmentInitialization(); // Not used yet - future feature
         }
       }
     });
   }
 
-  private resetReplenishmentInitialization() {
-    // Reset the flag so replenishment can be initialized for new characters
-    this.replenishmentInitialized = false;
+  // private resetReplenishmentInitialization() {
+  //   // Reset the flag so replenishment can be initialized for new characters
+  //   this.replenishmentInitialized = false;
+  // } // Not used yet - future feature
+
+  /**
+   * Clear object cache to force refresh
+   */
+  private clearObjectCache() {
+    this._lastObjectPosition = '';
+    this._cachedObjects = [];
   }
 
   async ngOnInit() {
@@ -184,23 +192,8 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
     await this.inventoryService.loadInventory();
     if (DEBUG_MAIN) { console.log('Current inventory:', this.inventoryService.inventory); }
 
-    // Initialize replenishable items for current character
-    if (
-      this.currentCharacter &&
-      typeof this.currentCharacter.name === 'string' &&
-      typeof this.currentCharacter.userId === 'string' &&
-      !this.replenishmentInitialized
-    ) {
-      const charName = this.currentCharacter.name as unknown as string;
-      const userId = this.currentCharacter.userId as unknown as string;
-      await (this.replenishmentService.initializeReplenishableItems as (name: string, userId: string) => Promise<void>)(
-        this.currentCharacter.name!,
-        this.currentCharacter.userId!
-      );
-      this.replenishmentInitialized = true;
-    } else if (!this.currentCharacter?.name || !this.currentCharacter?.userId) {
-      if (DEBUG_MAIN) { console.error('currentCharacter.name or userId is undefined!'); }
-    }
+    // Replenishment system is for future features - not used yet
+    // All harvestable items use tile action service with flags
 
     // Generate initial map
     this.generateMap();
@@ -980,7 +973,7 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
           name: 'Melon Plants',
           image: 'pumpkinplant',
           description: 'Growing melon plants in the garden.',
-          action: 'harvest'
+          action: 'search'
         });
       }
       if (xaxis === 3 && yaxis === 2) {
@@ -996,7 +989,7 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
           name: 'Garden',
           image: 'plants',
           description: 'A small vegetable garden.',
-          action: 'harvest'
+          action: 'search'
         });
       }
       if (xaxis === 3 && yaxis === 1) {
@@ -1004,32 +997,13 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
           name: 'Fruit Tree',
           image: 'fruittree',
           description: 'A tree bearing delicious fruit.',
-          action: 'harvest'
+          action: 'search'
         });
       }
     }
 
-    // Add replenishable items from the service
-    if (this.currentCharacter) {
-      const replenishableItems = this.replenishmentService.getReplenishableItems(
-        this.currentCharacter.map,
-        this.currentCharacter.xaxis,
-        this.currentCharacter.yaxis
-      );
-
-      replenishableItems.forEach(item => {
-        const statusText = item.currentQuantity > 0
-          ? ` (${item.currentQuantity} available)`
-          : ' (depleted)';
-
-        objects.push({
-          name: item.name,
-          image: this.getReplenishableItemImage(item),
-          description: `${item.name}${statusText}`,
-          action: 'harvest'
-        });
-      });
-    }
+    // Replenishment system is for future features - not used yet
+    // All harvestable items should use tile action service with flags
 
     if (DEBUG_MAIN) { console.log('Returning objects:', objects); }
 
@@ -1043,18 +1017,18 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
   /**
    * Get the appropriate image for a replenishable item
    */
-  private getReplenishableItemImage(item: ReplenishableItem): string {
-    switch (item.type) {
-      case 'fruit':
-        return 'fruittree';
-      case 'herb':
-        return 'herbrack';
-      case 'resource':
-        return 'plants';
-      default:
-        return 'plants';
-    }
-  }
+  // private getReplenishableItemImage(item: ReplenishableItem): string {
+  //   switch (item.type) {
+  //     case 'fruit':
+  //     return 'fruittree';
+  //     case 'herb':
+  //     return 'herbrack';
+  //     case 'resource':
+  //     return 'plants';
+  //     default:
+  //     return 'plants';
+  //   }
+  // } // Not used yet - future feature
 
   getCurrentPortals(): Portal[] {
     if (!this.currentCharacter) return [];
@@ -1381,9 +1355,37 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
         }
         break;
       case 'melon plants':
+        if (this.currentCharacter) {
+          const result = await this.tileActionService.handleTileAction(
+            this.currentCharacter.map,
+            this.currentCharacter.xaxis,
+            this.currentCharacter.yaxis,
+            this.currentCharacter.name
+          );
+          await this.openItemModal(result.items || [], result.message);
+        }
+        break;
       case 'garden':
+        if (this.currentCharacter) {
+          const result = await this.tileActionService.handleTileAction(
+            this.currentCharacter.map,
+            this.currentCharacter.xaxis,
+            this.currentCharacter.yaxis,
+            this.currentCharacter.name
+          );
+          await this.openItemModal(result.items || [], result.message);
+        }
+        break;
       case 'fruit tree':
-        await this.handleHarvest(object.name);
+        if (this.currentCharacter) {
+          const result = await this.tileActionService.handleTileAction(
+            this.currentCharacter.map,
+            this.currentCharacter.xaxis,
+            this.currentCharacter.yaxis,
+            this.currentCharacter.name
+          );
+          await this.openItemModal(result.items || [], result.message);
+        }
         break;
       case 'chest':
         await this.handleChest();
@@ -1493,105 +1495,17 @@ export class MainPage implements OnInit, AfterViewInit, OnDestroy {
 
   /**
    * Handle harvesting from plants/trees
+   * Note: This method is deprecated - all items should use tile action service with flags
    */
   private async handleHarvest(plantName: string) {
     if (!this.currentCharacter) return;
 
-    // Check for replenishable items at current location
-    const replenishableItems = this.replenishmentService.getReplenishableItems(
-      this.currentCharacter.map,
-      this.currentCharacter.xaxis,
-      this.currentCharacter.yaxis
+    // All harvestable items should use tile action service with flags
+    // This method is kept for backward compatibility but should not be used
+    await this.openItemModal(
+      [],
+      `Harvesting from ${plantName} should use the tile action service. This is a deprecated method.`
     );
-
-    // Find matching replenishable item by name
-    const matchingItem = replenishableItems.find(item =>
-      item.name.toLowerCase().includes(plantName.toLowerCase()) ||
-      plantName.toLowerCase().includes(item.name.toLowerCase())
-    );
-
-    if (
-      matchingItem &&
-      matchingItem.currentQuantity > 0 &&
-      this.currentCharacter.name &&
-      matchingItem.id
-    ) {
-      // Harvest from replenishable source
-      const harvestedItem = await this.replenishmentService.harvestItem(
-        this.currentCharacter.name,
-        matchingItem.id
-      );
-
-      if (harvestedItem) {
-        const item = this.inventoryService.createBasicItem(
-          harvestedItem.itemData.name,
-          harvestedItem.itemData.description,
-          harvestedItem.itemData.type,
-          harvestedItem.itemData.image,
-          harvestedItem.itemData.quantity,
-          harvestedItem.itemData.options || {}
-        );
-
-        const success = await this.inventoryService.addItem(item);
-        if (success) {
-          const foundItems: FoundItem[] = [{
-            name: harvestedItem.itemData.name,
-            description: harvestedItem.itemData.description,
-            image: harvestedItem.itemData.image,
-            quantity: harvestedItem.itemData.quantity
-          }];
-          const remainingText = harvestedItem.currentQuantity > 0
-            ? `(${harvestedItem.currentQuantity} remaining)`
-            : '(depleted)';
-          await this.openItemModal(
-            foundItems,
-            `You harvest a ${harvestedItem.itemData.name.toLowerCase()} from the ${matchingItem.name.toLowerCase()}. ${remainingText}`
-          );
-        } else {
-          await this.openItemModal(
-            [],
-            'Your inventory is full.'
-          );
-        }
-      }
-    } else {
-      // Fallback to old static harvest logic for non-replenishable items
-      const harvestResults: { [key: string]: any } = {
-        'melon plants': { name: 'Melon', type: 'Food', image: 'melon', description: 'A juicy melon from the garden.' },
-        'garden': { name: 'Vegetable', type: 'Food', image: 'vegetable', description: 'Fresh vegetables from the garden.' }
-      };
-
-      const result = harvestResults[plantName.toLowerCase()];
-      if (result) {
-        const item = this.inventoryService.createBasicItem(
-          result.name,
-          result.description,
-          result.type,
-          result.image,
-          1,
-          { consumable: 1 }
-        );
-
-        const success = await this.inventoryService.addItem(item);
-        if (success) {
-          const foundItems: FoundItem[] = [{
-            name: result.name,
-            description: result.description,
-            image: result.image,
-            quantity: 1
-          }];
-          await this.openItemModal(
-            foundItems,
-            `You harvest a ${result.name.toLowerCase()} from the ${plantName.toLowerCase()}.`
-          );
-        } else {
-          await this.openItemModal(
-            [],
-            'Your inventory is full.'
-          );
-        }
-      }
-    }
   }
 
   /**

@@ -595,14 +595,27 @@ export class TileActionService {
       characterName,
       flagKey: tileAction.flagKey,
       flagValue,
-      flags
+      isYardItem: tileAction.flagKey === 'yardgarden' || tileAction.flagKey === 'yardmelon' ||
+                  tileAction.flagKey === 'yardtrees' || tileAction.flagKey === 'yardcoop',
+      shouldStop: tileAction.flagKey === 'yardgarden' || tileAction.flagKey === 'yardmelon' ||
+                  tileAction.flagKey === 'yardtrees' || tileAction.flagKey === 'yardcoop'
+                  ? (typeof flagValue === 'number' && flagValue >= 2)
+                  : (typeof flagValue === 'number' && flagValue > 0)
     });
 
     // Special handling for yard items that can be collected twice (like old demo)
     if (tileAction.flagKey === 'yardgarden' || tileAction.flagKey === 'yardmelon' ||
         tileAction.flagKey === 'yardtrees' || tileAction.flagKey === 'yardcoop') {
       // Allow collection when flag is 0 or 1, stop at 2
-      return typeof flagValue === 'number' && flagValue >= 2;
+      // Handle undefined flags as 0 (for existing characters without yard flags)
+      const effectiveFlagValue = typeof flagValue === 'number' ? flagValue : 0;
+      console.log('[DEBUG] Yard item check:', {
+        flagKey: tileAction.flagKey,
+        flagValue,
+        effectiveFlagValue,
+        shouldStop: effectiveFlagValue >= 2
+      });
+      return effectiveFlagValue >= 2;
     }
 
     // For other items, check if flag is greater than 0 (meaning item has been found)
@@ -702,11 +715,26 @@ export class TileActionService {
       if (tileAction.flagKey === 'yardgarden' || tileAction.flagKey === 'yardmelon' ||
           tileAction.flagKey === 'yardtrees' || tileAction.flagKey === 'yardcoop') {
         const flags = await this.characterService.getCharacterFlags(characterName);
-        const currentFlagValue = flags?.[tileAction.flagKey as keyof typeof flags] || 0;
+        const currentFlagValue = typeof flags?.[tileAction.flagKey as keyof typeof flags] === 'number'
+          ? flags[tileAction.flagKey as keyof typeof flags]
+          : 0;
+        const newFlagValue = currentFlagValue + 1;
+        console.log('[DEBUG] setItemFlags - yard item:', {
+          characterName,
+          flagKey: tileAction.flagKey,
+          currentFlagValue,
+          newFlagValue,
+          action: 'incrementing flag'
+        });
         // Increment the flag: 0 -> 1, 1 -> 2
-        await this.characterService.setCharacterFlag(characterName, tileAction.flagKey as any, currentFlagValue + 1);
+        await this.characterService.setCharacterFlag(characterName, tileAction.flagKey as any, newFlagValue);
       } else {
         // For other items, just set to 1
+        console.log('[DEBUG] setItemFlags - regular item:', {
+          characterName,
+          flagKey: tileAction.flagKey,
+          settingTo: 1
+        });
         await this.characterService.setCharacterFlag(characterName, tileAction.flagKey as any, 1);
       }
     }
